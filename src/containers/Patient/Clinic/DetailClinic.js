@@ -64,7 +64,7 @@ class DetailClinic extends Component {
             <div className="detail-clinic-container">
                 <HomeHeader />
                 <div className="detail-clinic-body">
-                    <div className="description-specialty">
+                    <div className="description-clinic">
                         {dataDetailClinic && !_.isEmpty(dataDetailClinic) && (
                             <>
                                 <div>{dataDetailClinic.name}</div>
@@ -99,7 +99,7 @@ class DetailClinic extends Component {
                                                 doctorIdFromParent={item}
                                             />
                                         </div>
-                                        <div className="doctor-extra-info">
+                                        <div className="doctor-extra-infor">
                                             <DoctorExtraInfor
                                                 doctorIdFromParent={item}
                                             />
