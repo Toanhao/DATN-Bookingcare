@@ -1,7 +1,7 @@
 import { Component } from "react";
 import { connect } from "react-redux";
 import { postVerifyBookAppointment } from "../../services/userService";
-import HomeHeader from "../HomePage/HomeHeader";
+import HomeHeader from "../HomePage/HomeHeader/HomeHeader";
 import "./VerifyEmail.scss";
 
 class VerifyEmail extends Component {

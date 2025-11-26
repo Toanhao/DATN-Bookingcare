@@ -2,74 +2,69 @@
 
 import React, { Component } from "react";
 import { connect } from "react-redux";
-import "./Specialty.scss";
+import "./MedicalFacility.scss";
 import { FormattedMessage } from "react-intl";
 import Slider from "react-slick";
-import "slick-carousel/slick/slick.css";
-import "slick-carousel/slick/slick-theme.css";
-import { getAllSpecialty } from "../../../services/userService";
+import { getAllClinic } from "../../../../services/userService";
 import { withRouter } from "react-router";
 
-
-class Specialty extends Component {
+class MedicalFacility extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            dataSpecialty: [],
+            dataClinics: [],
         };
     }
 
     async componentDidMount() {
-        let res = await getAllSpecialty();
+        let res = await getAllClinic();
         if (res && res.errCode === 0) {
             this.setState({
-                dataSpecialty: res.data ? res.data : [],
+                dataClinics: res.data ? res.data : [],
             });
         }
     }
 
-    handleViewDetailSpecialty = (item) => {
+    handleViewDetailClinic = (clinic) => {
         if (this.props.history) {
-            this.props.history.push(`/detail-specialty/${item.id}`);
+            this.props.history.push(`/detail-clinic/${clinic.id}`);
         }
     };
-
     render() {
-        let { dataSpecialty } = this.state;
-
+        let { dataClinics } = this.state;
         return (
-            <div className="section-share section-specialty">
+            <div className="section-share section-medical-facility">
                 <div className="section-container">
                     <div className="section-header">
                         <span className="title-section">
-                            <FormattedMessage id="homepage.specialty" />
+                            <FormattedMessage id="homepage.facilities" />
                         </span>
                         <button className="btn-section">
                             <FormattedMessage id="homepage.more-infor" />
                         </button>
                     </div>
-                    <div className="section-body">
+                    <div className="section-body section-medical-facility">
                         <Slider {...this.props.settings}>
-                            {dataSpecialty &&
-                                dataSpecialty.length > 0 &&
-                                dataSpecialty.map((item, index) => {
+                            {dataClinics &&
+                                dataClinics.length > 0 &&
+                                dataClinics.map((item, index) => {
                                     return (
                                         <div
-                                            className="section-customize specialty-child"
+                                            className="section-customize clinic-child"
                                             key={index}
                                             onClick={() =>
-                                                this.handleViewDetailSpecialty(
+                                                this.handleViewDetailClinic(
                                                     item
                                                 )
                                             }
                                         >
                                             <div
-                                                className="bg-image section-specialty"
+                                                className="bg-image section-medical-facility"
                                                 style={{
                                                     backgroundImage: `url(${item.image})`,
                                                 }}
                                             />
-                                            <div className="specialty-name">
+                                            <div className="clinic-name">
                                                 {item.name}
                                             </div>
                                         </div>
@@ -86,7 +81,6 @@ class Specialty extends Component {
 const mapStateToProps = (state) => {
     return {
         isLoggedIn: state.user.isLoggedIn,
-        language: state.app.language,
     };
 };
 
@@ -95,5 +89,5 @@ const mapDispatchToProps = (dispatch) => {
 };
 
 export default withRouter(
-    connect(mapStateToProps, mapDispatchToProps)(Specialty)
+    connect(mapStateToProps, mapDispatchToProps)(MedicalFacility)
 );

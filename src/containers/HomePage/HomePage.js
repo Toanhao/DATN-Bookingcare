@@ -1,15 +1,15 @@
-import { Component } from "react";
-import { connect } from "react-redux";
-import HomeHeader from "./HomeHeader";
-import Specialty from "./Section/Specialty";
-import About from "./Section/About";
-import HomeFooter from "./HomeFooter";
-// import HandBook from "./Section/HandBook";
-import MedicalFacility from "./Section/MedicalFacility";
-import OutStandingDoctor from "./Section/OutStandingDoctor";
-import "./HomePage.scss";
-import "slick-carousel/slick/slick.css";
-import "slick-carousel/slick/slick-theme.css";
+import { Component } from 'react';
+import { connect } from 'react-redux';
+import HomeHeader from './HomeHeader/HomeHeader';
+import Specialty from './Section/Speciatly/Specialty';
+import About from './Section/About/About';
+import HomeFooter from './HomeFooter/HomeFooter';
+import HandBook from './Section/HandBook/HandBook';
+import MedicalFacility from './Section/MedicalFacility/MedicalFacility';
+import OutStandingDoctor from './Section/OutStandingDoctor/OutStandingDoctor';
+import './HomePage.scss';
+import 'slick-carousel/slick/slick.css';
+import 'slick-carousel/slick/slick-theme.css';
 class HomePage extends Component {
   render() {
     var settings = {
@@ -26,7 +26,7 @@ class HomePage extends Component {
         <OutStandingDoctor settings={settings} />
         <Specialty settings={settings} />
         <MedicalFacility settings={settings} />
-        {/* <HandBook settings={settings} /> */}
+        <HandBook settings={settings} />
         <About />
         <HomeFooter />
       </div>

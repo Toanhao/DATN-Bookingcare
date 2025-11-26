@@ -3,7 +3,7 @@
 import { Component } from "react";
 import { connect } from "react-redux";
 import "./DetailClinic.scss";
-import HomeHeader from "../../HomePage/HomeHeader";
+import HomeHeader from "../../HomePage/HomeHeader/HomeHeader";
 import ProfileDoctor from "../Doctor/ProfileDoctor";
 import DoctorSchedule from "../Doctor/DoctorSchedule";
 import DoctorExtraInfor from "../Doctor/DoctorExtraInfor";
