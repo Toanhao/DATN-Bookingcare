@@ -1,9 +1,10 @@
-/* Styles moved from HomePage.scss: .home-footer */
+
 .home-footer {
   background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
   color: #ffffff;
   padding: 40px 20px 20px;
-  margin-top: 60px;
+  // margin-top: 60px;
+  flex-shrink: 0;
 
   .footer-container {
     max-width: 1200px;

@@ -20,6 +20,7 @@ import Home from "../routes/Home";
 import Login from "../containers/Auth/Login";
 import System from "../routes/System";
 import ConfirmModal from "../components/ConfirmModal";
+import ChatWidget from "../components/ChatWidget/ChatWidget";
 
 class App extends Component {
     handlePersistorState = () => {
@@ -94,19 +95,6 @@ class App extends Component {
                             </CustomScrollbars>
                         </span>
 
-                        {/* <ToastContainer
-                            className="toast-container"
-                            toastClassName="toast-item"
-                            bodyClassName="toast-item-body"
-                            autoClose={false}
-                            hideProgressBar={true}
-                            pauseOnHover={false}
-                            pauseOnFocusLoss={true}
-                            closeOnClick={false}
-                            draggable={false}
-                            closeButton={<CustomToastCloseButton />}
-                        /> */}
-
                         <ToastContainer
                             position="bottom-right"
                             autoClose={5000}
@@ -119,6 +107,7 @@ class App extends Component {
                             pauseOnHover
                             theme="light"
                         />
+                        <ChatWidget />
                     </div>
                 </Router>
             </Fragment>

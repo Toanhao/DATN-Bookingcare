@@ -6,12 +6,28 @@ import { getDetailInforDoctor } from '../../../services/userService';
 import { LANGUAGES } from '../../../utils';
 import DoctorSchedule from './DoctorSchedule';
 import DoctorExtraInfor from './DoctorExtraInfor';
+import HomeFooter from '../../HomePage/HomeFooter/HomeFooter';
 class DetailDoctor extends Component {
   constructor(props) {
     super(props);
     this.state = {
       detailDoctor: {},
       currentDoctorId: -1,
+      // fake social data (local only until BE available)
+      likesCount: 42,
+      userLiked: false,
+      ratingAvg: 4.2,
+      ratingCount: 10,
+      lastRated: 0,
+      comments: [
+        {
+          id: 1,
+          user: 'Nguyen A',
+          text: 'Bác sĩ rất tận tâm',
+          date: '2025-01-01',
+        },
+      ],
+      newComment: '',
     };
   }
 
@@ -33,6 +49,45 @@ class DetailDoctor extends Component {
       }
     }
   }
+
+  handleToggleLike = () => {
+    this.setState((prev) => {
+      const userLiked = !prev.userLiked;
+      const likesCount = userLiked ? prev.likesCount + 1 : prev.likesCount - 1;
+      return { userLiked, likesCount };
+    });
+  };
+
+  handleRate = (value) => {
+    this.setState((prev) => {
+      const newCount = prev.ratingCount + 1;
+      const newAvg = (prev.ratingAvg * prev.ratingCount + value) / newCount;
+      return {
+        ratingAvg: parseFloat(newAvg.toFixed(2)),
+        ratingCount: newCount,
+        lastRated: value,
+      };
+    });
+  };
+
+  handleCommentChange = (e) => {
+    this.setState({ newComment: e.target.value });
+  };
+
+  handleSubmitComment = () => {
+    const { newComment } = this.state;
+    if (!newComment || !newComment.trim()) return;
+    const newC = {
+      id: Date.now(),
+      user: 'Bạn',
+      text: newComment.trim(),
+      date: new Date().toISOString(),
+    };
+    this.setState((prev) => ({
+      comments: [...prev.comments, newC],
+      newComment: '',
+    }));
+  };
 
   componentDidUpdate(prevProps, prevState, snapshot) {}
 
@@ -63,6 +118,34 @@ class DetailDoctor extends Component {
               <div className="up">
                 {language === LANGUAGES.VI ? nameVi : nameEn}
               </div>
+              <div className="meta-actions" style={{ marginTop: 8 }}>
+                <button
+                  className={`btn-like ${this.state.userLiked ? 'liked' : ''}`}
+                  onClick={this.handleToggleLike}
+                >
+                  <i className="fas fa-thumbs-up"></i> ({this.state.likesCount})
+                </button>
+                <span style={{ marginLeft: 12 }}>
+                  Rating: {this.state.ratingAvg} / 5{' '}
+                  <i class="fas fa-star rating"></i> ({this.state.ratingCount})
+                </span>
+                <div style={{ marginTop: 6 }}>
+                  {[1, 2, 3, 4, 5].map((i) => (
+                    <button
+                      key={i}
+                      className={
+                        'star-button' +
+                        (this.state.lastRated >= i ? ' active' : '')
+                      }
+                      style={{ marginRight: 6 }}
+                      onClick={() => this.handleRate(i)}
+                      aria-label={`Rate ${i}`}
+                    >
+                      {i}★
+                    </button>
+                  ))}
+                </div>
+              </div>
               <div className="down">
                 {detailDoctor &&
                   detailDoctor.Markdown &&
@@ -82,6 +165,7 @@ class DetailDoctor extends Component {
               />
             </div>
           </div>
+
           <div className="detail-infor-doctor">
             {detailDoctor &&
               detailDoctor.Markdown &&
@@ -93,7 +177,43 @@ class DetailDoctor extends Component {
                 ></div>
               )}
           </div>
-          <div className="comment-doctor"></div>
+          <div className="comment-doctor">
+            <div style={{ padding: 12 }}>
+              <h4>Bình luận</h4>
+              <div>
+                {this.state.comments.map((c) => (
+                  <div
+                    key={c.id}
+                    style={{
+                      marginBottom: 8,
+                      borderBottom: '1px solid #eee',
+                      paddingBottom: 6,
+                    }}
+                  >
+                    <strong>{c.user}</strong>{' '}
+                    <small style={{ color: '#666' }}>
+                      {new Date(c.date).toLocaleString()}
+                    </small>
+                    <div>{c.text}</div>
+                  </div>
+                ))}
+              </div>
+              <div style={{ marginTop: 8 }}>
+                <textarea
+                  value={this.state.newComment}
+                  onChange={this.handleCommentChange}
+                  placeholder="Viết bình luận..."
+                  style={{ width: '100%', minHeight: 80 }}
+                />
+                <div style={{ textAlign: 'right', marginTop: 6 }}>
+                  <button onClick={this.handleSubmitComment}>
+                    Gửi bình luận
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+          <HomeFooter />
         </div>
       </>
     );

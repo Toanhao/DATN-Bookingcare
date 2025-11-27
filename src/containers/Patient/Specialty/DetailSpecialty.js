@@ -13,6 +13,7 @@ import {
 } from "../../../services/userService";
 import _ from "lodash";
 import { LANGUAGES } from "../../../utils";
+import HomeFooter from "../../HomePage/HomeFooter/HomeFooter";
 
 class DetailSpecialty extends Component {
     constructor(props) {
@@ -186,6 +187,7 @@ class DetailSpecialty extends Component {
                             );
                         })}
                 </div>
+                <HomeFooter />
             </div>
         );
     }
