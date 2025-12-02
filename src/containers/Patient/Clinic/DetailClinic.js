@@ -335,8 +335,8 @@ class DetailClinic extends Component {
                               this.handleToggleReplyLike(c.id, r.id)
                             }
                           >
-                            {r.likedByUser ? 'Unlike' : 'Like'} (
-                            {r.likesCount || 0})
+                            <i className="fas fa-thumbs-up"></i>{' '}
+                            {r.likesCount || 0}
                           </button>
                         </div>
                       </div>

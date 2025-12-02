@@ -1,0 +1,155 @@
+.diagnosis-widget {
+  position: fixed;
+  right: 24px;
+  bottom: 80px;
+  z-index: 9999;
+}
+.diag-toggle {
+  width: 56px;
+  height: 56px;
+  border-radius: 28px;
+  background: #1e88e5;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.15);
+  cursor: pointer;
+}
+.diag-panel {
+  width: 480px;
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
+  overflow: hidden;
+  height: 650px;
+  margin-bottom: 8px;
+}
+.diagnosis-widget .diag-panel {
+  display: none;
+}
+.diagnosis-widget.open .diag-panel {
+  display: block;
+}
+.diag-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 12px;
+  border-bottom: 1px solid #eee;
+}
+.diag-header .title {
+  font-weight: 600;
+}
+.diag-body {
+  display: flex;
+  flex-direction: column;
+  /* make body scrollable when content is long */
+  flex: 1 1 auto;
+  overflow: hidden;
+}
+.diag-input {
+  padding: 12px;
+}
+.diag-input textarea {
+  width: 100%;
+  min-height: 90px;
+  padding: 8px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+}
+.diag-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  align-items: flex-start;
+  margin-top: 8px;
+}
+.analyze-btn {
+  background: #0b74de;
+  color: #fff;
+  padding: 8px 12px;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+}
+.attach {
+  background: #f3f4f6;
+  border: 1px solid #ddd;
+  padding: 6px 8px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+.diag-history {
+  padding: 8px;
+  border-top: 1px solid #f0f0f0;
+  /* limit height and enable scroll for long results */
+  max-height: 340px;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+.diag-card {
+  border-radius: 8px;
+  padding: 12px;
+  margin-bottom: 10px;
+  background: linear-gradient(180deg, #ffffff, #fbfdff);
+  box-shadow: 0 6px 18px rgba(15, 23, 42, 0.06);
+  border: 1px solid rgba(14, 165, 233, 0.06);
+}
+.diag-context {
+  width: 100%;
+  padding: 8px;
+  border: 1px solid #e6eef7;
+  border-radius: 6px;
+  margin-bottom: 8px;
+}
+.delete-btn {
+  background: transparent;
+  border: none;
+  color: #9ca3af;
+  cursor: pointer;
+}
+.card-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.card-time {
+  font-size: 12px;
+  color: #6b7280;
+  margin-bottom: 8px;
+}
+.summary {
+  background: #f0f9ff;
+  border-left: 4px solid #0ea5e9;
+  padding: 10px;
+  border-radius: 6px;
+  margin-bottom: 10px;
+}
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 6px 0;
+}
+.chip {
+  background: #eef2ff;
+  color: #0369a1;
+  padding: 6px 8px;
+  border-radius: 999px;
+  font-size: 13px;
+}
+.section {
+  margin-bottom: 8px;
+}
+.recommendations ul,
+.next-steps ul {
+  padding-left: 18px;
+  margin: 6px 0;
+}
+.disclaimer {
+  font-size: 12px;
+  color: #6b7280;
+  margin-top: 8px;
+  font-style: italic;
+}

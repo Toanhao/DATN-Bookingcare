@@ -177,39 +177,126 @@ class DetailDoctor extends Component {
                 ></div>
               )}
           </div>
-          <div className="comment-doctor">
-            <div style={{ padding: 12 }}>
-              <h4>Bình luận</h4>
-              <div>
-                {this.state.comments.map((c) => (
-                  <div
-                    key={c.id}
-                    style={{
-                      marginBottom: 8,
-                      borderBottom: '1px solid #eee',
-                      paddingBottom: 6,
-                    }}
-                  >
-                    <strong>{c.user}</strong>{' '}
-                    <small style={{ color: '#666' }}>
+
+          {/* comments for clinic */}
+          <div className="clinic-comments" style={{ padding: 12 }}>
+            <h4>Bình luận về phòng khám</h4>
+            <div className="comment-list">
+              {this.state.comments.map((c) => (
+                <div
+                  key={c.id}
+                  className="comment-item"
+                  style={{ marginBottom: 12 }}
+                >
+                  <div className="comment-head">
+                    <strong>{c.user}</strong>
+                    <small
+                      className="comment-date"
+                      style={{ marginLeft: 8, color: '#666' }}
+                    >
                       {new Date(c.date).toLocaleString()}
                     </small>
-                    <div>{c.text}</div>
                   </div>
-                ))}
-              </div>
-              <div style={{ marginTop: 8 }}>
-                <textarea
-                  value={this.state.newComment}
-                  onChange={this.handleCommentChange}
-                  placeholder="Viết bình luận..."
-                  style={{ width: '100%', minHeight: 80 }}
-                />
-                <div style={{ textAlign: 'right', marginTop: 6 }}>
-                  <button onClick={this.handleSubmitComment}>
-                    Gửi bình luận
-                  </button>
+                  <div className="comment-body" style={{ marginTop: 6 }}>
+                    {c.text}
+                  </div>
+                  <div className="comment-actions" style={{ marginTop: 6 }}>
+                    <button
+                      className={`btn-like ${c.likedByUser ? 'liked' : ''}`}
+                      onClick={() => this.handleToggleCommentLike(c.id)}
+                    >
+                      {/* {c.likedByUser ? 'Unlike' : 'Like'} ({c.likesCount || 0}){' '} */}
+                      <i className="fas fa-thumbs-up"></i> {c.likesCount || 0}
+                    </button>
+                    <button
+                      className="btn-reply"
+                      style={{ marginLeft: 8 }}
+                      onClick={() => this.handleStartReply(c.id)}
+                    >
+                      Trả lời <i className="fas fa-reply"></i>
+                    </button>
+                  </div>
+
+                  {/* replies */}
+                  <div
+                    className="replies"
+                    style={{ marginTop: 8, paddingLeft: 12 }}
+                  >
+                    {c.replies &&
+                      c.replies.map((r) => (
+                        <div
+                          key={r.id}
+                          className="reply-item"
+                          style={{ marginBottom: 8 }}
+                        >
+                          <div className="reply-head">
+                            <strong>{r.user}</strong>{' '}
+                            <small style={{ marginLeft: 8, color: '#666' }}>
+                              {new Date(r.date).toLocaleString()}
+                            </small>
+                          </div>
+                          <div className="reply-body" style={{ marginTop: 4 }}>
+                            {r.text}
+                          </div>
+                          <div
+                            className="reply-actions"
+                            style={{ marginTop: 4 }}
+                          >
+                            <button
+                              className={`btn-like ${
+                                r.likedByUser ? 'liked' : ''
+                              }`}
+                              onClick={() =>
+                                this.handleToggleReplyLike(c.id, r.id)
+                              }
+                            >
+                              <i className="fas fa-thumbs-up"></i>{' '}
+                              {r.likesCount || 0}
+                            </button>
+                          </div>
+                        </div>
+                      ))}
+                  </div>
+
+                  {/* reply box */}
+                  {this.state.replyingToId === c.id && (
+                    <div className="reply-box" style={{ marginTop: 8 }}>
+                      <textarea
+                        value={this.state.replyText}
+                        onChange={this.handleReplyChange}
+                        placeholder="Viết trả lời..."
+                        style={{ width: '100%', minHeight: 60 }}
+                      />
+                      <div style={{ textAlign: 'right', marginTop: 6 }}>
+                        <button onClick={() => this.handleSubmitReply(c.id)}>
+                          Gửi trả lời <i class="fas fa-paper-plane"></i>
+                        </button>
+                        <button
+                          style={{ marginLeft: 8 }}
+                          onClick={() =>
+                            this.setState({ replyingToId: null, replyText: '' })
+                          }
+                        >
+                          Hủy
+                        </button>
+                      </div>
+                    </div>
+                  )}
                 </div>
+              ))}
+            </div>
+
+            <div className="new-comment" style={{ marginTop: 12 }}>
+              <textarea
+                value={this.state.newComment}
+                onChange={this.handleCommentChange}
+                placeholder="Viết bình luận..."
+                style={{ width: '100%', minHeight: 80 }}
+              />
+              <div style={{ textAlign: 'right', marginTop: 6 }}>
+                <button onClick={this.handleSubmitComment}>
+                  Gửi bình luận <i class="fas fa-paper-plane"></i>
+                </button>
               </div>
             </div>
           </div>

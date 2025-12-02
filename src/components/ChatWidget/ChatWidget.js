@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useSelector } from 'react-redux';
 import './ChatWidget.scss';
+import MarkdownIt from 'markdown-it';
 import { sendMessageToAI } from '../../services/chatService';
 
 const STORAGE_KEY = 'ai_chat_history_v1';
@@ -10,7 +11,12 @@ const ChatWidget = () => {
   const [messages, setMessages] = useState(() => {
     try {
       const raw = localStorage.getItem(STORAGE_KEY);
-      return raw ? JSON.parse(raw) : [];
+      if (!raw) return [];
+      const parsed = JSON.parse(raw);
+      if (Array.isArray(parsed)) return parsed;
+      // backward compatibility: if a single saved item was written, wrap into array
+      if (parsed && typeof parsed === 'object') return [parsed];
+      return [];
     } catch (e) {
       return [];
     }
@@ -20,12 +26,198 @@ const ChatWidget = () => {
     state.app && state.app.language ? state.app.language : 'vi'
   );
   const [language, setLanguage] = useState(reduxLang || 'en');
+  const [isRecording, setIsRecording] = useState(false);
+  const recognitionRef = useRef(null);
+  const [supportsSpeech, setSupportsSpeech] = useState(false);
   const [isTyping, setIsTyping] = useState(false);
   const [unread, setUnread] = useState(0);
   const listRef = useRef(null);
 
+  // Configuration to avoid sending >1000 characters per API request
+  const MAX_REQUEST_CHARS = 1000; // API limit per request
+  const CONTEXT_MESSAGES = 6; // how many previous msgs to consider (will be truncated as needed)
+  const PER_MSG_PREVIEW = 300; // max chars to include per message when adding context
+  const STORE_AI_MAX = 2000; // cap how much of AI responses we store in localStorage
+
+  const buildPromptWithLimit = (
+    instruction,
+    userText,
+    previousMsgs = [],
+    maxChars = MAX_REQUEST_CHARS,
+    perMsgPreview = PER_MSG_PREVIEW
+  ) => {
+    const safeInstr = instruction || '';
+    const userLabel = `User: `;
+    // ensure user text exists
+    let safeUser = (userText || '').replace(/\s+/g, ' ').trim();
+
+    // Start with instruction
+    let prompt = safeInstr ? safeInstr + '\n\n' : '';
+
+    // We'll attempt to add a Context section built from previousMsgs (oldest->newest)
+    if (previousMsgs && previousMsgs.length) {
+      prompt += 'Context:\n';
+      for (let i = 0; i < previousMsgs.length; i++) {
+        const m = previousMsgs[i];
+        if (!m || !m.text) continue;
+        const who = m.from === 'ai' ? 'AI: ' : 'User: ';
+        // take small preview of the message to keep size low
+        const preview =
+          m.text.length > perMsgPreview
+            ? m.text.slice(0, perMsgPreview) + '...'
+            : m.text;
+        const line = `${who}${preview}\n`;
+        // if adding this line plus the eventual user line would overflow, stop adding more context
+        if (
+          prompt.length + line.length + userLabel.length + safeUser.length >
+          maxChars
+        ) {
+          // try to add a shortened placeholder for remaining context if there is space
+          const remaining =
+            maxChars - (prompt.length + userLabel.length + safeUser.length) - 3;
+          if (remaining > 10) {
+            prompt += '...\n';
+          }
+          break;
+        }
+        prompt += line;
+      }
+      prompt += '\n';
+    }
+
+    // Append the user's message
+    // If still too long, truncate the user's message to fit the maxChars
+    if (prompt.length + userLabel.length + safeUser.length > maxChars) {
+      const allowed = Math.max(
+        20,
+        maxChars - prompt.length - userLabel.length - 3
+      );
+      safeUser = safeUser.slice(0, allowed) + '...';
+    }
+    prompt += `${userLabel}${safeUser}`;
+
+    // Final safety: if still longer, hard-truncate the whole prompt
+    if (prompt.length > maxChars) {
+      prompt = prompt.slice(0, maxChars - 3) + '...';
+    }
+
+    return prompt;
+  };
+
   useEffect(() => {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(messages));
+    // Initialize SpeechRecognition if available
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (SpeechRecognition) {
+      try {
+        const rec = new SpeechRecognition();
+        rec.continuous = false;
+        rec.interimResults = false;
+        rec.maxAlternatives = 1;
+        recognitionRef.current = rec;
+        setSupportsSpeech(true);
+      } catch (e) {
+        setSupportsSpeech(false);
+      }
+    } else {
+      setSupportsSpeech(false);
+    }
+    // cleanup when unmount
+    return () => {
+      if (recognitionRef.current) {
+        try { recognitionRef.current.onresult = null; recognitionRef.current.onend = null; recognitionRef.current.onerror = null; } catch (e) {}
+      }
+    };
+    // run once
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const startRecording = () => {
+    const rec = recognitionRef.current;
+    if (!rec) return alert('Trình duyệt không hỗ trợ microphone (SpeechRecognition).');
+    rec.lang = language === 'vi' ? 'vi-VN' : 'en-US';
+    rec.onresult = (event) => {
+      const transcript = Array.from(event.results)
+        .map((r) => r[0].transcript)
+        .join('')
+        .trim();
+      if (transcript) {
+        // append transcript to input for user to edit/send
+        setInput((cur) => (cur ? cur + ' ' + transcript : transcript));
+      }
+    };
+    rec.onend = () => {
+      setIsRecording(false);
+    };
+    rec.onerror = (e) => {
+      console.error('SpeechRecognition error', e);
+      setIsRecording(false);
+    };
+    try {
+      rec.start();
+      setIsRecording(true);
+    } catch (e) {
+      console.error('startRecording error', e);
+      setIsRecording(false);
+    }
+  };
+
+  const stopRecording = () => {
+    const rec = recognitionRef.current;
+    if (!rec) return;
+    try {
+      rec.stop();
+    } catch (e) {}
+    setIsRecording(false);
+  };
+
+  const toggleRecording = () => {
+    if (!supportsSpeech) return alert('Speech API không khả dụng trên trình duyệt này.');
+    if (isRecording) stopRecording();
+    else startRecording();
+  };
+
+  const speakText = (text, lang) => {
+    if (!text) return;
+    if (!window.speechSynthesis) return alert('SpeechSynthesis không được hỗ trợ trên trình duyệt này.');
+    try {
+      window.speechSynthesis.cancel();
+      const utt = new SpeechSynthesisUtterance(text);
+      utt.lang = lang === 'vi' ? 'vi-VN' : 'en-US';
+      utt.rate = 1;
+      utt.pitch = 1;
+      window.speechSynthesis.speak(utt);
+    } catch (e) {
+      console.error('speakText error', e);
+    }
+  };
+  // Use markdown-it to render Markdown safely (no raw HTML)
+  const md = new MarkdownIt({ html: false, linkify: true, typographer: true });
+  // effect: Store a truncated copy of messages to avoid very large localStorage entries
+  useEffect(() => {
+    try {
+      const msgArray = Array.isArray(messages) ? messages : messages ? [messages] : [];
+      const toStore = msgArray.map((m) => {
+        if (m && m.from === 'ai' && m.text) {
+          return {
+            ...m,
+            text:
+              m.text.length > STORE_AI_MAX
+                ? m.text.slice(0, STORE_AI_MAX) + '\n\n[Truncated]'
+                : m.text,
+          };
+        }
+        return m;
+      });
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(toStore));
+    } catch (e) {
+      // fallback
+      try {
+        const safe = Array.isArray(messages) ? messages : messages ? [messages] : [];
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(safe));
+      } catch (err) {
+        // ignore storage errors
+      }
+    }
     // update unread count when new message from AI arrives and widget closed
     const last = messages[messages.length - 1];
     if (last && last.from === 'ai' && !open) {
@@ -33,7 +225,7 @@ const ChatWidget = () => {
     }
     // scroll to bottom
     scrollToBottom();
-  }, [messages]);
+  }, [messages, open]);
 
   useEffect(() => {
     if (open) setUnread(0);
@@ -62,32 +254,30 @@ const ChatWidget = () => {
     setIsTyping(true);
 
     try {
-      // Build conversational context from recent messages so backend can answer cohesively
-      const CONTEXT_MESSAGES = 8; // how many previous msgs to include
-      const recent = messages
+      // Build a safe prompt (never exceed MAX_REQUEST_CHARS)
+      const recentMsgs = messages
         .filter((m) => m && m.text)
-        .slice(-CONTEXT_MESSAGES)
-        .map((m) => (m.from === 'ai' ? `AI: ${m.text}` : `User: ${m.text}`))
-        .join('\n');
+        .slice(-CONTEXT_MESSAGES); // oldest->newest order kept
 
-      let prompt = '';
-      if (recent) {
-        prompt += `Context:\n${recent}\n\n`;
-      }
-      prompt += `User: ${text}`;
-
-      // If app language is Vietnamese, append an instruction so backend replies in Vietnamese briefly and to-the-point
       let instruction = '';
       if (language === 'vi') {
         instruction =
-          'Bạn là chatbot y tế, trả lời bằng tiếng Việt, ngắn gọn, súc tích, không dài dòng.\n\n';
+          'trả lời bằng tiếng Việt, ngắn gọn, súc tích';
       } else {
         instruction =
-          'You are a health assistant chatbot, answer concisely and to the point, not long-winded.\n\n';
+          'Answer concisely and to the point';
       }
 
-      // nối instruction lên đầu prompt
-      prompt = instruction + prompt;
+      const prompt = buildPromptWithLimit(
+        instruction,
+        text,
+        recentMsgs,
+        MAX_REQUEST_CHARS,
+        PER_MSG_PREVIEW
+      );
+      if (prompt.length >= MAX_REQUEST_CHARS) {
+        console.warn('Prompt length reached maximum limit and was truncated.');
+      }
 
       const res = await sendMessageToAI({ message: prompt, language });
       // emulate streaming by revealing characters progressively
@@ -139,12 +329,10 @@ const ChatWidget = () => {
     localStorage.removeItem(STORAGE_KEY);
   };
 
-  // sync with redux language changes
   useEffect(() => {
     if (reduxLang && reduxLang !== language) {
       setLanguage(reduxLang);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [reduxLang]);
 
   return (
@@ -160,8 +348,9 @@ const ChatWidget = () => {
 
       <div className="chat-panel" role="dialog" aria-hidden={!open}>
         <div className="chat-header">
-          <div className="title">Trợ lý ảo</div>
+          <div className="title">Chat với AI</div>
           <div className="controls">
+            {/* attachment removed from chat widget - use Diagnosis widget for analysis uploads */}
             <select
               value={language}
               onChange={(e) => setLanguage(e.target.value)}
@@ -186,7 +375,9 @@ const ChatWidget = () => {
         <div className="chat-body" ref={listRef}>
           {messages.length === 0 && (
             <div className="empty">
-              Chào bạn! Bạn có thể hỏi về đặt lịch khám, bác sĩ, và dịch vụ.
+              <div>
+                Chào bạn! Bạn có thể hỏi về đặt lịch khám, bác sĩ, và dịch vụ.
+              </div>
             </div>
           )}
           {messages.map((m) => (
@@ -194,7 +385,69 @@ const ChatWidget = () => {
               key={m.id}
               className={`msg ${m.from === 'ai' ? 'ai' : 'user'}`}
             >
-              <div className="bubble">{m.text}</div>
+                  {m.type === 'analysis' && m.content ? (
+                <div className="bubble analysis">
+                  {m.content.summary && (
+                    <div className="analysis-section">
+                      <strong>Summary:</strong>
+                      <div dangerouslySetInnerHTML={{ __html: md.render(m.content.summary || '') }} />
+                    </div>
+                  )}
+                  {m.content.key_findings &&
+                    m.content.key_findings.length > 0 && (
+                      <div className="analysis-section">
+                        <strong>Key findings:</strong>
+                        <ul>
+                          {m.content.key_findings.map((kf, i) => (
+                            <li key={i} dangerouslySetInnerHTML={{ __html: md.renderInline(kf || '') }} />
+                          ))}
+                        </ul>
+                      </div>
+                    )}
+                  {m.content.recommendations &&
+                    m.content.recommendations.length > 0 && (
+                      <div className="analysis-section">
+                        <strong>Recommendations:</strong>
+                        <ul>
+                          {m.content.recommendations.map((rec, i) => (
+                            <li key={i} dangerouslySetInnerHTML={{ __html: md.renderInline(rec || '') }} />
+                          ))}
+                        </ul>
+                      </div>
+                    )}
+                  {m.content.next_steps && m.content.next_steps.length > 0 && (
+                    <div className="analysis-section">
+                      <strong>Next steps:</strong>
+                      <ul>
+                        {m.content.next_steps.map((ns, i) => (
+                          <li key={i} dangerouslySetInnerHTML={{ __html: md.renderInline(ns || '') }} />
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+                      {m.content.disclaimer && (
+                        <div className="analysis-section disclaimer">
+                          <span dangerouslySetInnerHTML={{ __html: md.renderInline(m.content.disclaimer || '') }} />
+                        </div>
+                      )}
+                </div>
+              ) : (
+                <div className="bubble">
+                  <div
+                    className="bubble-html"
+                    dangerouslySetInnerHTML={{ __html: md.render(m.text || '') }}
+                  />
+                  {m.from === 'ai' && (
+                    <button
+                      className="play-btn"
+                      onClick={() => speakText(m.text, m.language || language)}
+                      title="Phát âm"
+                    >
+                      🔊
+                    </button>
+                  )}
+                </div>
+              )}
               <div className="time">
                 {new Date(m.time).toLocaleTimeString()}
               </div>
@@ -218,6 +471,14 @@ const ChatWidget = () => {
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={handleKeyDown}
           />
+          {/* mic placed next to send button for quick voice input */}
+          <button
+            className={`voice-btn input-voice ${isRecording ? 'recording' : ''}`}
+            onClick={toggleRecording}
+            title={isRecording ? 'Dừng ghi âm' : 'Ghi âm (nói)'}
+          >
+            {isRecording ? '●' : '🎤'}
+          </button>
           <button
             className="send-btn"
             onClick={handleSend}
