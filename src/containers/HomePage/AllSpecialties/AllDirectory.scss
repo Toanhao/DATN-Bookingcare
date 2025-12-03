@@ -1,0 +1,190 @@
+.all-directory-root {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh; /* make page fill viewport so footer can stick */
+}
+
+.page-body {
+  padding: 24px 16px;
+  flex: 1 0 auto; /* allow page body to grow and push footer down */
+}
+
+.page-title {
+  text-align: center;
+  margin-bottom: 18px;
+}
+
+.all-search {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: #f7d800;
+  padding: 10px 18px;
+  border-radius: 28px;
+  max-width: 1100px;
+  margin: 0 auto 20px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06);
+
+  i {
+    color: rgba(0, 0, 0, 0.6);
+    font-size: 18px;
+    margin-left: 6px;
+  }
+
+  input {
+    flex: 1;
+    background: transparent;
+    border: none;
+    outline: none;
+    font-size: 15px;
+    color: #333;
+    padding: 6px 8px;
+  }
+
+  select {
+    background: transparent;
+    border: none;
+    outline: none;
+    padding: 6px 22px 6px 18px;
+    border-left: 1px solid rgba(0, 0, 0, 0.12);
+    border-radius: 0 20px 20px 0;
+    cursor: pointer;
+    font-size: 14px;
+    color: #111;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    background-image: linear-gradient(45deg, transparent 50%, #111 50%),
+      linear-gradient(135deg, #111 50%, transparent 50%);
+    background-position: calc(100% - 12px) calc(1em + 2px),
+      calc(100% - 7px) calc(1em + 2px);
+    background-size: 6px 6px, 6px 6px;
+    background-repeat: no-repeat;
+  }
+
+  @media (max-width: 768px) {
+    padding: 8px 12px;
+    max-width: 100%;
+    select {
+      padding-left: 12px;
+    }
+  }
+}
+
+.tabs {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.tab-btn {
+  padding: 8px 14px;
+  border: 1px solid #ddd;
+  background: #fff;
+  cursor: pointer;
+}
+
+.tab-btn.active {
+  background: #007bff;
+  color: #fff;
+  border-color: #007bff;
+}
+
+.grid {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.card {
+  width: 180px;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.img {
+  width: 140px;
+  height: 100px;
+  background-size: cover;
+  background-position: center;
+  border-radius: 6px;
+  margin-bottom: 8px;
+}
+
+.title {
+  font-weight: 600;
+  text-align: center;
+}
+
+/* Ensure doctor slider-style items show correctly without outer .section-share wrapper */
+.section-customize {
+  padding: 6px;
+  cursor: pointer;
+  box-sizing: border-box;
+  width: 260px; /* unify card width for consistent grid */
+}
+
+.section-customize .customize-border {
+  border: 1px solid rgba(255, 165, 0, 0.95);
+  padding: 14px;
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-height: 220px; /* make titles align across cards */
+  box-sizing: border-box;
+  background: #fff;
+}
+
+.section-customize .outer-bg {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 10px;
+  width: 100%;
+}
+
+.section-customize .bg-image {
+  width: 100%;
+  height: 150px;
+  background-position: center center;
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-color: #eee;
+  border-radius: 6px;
+}
+
+/* Doctor avatar remains circular but stays centered inside card */
+.section-customize .bg-image.section-outstanding-doctor {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  margin: 0 auto;
+}
+
+.section-customize .position {
+  text-align: center;
+  width: 100%;
+}
+
+@media (max-width: 900px) {
+  .section-customize {
+    width: 45%;
+  }
+}
+
+@media (max-width: 480px) {
+  .section-customize {
+    width: 100%;
+  }
+  .section-customize .customize-border {
+    min-height: auto;
+    padding: 12px;
+  }
+  .section-customize .bg-image {
+    height: 140px;
+  }
+}

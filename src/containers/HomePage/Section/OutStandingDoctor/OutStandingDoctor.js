@@ -6,7 +6,8 @@ import { FormattedMessage } from 'react-intl';
 import Slider from 'react-slick';
 import * as actions from '../../../../store/actions';
 import { LANGUAGES } from '../../../../utils';
-import { Buffer } from 'buffer';
+import computeImageUrl from '../../../../utils/imageUtils';
+import userAvatar from '../../../../assets/images/user.svg';
 import { withRouter } from 'react-router';
 import {
   getDetailInforDoctor,
@@ -103,7 +104,6 @@ class OutStandingDoctor extends Component {
 
       this.setState({ arrDoctors: enriched });
     } catch (e) {
-      console.error('enrichDoctorsWithSpecialty error:', e);
       this.setState({ arrDoctors: doctors });
     }
   };
@@ -133,12 +133,7 @@ class OutStandingDoctor extends Component {
               {arrDoctors &&
                 arrDoctors.length > 0 &&
                 arrDoctors.map((item, index) => {
-                  let imageBase64 = '';
-                  if (item.image) {
-                    imageBase64 = new Buffer(item.image, 'base64').toString(
-                      'binary'
-                    );
-                  }
+                  const imageUrl = computeImageUrl(item.image) || userAvatar;
                   let nameVi = `${item.positionData.valueVi}, ${item.lastName} ${item.firstName} `;
                   let nameEn = `${item.positionData.valueEn}, ${item.lastName} ${item.firstName} `;
                   return (
@@ -151,9 +146,7 @@ class OutStandingDoctor extends Component {
                         <div className="outer-bg">
                           <div
                             className="bg-image section-outstanding-doctor"
-                            style={{
-                              backgroundImage: `url(${imageBase64})`,
-                            }}
+                            style={{ backgroundImage: `url(${imageUrl})` }}
                           />
                         </div>
                         <div className="position text-center">

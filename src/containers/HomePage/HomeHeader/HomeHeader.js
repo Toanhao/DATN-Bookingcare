@@ -14,6 +14,13 @@ class HomeHeader extends Component {
     this.props.changeLanguageAppRedux(language);
   };
 
+  goToAllDirectory = (tab) => {
+    if (this.props.history) {
+      const t = tab ? `?tab=${tab}` : '';
+      this.props.history.push(`/all-directory${t}`);
+    }
+  };
+
   returnToHome = () => {
     if (this.props.history) {
       this.props.history.push('/home');
@@ -24,8 +31,8 @@ class HomeHeader extends Component {
     let language = this.props.language;
     let placeHolder =
       language === LANGUAGES.VI
-        ? 'Tìm chuyên khoa khám bệnh '
-        : 'Find a medical specialist';
+        ? 'Tìm tất cả chuyên khoa, bác sĩ, cơ sở y tế '
+        : 'Tìm tất cả chuyên khoa, bác sĩ, cơ sở y tế';
     return (
       <React.Fragment>
         <div className="home-header-container">
@@ -40,7 +47,11 @@ class HomeHeader extends Component {
               />
             </div>
             <div className="center-content">
-              <div className="child-content">
+              <div
+                className="child-content"
+                onClick={() => this.goToAllDirectory('specialty')}
+                style={{ cursor: 'pointer' }}
+              >
                 <div>
                   <b>
                     <FormattedMessage id="home-header.speciality" />
@@ -51,7 +62,11 @@ class HomeHeader extends Component {
                 </div>
               </div>
 
-              <div className="child-content">
+              <div
+                className="child-content"
+                onClick={() => this.goToAllDirectory('clinic')}
+                style={{ cursor: 'pointer' }}
+              >
                 <div>
                   <b>
                     <FormattedMessage id="home-header.health-facility" />
@@ -61,7 +76,11 @@ class HomeHeader extends Component {
                   <FormattedMessage id="home-header.select-room" />
                 </div>
               </div>
-              <div className="child-content">
+              <div
+                className="child-content"
+                onClick={() => this.goToAllDirectory('doctor')}
+                style={{ cursor: 'pointer' }}
+              >
                 <div>
                   <b>
                     <FormattedMessage id="home-header.doctor" />
@@ -121,7 +140,10 @@ class HomeHeader extends Component {
               <div className="title2">
                 <FormattedMessage id="banner.title2" />
               </div>
-              <div className="search">
+              <div
+                className="search"
+                onClick={() => this.goToAllDirectory('all')}
+              >
                 <i className="fas fa-search"></i>
                 <input type="text" placeholder={placeHolder}></input>
               </div>

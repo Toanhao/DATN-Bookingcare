@@ -232,11 +232,16 @@ const ChatWidget = () => {
   }, [open]);
 
   const scrollToBottom = () => {
-    if (listRef.current) {
-      requestAnimationFrame(() => {
-        listRef.current.scrollTop = listRef.current.scrollHeight;
-      });
-    }
+    const el = listRef.current;
+    if (!el) return;
+    requestAnimationFrame(() => {
+      if (!el) return;
+      try {
+        el.scrollTop = el.scrollHeight;
+      } catch (e) {
+        // ignore if element was removed between frames
+      }
+    });
   };
 
   const handleSend = async () => {

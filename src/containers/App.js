@@ -9,6 +9,7 @@ import DetailDoctor from "./Patient/Doctor/DetailDoctor.js";
 import Doctor from "../routes/Doctor";
 import DetailSpecialty from "./Patient/Specialty/DetailSpecialty";
 import DetailClinic from "./Patient/Clinic/DetailClinic";
+import AllDirectory from "./HomePage/AllSpecialties/AllDirectory";
 import VerifyEmail from "./Patient/VerifyEmail.js";
 import {
     userIsAuthenticated,
@@ -74,6 +75,10 @@ class App extends Component {
                                     <Route
                                         path={path.HOMEPAGE}
                                         component={HomePage}
+                                    />
+                                    <Route
+                                        path={path.ALL_DIRECTORY}
+                                        component={AllDirectory}
                                     />
                                     <Route
                                         path={path.DETAIL_SPECIALTY}
