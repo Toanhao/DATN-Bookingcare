@@ -202,3 +202,86 @@
     }
   }
 }
+
+/* Sidebar menu styles to improve contrast and readability */
+.sidebar-menu {
+  width: 100%;
+  background: rgba(255, 255, 255, 0.98);
+  border-radius: 6px;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.15);
+  padding: 12px 12px; /* smaller top padding so items are not pushed down */
+
+  ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  li {
+    display: flex;
+    align-items: center;
+    padding: 8px 10px;
+    border-radius: 4px;
+    color: #222;
+    cursor: pointer;
+    transition: background-color 120ms ease, color 120ms ease;
+
+    i {
+      width: 22px;
+      text-align: center;
+      color: #4a4a4a;
+      font-size: 16px;
+    }
+
+    span {
+      margin-left: 10px;
+      font-weight: 600;
+    }
+
+    &:hover {
+      background: #f5f7fa;
+      color: #111;
+    }
+  }
+}
+
+/* Ensure PrimeReact sidebar close button sits inside the white panel */
+.p-sidebar {
+  /* ensure the close button can be absolutely positioned relative to the sidebar */
+  position: relative;
+  padding: 0;
+}
+
+/* make close button an overlay inside the white panel */
+.p-sidebar .p-sidebar-close {
+  position: absolute;
+  top: 12px !important;
+  right: 12px !important;
+  left: auto !important;
+  background: #fff;
+  border: none;
+  color: #333;
+  z-index: 10;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.12);
+}
+
+/* if sidebar attaches left, keep close inside */
+.p-sidebar-left .p-sidebar-close {
+  right: 12px !important;
+  left: auto !important;
+}
+
+/* if sidebar attaches right, place the close icon near the left inside edge */
+.p-sidebar-right .p-sidebar-close {
+  left: 12px !important;
+  right: auto !important;
+}

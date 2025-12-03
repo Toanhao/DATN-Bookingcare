@@ -54,6 +54,10 @@
     display: flex;
   }
 
+  &.open .chat-toggle {
+    display: none;
+  }
+
   .chat-header {
     padding: 10px 12px;
     background: linear-gradient(90deg, #2d9cdb, #2b6ef6);

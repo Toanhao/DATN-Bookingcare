@@ -9,6 +9,7 @@ import 'slick-carousel/slick/slick.css';
 import 'slick-carousel/slick/slick-theme.css';
 import { getAllSpecialty } from '../../../../services/userService';
 import { withRouter } from 'react-router';
+import { Link } from 'react-router-dom';
 
 class Specialty extends Component {
   constructor(props) {
@@ -43,9 +44,9 @@ class Specialty extends Component {
             <span className="title-section">
               <FormattedMessage id="homepage.specialty" />
             </span>
-            <button className="btn-section">
+            <Link className="btn-section" to="/all-directory?tab=specialty">
               <FormattedMessage id="homepage.more-infor" />
-            </button>
+            </Link>
           </div>
           <div className="section-body">
             <Slider {...this.props.settings}>

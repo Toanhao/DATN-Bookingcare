@@ -2,7 +2,7 @@
   position: fixed;
   right: 24px;
   bottom: 80px;
-  z-index: 9999;
+  z-index: 999;
 }
 .diag-toggle {
   width: 56px;
@@ -30,6 +30,10 @@
 }
 .diagnosis-widget.open .diag-panel {
   display: block;
+}
+
+.diagnosis-widget.open .diag-toggle {
+  display: none;
 }
 .diag-header {
   display: flex;

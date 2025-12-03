@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { FormattedMessage } from 'react-intl';
 import Slider from 'react-slick';
+import { Link } from 'react-router-dom';
 
 class HandBook extends Component {
   render() {
@@ -13,9 +14,9 @@ class HandBook extends Component {
               {' '}
               <FormattedMessage id="homepage.handbook" />
             </span>
-            <button className="btn-section">
+            <Link className="btn-section" to="/all-directory?tab=all">
               <FormattedMessage id="homepage.more-infor" />
-            </button>
+            </Link>
           </div>
           <div className="section-body">
             <Slider {...this.props.settings}>

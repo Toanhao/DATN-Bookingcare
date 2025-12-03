@@ -7,6 +7,7 @@ import { FormattedMessage } from "react-intl";
 import Slider from "react-slick";
 import { getAllClinic } from "../../../../services/userService";
 import { withRouter } from "react-router";
+import { Link } from 'react-router-dom';
 
 class MedicalFacility extends Component {
     constructor(props) {
@@ -39,9 +40,9 @@ class MedicalFacility extends Component {
                         <span className="title-section">
                             <FormattedMessage id="homepage.facilities" />
                         </span>
-                        <button className="btn-section">
-                            <FormattedMessage id="homepage.more-infor" />
-                        </button>
+                            <Link className="btn-section" to="/all-directory?tab=clinic">
+                                <FormattedMessage id="homepage.more-infor" />
+                            </Link>
                     </div>
                     <div className="section-body section-medical-facility">
                         <Slider {...this.props.settings}>
@@ -76,6 +77,7 @@ class MedicalFacility extends Component {
             </div>
         );
     }
+
 }
 
 const mapStateToProps = (state) => {

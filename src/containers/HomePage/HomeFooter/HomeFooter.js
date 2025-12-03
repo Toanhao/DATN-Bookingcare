@@ -3,7 +3,13 @@ import { connect } from 'react-redux';
 import 'slick-carousel/slick/slick.css';
 import 'slick-carousel/slick/slick-theme.css';
 import './HomeFooter.scss';
+import { withRouter } from 'react-router';
+import { Link } from 'react-router-dom';
 class HomeFooter extends Component {
+  handleSupportClick = () => {
+    const message = `Nền tảng Đặt khám BookingCare\nĐT:0347581948\nEmail: support@bookingcare.vn\nTrực thuộc: Công ty CP Công nghệ BookingCare\nĐịa chỉ: PTIT Hà Nội`;
+    window.alert(message);
+  };
   render() {
     return (
       <div className="home-footer">
@@ -11,7 +17,7 @@ class HomeFooter extends Component {
           {/* Company Info Section */}
           <div className="footer-section">
             <h3>Booking Care</h3>
-            <p>Platform đặt lịch khám trực tuyến hàng đầu tại Việt Nam</p>
+            <p>Nền tảng đặt lịch khám trực tuyến hàng đầu tại Việt Nam</p>
             <p>Giúp bạn kết nối với các bác sĩ tốt nhất một cách dễ dàng</p>
           </div>
 
@@ -20,16 +26,16 @@ class HomeFooter extends Component {
             <h4>Liên kết nhanh</h4>
             <ul>
               <li>
-                <a href="#home">Trang chủ</a>
+                <Link to="/home">Trang chủ</Link>
               </li>
               <li>
-                <a href="#about">Về chúng tôi</a>
+                <Link to="/all-directory?tab=doctor">Bác sĩ nổi bật</Link>
               </li>
               <li>
-                <a href="#doctors">Danh sách bác sĩ</a>
+                <Link to="/all-directory?tab=clinic">Cơ sở y tế</Link>
               </li>
               <li>
-                <a href="#contact">Liên hệ</a>
+                <Link to="/all-directory?tab=specialty">Chuyên khoa</Link>
               </li>
             </ul>
           </div>
@@ -39,16 +45,21 @@ class HomeFooter extends Component {
             <h4>Dịch vụ</h4>
             <ul>
               <li>
-                <a href="#specialty">Chuyên khoa</a>
+                <Link to="/booking">Đặt lịch khám</Link>
               </li>
               <li>
-                <a href="#booking">Đặt lịch khám</a>
+                <Link to="/history">Lịch sử khám</Link>
               </li>
               <li>
-                <a href="#history">Lịch sử khám</a>
-              </li>
-              <li>
-                <a href="#support">Hỗ trợ</a>
+                <a
+                  role="button"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    this.handleSupportClick();
+                  }}
+                >
+                  Hỗ trợ
+                </a>
               </li>
             </ul>
           </div>
@@ -62,7 +73,7 @@ class HomeFooter extends Component {
             </p>
             <p>
               <i className="fa fa-phone"></i>
-              Hotline: 1900-xxxx
+              Hotline: 1900-1234
             </p>
             <p>
               <i className="fa fa-envelope"></i>
@@ -149,11 +160,11 @@ class HomeFooter extends Component {
 
         {/* Bottom Bar */}
         <div className="footer-bottom">
-          <p>
-            &copy; 2025 Booking Care. Bảo lưu mọi quyền. |{' '}
-            <a href="#privacy">Chính sách bảo mật</a> |{' '}
-            <a href="#terms">Điều khoản sử dụng</a>
-          </p>
+            <p>
+              &copy; 2025 Booking Care. Bảo lưu mọi quyền. |{' '}
+              <Link to="/privacy">Chính sách bảo mật</Link> |{' '}
+              <Link to="/terms">Điều khoản sử dụng</Link>
+            </p>
         </div>
       </div>
     );
@@ -171,4 +182,6 @@ const mapDispatchToProps = (dispatch) => {
   return {};
 };
 
-export default connect(mapStateToProps, mapDispatchToProps)(HomeFooter);
+export default withRouter(
+  connect(mapStateToProps, mapDispatchToProps)(HomeFooter)
+);

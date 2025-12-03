@@ -22,6 +22,7 @@ import Login from "../containers/Auth/Login";
 import System from "../routes/System";
 import ConfirmModal from "../components/ConfirmModal";
 import ChatWidget from "../components/ChatWidget/ChatWidget";
+import DiagnosisWidget from "../components/DiagnosisWidget/DiagnosisWidget.js";
 
 class App extends Component {
     handlePersistorState = () => {
@@ -113,6 +114,7 @@ class App extends Component {
                             theme="light"
                         />
                         <ChatWidget />
+                        <DiagnosisWidget />
                     </div>
                 </Router>
             </Fragment>

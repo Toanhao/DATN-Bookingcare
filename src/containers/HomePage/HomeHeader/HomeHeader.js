@@ -8,11 +8,20 @@ import { FormattedMessage } from 'react-intl';
 import { LANGUAGES } from '../../../utils';
 import { changeLanguageApp } from '../../../store/actions';
 import { withRouter } from 'react-router';
+import { Link } from 'react-router-dom';
+import { Sidebar } from 'primereact/sidebar';
 
 class HomeHeader extends Component {
   changeLanguage = (language) => {
     this.props.changeLanguageAppRedux(language);
   };
+
+  constructor(props) {
+    super(props);
+    this.state = {
+      visible: false,
+    };
+  }
 
   goToAllDirectory = (tab) => {
     if (this.props.history) {
@@ -27,6 +36,15 @@ class HomeHeader extends Component {
     }
   };
 
+  handleSupportClick = () => {
+    const message = `Nền tảng Đặt khám BookingCare
+ĐT:0347581948
+Email: support@bookingcare.vn
+Trực thuộc: Công ty CP Công nghệ BookingCare
+Địa chỉ: PTIT Hà Nội`;
+    window.alert(message);
+  };
+
   render() {
     let language = this.props.language;
     let placeHolder =
@@ -38,19 +56,83 @@ class HomeHeader extends Component {
         <div className="home-header-container">
           <div className="home-header-content">
             <div className="left-content">
-              <i className="fa fa-bars"></i>
-              <img
-                className="header-logo"
-                src={logo}
-                alt="BookingCare logo"
-                onClick={() => this.returnToHome()}
-              />
+              <Sidebar
+                visible={this.state.visible}
+                onHide={() => this.setState({ visible: false })}
+                style={{ width: '260px' }}
+              >
+                <div className="sidebar-menu">
+                  <ul>
+                    <li>
+                      <Link
+                        to="/home"
+                        onClick={() => this.setState({ visible: false })}
+                        className="sidebar-link"
+                      >
+                        <i className="fa fa-home" />
+                        <span style={{ marginLeft: 8 }}>Trang chủ</span>
+                      </Link>
+                    </li>
+
+                    <li>
+                      <Link
+                        to="/all-directory?tab=specialty"
+                        onClick={() => this.setState({ visible: false })}
+                        className="sidebar-link"
+                      >
+                        <i className="fa fa-list-alt" />
+                        <span style={{ marginLeft: 8 }}>Chuyên khoa</span>
+                      </Link>
+                    </li>
+
+                    <li>
+                      <Link
+                        to="/all-directory?tab=doctor"
+                        onClick={() => this.setState({ visible: false })}
+                        className="sidebar-link"
+                      >
+                        <i className="fa fa-user-md" />
+                        <span style={{ marginLeft: 8 }}>Bác sĩ nổi bật</span>
+                      </Link>
+                    </li>
+
+                    <li>
+                      <Link
+                        to="/all-directory?tab=clinic"
+                        onClick={() => this.setState({ visible: false })}
+                        className="sidebar-link"
+                      >
+                        <i className="fa fa-hospital" />
+                        <span style={{ marginLeft: 8 }}>Cơ sở y tế nổi bật</span>
+                      </Link>
+                    </li>
+
+                    <li>
+                      <a
+                        role="button"
+                        onClick={() => {
+                          this.handleSupportClick();
+                          this.setState({ visible: false });
+                        }}
+                        style={{ cursor: 'pointer', display: 'flex', alignItems: 'center' }}
+                      >
+                        <i className="fa fa-question-circle" />
+                        <span style={{ marginLeft: 8 }}>Hỗ trợ</span>
+                      </a>
+                    </li>
+                  </ul>
+                </div>
+              </Sidebar>
+              <i className="fa fa-bars" onClick={() => this.setState({ visible: true })}></i>
+              <Link to="/home">
+                <img className="header-logo" src={logo} alt="BookingCare logo" />
+              </Link>
             </div>
             <div className="center-content">
-              <div
+              <Link
+                to="/all-directory?tab=specialty"
                 className="child-content"
-                onClick={() => this.goToAllDirectory('specialty')}
-                style={{ cursor: 'pointer' }}
+                style={{ cursor: 'pointer', textDecoration: 'none', color: 'inherit' }}
               >
                 <div>
                   <b>
@@ -60,12 +142,12 @@ class HomeHeader extends Component {
                 <div className="subs-title">
                   <FormattedMessage id="home-header.searchdoctor" />
                 </div>
-              </div>
+              </Link>
 
-              <div
+              <Link
+                to="/all-directory?tab=clinic"
                 className="child-content"
-                onClick={() => this.goToAllDirectory('clinic')}
-                style={{ cursor: 'pointer' }}
+                style={{ cursor: 'pointer', textDecoration: 'none', color: 'inherit' }}
               >
                 <div>
                   <b>
@@ -75,11 +157,11 @@ class HomeHeader extends Component {
                 <div className="subs-title">
                   <FormattedMessage id="home-header.select-room" />
                 </div>
-              </div>
-              <div
+              </Link>
+              <Link
+                to="/all-directory?tab=doctor"
                 className="child-content"
-                onClick={() => this.goToAllDirectory('doctor')}
-                style={{ cursor: 'pointer' }}
+                style={{ cursor: 'pointer', textDecoration: 'none', color: 'inherit' }}
               >
                 <div>
                   <b>
@@ -89,7 +171,7 @@ class HomeHeader extends Component {
                 <div className="subs-title">
                   <FormattedMessage id="home-header.select-doctor" />
                 </div>
-              </div>
+              </Link>
               <div className="child-content">
                 <div>
                   <b>
@@ -102,7 +184,11 @@ class HomeHeader extends Component {
               </div>
             </div>
             <div className="right-content">
-              <div className="support">
+              <div
+                className="support"
+                onClick={() => this.handleSupportClick()}
+                style={{ cursor: 'pointer' }}
+              >
                 <i className="fas fa-question-circle"></i>
                 <FormattedMessage id="home-header.support" />
               </div>

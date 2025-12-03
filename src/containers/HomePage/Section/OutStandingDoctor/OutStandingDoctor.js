@@ -9,6 +9,7 @@ import { LANGUAGES } from '../../../../utils';
 import computeImageUrl from '../../../../utils/imageUtils';
 import userAvatar from '../../../../assets/images/user.svg';
 import { withRouter } from 'react-router';
+import { Link } from 'react-router-dom';
 import {
   getDetailInforDoctor,
   getAllSpecialty,
@@ -124,9 +125,9 @@ class OutStandingDoctor extends Component {
             <span className="title-section">
               <FormattedMessage id="homepage.outstanding-doctor" />
             </span>
-            <button className="btn-section">
+            <Link className="btn-section" to="/all-directory?tab=doctor">
               <FormattedMessage id="homepage.more-infor" />
-            </button>
+            </Link>
           </div>
           <div className="section-body section-outstanding-doctor">
             <Slider {...this.props.settings}>
