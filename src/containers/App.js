@@ -14,6 +14,7 @@ import VerifyEmail from "./Patient/VerifyEmail.js";
 import {
     userIsAuthenticated,
     userIsNotAuthenticated,
+    userIsAdminOrDoctor,
 } from "../hoc/authentication";
 import CustomScrollbars from "../components/CustomScrollbars";
 import { path } from "../utils";
@@ -67,11 +68,11 @@ class App extends Component {
                                     />
                                     <Route
                                         path={path.SYSTEM}
-                                        component={userIsAuthenticated(System)}
+                                        component={userIsAdminOrDoctor(System)}
                                     />
                                     <Route
                                         path={"/doctor"}
-                                        component={userIsAuthenticated(Doctor)}
+                                        component={userIsAdminOrDoctor(Doctor)}
                                     />
                                     <Route
                                         path={path.HOMEPAGE}

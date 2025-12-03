@@ -1,4 +1,5 @@
 import actionTypes from "./actionTypes";
+import { history } from "../../redux";
 
 export const addUserSuccess = () => ({
     type: actionTypes.ADD_USER_SUCCESS,
@@ -13,6 +14,15 @@ export const userLoginFail = () => ({
     type: actionTypes.USER_LOGIN_FAIL,
 });
 
-export const processLogout = () => ({
-    type: actionTypes.PROCESS_LOGOUT,
-});
+// processLogout as thunk: dispatch logout then navigate to login page
+export const processLogout = () => {
+    return (dispatch, getState) => {
+        dispatch({ type: actionTypes.PROCESS_LOGOUT });
+        // after clearing user state redirect to login
+        try {
+            history.push('/login');
+        } catch (e) {
+            // ignore navigation errors
+        }
+    };
+};

@@ -6,7 +6,7 @@ import './HomeHeader.scss';
 import logo from '../../../assets/logo.svg';
 import { FormattedMessage } from 'react-intl';
 import { LANGUAGES } from '../../../utils';
-import { changeLanguageApp } from '../../../store/actions';
+import { changeLanguageApp, processLogout } from '../../../store/actions';
 import { withRouter } from 'react-router';
 import { Link } from 'react-router-dom';
 import { Sidebar } from 'primereact/sidebar';
@@ -214,6 +214,16 @@ Trực thuộc: Công ty CP Công nghệ BookingCare
                   EN
                 </span>
               </div>
+              {this.props.isLoggedIn && (
+                <div
+                  className="btn btn-logout"
+                  onClick={() => this.props.processLogout()}
+                  title="Log out"
+                  style={{ marginLeft: 12 }}
+                >
+                  <i className="fas fa-sign-out-alt"></i>
+                </div>
+              )}
             </div>
           </div>
         </div>
@@ -304,6 +314,7 @@ const mapStateToProps = (state) => {
 const mapDispatchToProps = (dispatch) => {
   return {
     changeLanguageAppRedux: (language) => dispatch(changeLanguageApp(language)),
+    processLogout: () => dispatch(processLogout()),
   };
 };
 
