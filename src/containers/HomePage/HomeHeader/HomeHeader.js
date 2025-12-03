@@ -4,6 +4,8 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import './HomeHeader.scss';
 import logo from '../../../assets/logo.svg';
+import computeImageUrl from '../../../utils/imageUtils';
+import userAvatar from '../../../assets/images/user.svg';
 import { FormattedMessage } from 'react-intl';
 import { LANGUAGES } from '../../../utils';
 import { changeLanguageApp, processLogout } from '../../../store/actions';
@@ -20,8 +22,40 @@ class HomeHeader extends Component {
     super(props);
     this.state = {
       visible: false,
+      showUserMenu: false,
     };
+
+    this.userMenuRef = React.createRef();
   }
+
+  componentDidMount() {
+    document.addEventListener('click', this.handleDocumentClick);
+  }
+
+  componentWillUnmount() {
+    document.removeEventListener('click', this.handleDocumentClick);
+  }
+
+  handleDocumentClick = (e) => {
+    if (
+      this.userMenuRef &&
+      this.userMenuRef.current &&
+      !this.userMenuRef.current.contains(e.target)
+    ) {
+      this.setState({ showUserMenu: false });
+    }
+  };
+
+  toggleUserMenu = (e) => {
+    // prevent document click handler from immediately closing it
+    e && e.stopPropagation && e.stopPropagation();
+    this.setState((prev) => ({ showUserMenu: !prev.showUserMenu }));
+  };
+
+  handleLogoutFromMenu = () => {
+    this.setState({ showUserMenu: false });
+    this.props.processLogout();
+  };
 
   goToAllDirectory = (tab) => {
     if (this.props.history) {
@@ -103,36 +137,48 @@ Trực thuộc: Công ty CP Công nghệ BookingCare
                         className="sidebar-link"
                       >
                         <i className="fa fa-hospital" />
-                        <span style={{ marginLeft: 8 }}>Cơ sở y tế nổi bật</span>
+                        <span style={{ marginLeft: 8 }}>
+                          Cơ sở y tế nổi bật
+                        </span>
                       </Link>
                     </li>
 
                     <li>
-                      <a
-                        role="button"
+                      <i className="fa fa-question-circle" />
+                      <span
                         onClick={() => {
                           this.handleSupportClick();
                           this.setState({ visible: false });
                         }}
-                        style={{ cursor: 'pointer', display: 'flex', alignItems: 'center' }}
+                        style={{ marginLeft: 8 }}
                       >
-                        <i className="fa fa-question-circle" />
-                        <span style={{ marginLeft: 8 }}>Hỗ trợ</span>
-                      </a>
+                        <FormattedMessage id="home-header.support" />
+                      </span>
                     </li>
                   </ul>
                 </div>
               </Sidebar>
-              <i className="fa fa-bars" onClick={() => this.setState({ visible: true })}></i>
+              <i
+                className="fa fa-bars"
+                onClick={() => this.setState({ visible: true })}
+              ></i>
               <Link to="/home">
-                <img className="header-logo" src={logo} alt="BookingCare logo" />
+                <img
+                  className="header-logo"
+                  src={logo}
+                  alt="BookingCare logo"
+                />
               </Link>
             </div>
             <div className="center-content">
               <Link
                 to="/all-directory?tab=specialty"
                 className="child-content"
-                style={{ cursor: 'pointer', textDecoration: 'none', color: 'inherit' }}
+                style={{
+                  cursor: 'pointer',
+                  textDecoration: 'none',
+                  color: 'inherit',
+                }}
               >
                 <div>
                   <b>
@@ -147,7 +193,11 @@ Trực thuộc: Công ty CP Công nghệ BookingCare
               <Link
                 to="/all-directory?tab=clinic"
                 className="child-content"
-                style={{ cursor: 'pointer', textDecoration: 'none', color: 'inherit' }}
+                style={{
+                  cursor: 'pointer',
+                  textDecoration: 'none',
+                  color: 'inherit',
+                }}
               >
                 <div>
                   <b>
@@ -161,7 +211,11 @@ Trực thuộc: Công ty CP Công nghệ BookingCare
               <Link
                 to="/all-directory?tab=doctor"
                 className="child-content"
-                style={{ cursor: 'pointer', textDecoration: 'none', color: 'inherit' }}
+                style={{
+                  cursor: 'pointer',
+                  textDecoration: 'none',
+                  color: 'inherit',
+                }}
               >
                 <div>
                   <b>
@@ -216,12 +270,63 @@ Trực thuộc: Công ty CP Công nghệ BookingCare
               </div>
               {this.props.isLoggedIn && (
                 <div
-                  className="btn btn-logout"
-                  onClick={() => this.props.processLogout()}
-                  title="Log out"
-                  style={{ marginLeft: 12 }}
+                  className="user-section"
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    marginLeft: 12,
+                    position: 'relative',
+                  }}
+                  ref={this.userMenuRef}
                 >
-                  <i className="fas fa-sign-out-alt"></i>
+                  <div
+                    className="user-info"
+                    title={this.props.userInfo && this.props.userInfo.email}
+                    onClick={this.toggleUserMenu}
+                    role="button"
+                  >
+                    {(() => {
+                      const avatarUrl =
+                        (this.props.userInfo && this.props.userInfo.image
+                          ? computeImageUrl(this.props.userInfo.image)
+                          : null) || userAvatar;
+                      return (
+                        <div
+                          className="user-avatar"
+                          style={{ backgroundImage: `url(${avatarUrl})` }}
+                          role="img"
+                          aria-label="user avatar"
+                        />
+                      );
+                    })()}
+                    <span className="user-name">
+                      {this.props.userInfo &&
+                      this.props.userInfo.firstName &&
+                      this.props.userInfo.lastName
+                        ? `${this.props.userInfo.lastName} ${this.props.userInfo.firstName} `
+                        : ''}
+                    </span>
+                  </div>
+
+                  {this.state.showUserMenu && (
+                    <div className="user-dropdown">
+                      {/* you can add more items here (Profile, Settings...) */}
+                      <div
+                        className="user-dropdown-item"
+                        onClick={this.handleLogoutFromMenu}
+                        role="button"
+                      >
+                        <i
+                          className="fas fa-sign-out-alt"
+                          style={{ marginRight: 8 }}
+                        ></i>
+                        <FormattedMessage
+                          id="home-header.logout"
+                          defaultMessage="Logout"
+                        />
+                      </div>
+                    </div>
+                  )}
                 </div>
               )}
             </div>

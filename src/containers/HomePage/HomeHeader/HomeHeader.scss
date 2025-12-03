@@ -22,7 +22,7 @@
         width: 100%;
         cursor: pointer;
         transform: scale(0.5, 0.5);
-        margin-left: -45px;
+        margin-left: -10px;
       }
 
       i {
@@ -53,7 +53,7 @@
       align-items: center;
 
       .support {
-        padding-right: 50px;
+        padding-right: 30px;
         display: flex;
         align-items: center;
         cursor: pointer;
@@ -90,6 +90,60 @@
         }
         &:hover {
           opacity: 0.8;
+        }
+      }
+
+      .user-section {
+        display: flex;
+        align-items: center;
+        .user-info {
+          display: flex;
+          align-items: center;
+          cursor: pointer;
+          padding: 6px 8px;
+          border-radius: 6px;
+        }
+
+        .user-avatar {
+          width: 36px;
+          height: 36px;
+          border-radius: 50%;
+          background-size: cover;
+          background-position: center;
+          background-repeat: no-repeat;
+          display: inline-block;
+          overflow: hidden;
+          border: 1px solid #eee;
+        }
+
+        .user-name {
+          margin-left: 8px;
+          font-weight: 600;
+          color: #333;
+        }
+
+        .user-dropdown {
+          position: absolute;
+          right: 0;
+          top: calc(100% + 8px);
+          min-width: 160px;
+          background: #fff;
+          border-radius: 6px;
+          box-shadow: 0 8px 24px rgba(0, 0, 0, 0.16);
+          z-index: 60;
+          padding: 6px 0;
+        }
+
+        .user-dropdown-item {
+          padding: 10px 14px;
+          cursor: pointer;
+          display: flex;
+          align-items: center;
+          color: #333;
+        }
+
+        .user-dropdown-item:hover {
+          background: #f5f7fa;
         }
       }
     }
@@ -245,6 +299,22 @@
       background: #f5f7fa;
       color: #111;
     }
+
+    /* ensure react-router Link inside sidebar doesn't show default link styles */
+    .sidebar-link {
+      display: flex;
+      align-items: center;
+      width: 100%;
+      color: inherit;
+      text-decoration: none;
+    }
+
+    .sidebar-link:hover,
+    .sidebar-link:focus,
+    .sidebar-link:active {
+      text-decoration: none;
+      color: inherit;
+    }
   }
 }
 
@@ -271,17 +341,6 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.12);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.12);
 }
 
-/* if sidebar attaches left, keep close inside */
-.p-sidebar-left .p-sidebar-close {
-  right: 12px !important;
-  left: auto !important;
-}
-
-/* if sidebar attaches right, place the close icon near the left inside edge */
-.p-sidebar-right .p-sidebar-close {
-  left: 12px !important;
-  right: auto !important;
-}
