@@ -12,7 +12,6 @@ import DetailClinic from "./Patient/Clinic/DetailClinic";
 import AllDirectory from "./HomePage/AllSpecialties/AllDirectory";
 import VerifyEmail from "./Patient/VerifyEmail.js";
 import {
-    userIsAuthenticated,
     userIsNotAuthenticated,
     userIsAdminOrDoctor,
 } from "../hoc/authentication";
@@ -24,7 +23,7 @@ import System from "../routes/System";
 import ConfirmModal from "../components/ConfirmModal";
 import ChatWidget from "../components/ChatWidget/ChatWidget";
 import DiagnosisWidget from "../components/DiagnosisWidget/DiagnosisWidget.js";
-
+import BookingChat from "../components/BookingChat/BookingChat.js";
 class App extends Component {
     handlePersistorState = () => {
         const { persistor } = this.props;
@@ -114,6 +113,7 @@ class App extends Component {
                             pauseOnHover
                             theme="light"
                         />
+                        <BookingChat />
                         <ChatWidget />
                         <DiagnosisWidget />
                     </div>

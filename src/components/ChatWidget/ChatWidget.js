@@ -32,6 +32,7 @@ const ChatWidget = () => {
   const [isTyping, setIsTyping] = useState(false);
   const [unread, setUnread] = useState(0);
   const listRef = useRef(null);
+  const chatContainerRef = useRef(null);
 
   // Configuration to avoid sending >1000 characters per API request
   const MAX_REQUEST_CHARS = 1000; // API limit per request
@@ -130,6 +131,22 @@ const ChatWidget = () => {
     // run once
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  // Handle click outside to close chat
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (chatContainerRef.current && !chatContainerRef.current.contains(event.target)) {
+        setOpen(false);
+      }
+    };
+
+    if (open) {
+      document.addEventListener('mousedown', handleClickOutside);
+      return () => {
+        document.removeEventListener('mousedown', handleClickOutside);
+      };
+    }
+  }, [open]);
 
   const startRecording = () => {
     const rec = recognitionRef.current;
@@ -341,7 +358,7 @@ const ChatWidget = () => {
   }, [reduxLang]);
 
   return (
-    <div className={`chat-widget ${open ? 'open' : ''}`}>
+    <div className={`chat-widget ${open ? 'open' : ''}`} ref={chatContainerRef}>
       <div
         className="chat-toggle"
         onClick={() => setOpen((s) => !s)}
@@ -390,69 +407,23 @@ const ChatWidget = () => {
               key={m.id}
               className={`msg ${m.from === 'ai' ? 'ai' : 'user'}`}
             >
-                  {m.type === 'analysis' && m.content ? (
-                <div className="bubble analysis">
-                  {m.content.summary && (
-                    <div className="analysis-section">
-                      <strong>Summary:</strong>
-                      <div dangerouslySetInnerHTML={{ __html: md.render(m.content.summary || '') }} />
-                    </div>
-                  )}
-                  {m.content.key_findings &&
-                    m.content.key_findings.length > 0 && (
-                      <div className="analysis-section">
-                        <strong>Key findings:</strong>
-                        <ul>
-                          {m.content.key_findings.map((kf, i) => (
-                            <li key={i} dangerouslySetInnerHTML={{ __html: md.renderInline(kf || '') }} />
-                          ))}
-                        </ul>
-                      </div>
-                    )}
-                  {m.content.recommendations &&
-                    m.content.recommendations.length > 0 && (
-                      <div className="analysis-section">
-                        <strong>Recommendations:</strong>
-                        <ul>
-                          {m.content.recommendations.map((rec, i) => (
-                            <li key={i} dangerouslySetInnerHTML={{ __html: md.renderInline(rec || '') }} />
-                          ))}
-                        </ul>
-                      </div>
-                    )}
-                  {m.content.next_steps && m.content.next_steps.length > 0 && (
-                    <div className="analysis-section">
-                      <strong>Next steps:</strong>
-                      <ul>
-                        {m.content.next_steps.map((ns, i) => (
-                          <li key={i} dangerouslySetInnerHTML={{ __html: md.renderInline(ns || '') }} />
-                        ))}
-                      </ul>
-                    </div>
-                  )}
-                      {m.content.disclaimer && (
-                        <div className="analysis-section disclaimer">
-                          <span dangerouslySetInnerHTML={{ __html: md.renderInline(m.content.disclaimer || '') }} />
-                        </div>
-                      )}
-                </div>
-              ) : (
-                <div className="bubble">
-                  <div
-                    className="bubble-html"
-                    dangerouslySetInnerHTML={{ __html: md.render(m.text || '') }}
-                  />
-                  {m.from === 'ai' && (
-                    <button
-                      className="play-btn"
-                      onClick={() => speakText(m.text, m.language || language)}
-                      title="Phát âm"
-                    >
-                      🔊
-                    </button>
-                  )}
-                </div>
-              )}
+              <div className="bubble">
+                <div
+                  className="bubble-html"
+                  dangerouslySetInnerHTML={{
+                    __html: md.render(m.text || ''),
+                  }}
+                />
+                {m.from === 'ai' && (
+                  <button
+                    className="play-btn"
+                    onClick={() => speakText(m.text, m.language || language)}
+                    title="Phát âm"
+                  >
+                    🔊
+                  </button>
+                )}
+              </div>
               <div className="time">
                 {new Date(m.time).toLocaleTimeString()}
               </div>
@@ -478,7 +449,9 @@ const ChatWidget = () => {
           />
           {/* mic placed next to send button for quick voice input */}
           <button
-            className={`voice-btn input-voice ${isRecording ? 'recording' : ''}`}
+            className={`voice-btn input-voice ${
+              isRecording ? 'recording' : ''
+            }`}
             onClick={toggleRecording}
             title={isRecording ? 'Dừng ghi âm' : 'Ghi âm (nói)'}
           >

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useSelector } from 'react-redux';
 import './DiagnosisWidget.scss';
 import MarkdownIt from 'markdown-it';
@@ -7,6 +7,7 @@ import { analyzeText } from '../../services/chatService';
 const STORAGE_KEY = 'ai_diag_history_v1';
 
 export default function DiagnosisWidget() {
+  const diagContainerRef = useRef(null);
   const [open, setOpen] = useState(false);
   const [input, setInput] = useState('');
   const [context, setContext] = useState('');
@@ -37,6 +38,22 @@ export default function DiagnosisWidget() {
   const lang = reduxLang || 'en';
 
   const md = new MarkdownIt({ html: false, linkify: true, typographer: true });
+
+  // Handle click outside to close diagnosis widget
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (diagContainerRef.current && !diagContainerRef.current.contains(event.target)) {
+        setOpen(false);
+      }
+    };
+
+    if (open) {
+      document.addEventListener('mousedown', handleClickOutside);
+      return () => {
+        document.removeEventListener('mousedown', handleClickOutside);
+      };
+    }
+  }, [open]);
 
   const saveResult = (res) => {
     const item = {
@@ -78,7 +95,7 @@ export default function DiagnosisWidget() {
 
 
   return (
-    <div className={`diagnosis-widget ${open ? 'open' : ''}`}>
+    <div className={`diagnosis-widget ${open ? 'open' : ''}`} ref={diagContainerRef}>
       <div
         className="diag-toggle"
         onClick={() => setOpen((s) => !s)}
@@ -153,14 +170,6 @@ export default function DiagnosisWidget() {
 
                       return (
                         <>
-                          {content.summary && (
-                            <div
-                              className="summary"
-                              dangerouslySetInnerHTML={{
-                                __html: md.render(content.summary || ''),
-                              }}
-                            />
-                          )}
                           {Array.isArray(content.key_findings) &&
                             content.key_findings.length > 0 && (
                               <div className="section">

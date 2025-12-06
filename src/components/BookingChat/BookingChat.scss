@@ -1,8 +1,8 @@
-.chat-widget {
+.booking-chat {
   position: fixed;
   right: 24px;
-  bottom: 20px;
-  z-index: 9999;
+  bottom: 140px;
+  z-index: 9997;
 
   .chat-toggle {
     width: 56px;
@@ -161,9 +161,16 @@
       font-weight: 600;
       margin: 6px 0 4px;
     }
-    .chat-line { margin: 2px 0 }
-    .simple-list { padding-left: 18px; margin: 6px 0 }
-    .simple-list li { margin: 4px 0 }
+    .chat-line {
+      margin: 2px 0;
+    }
+    .simple-list {
+      padding-left: 18px;
+      margin: 6px 0;
+    }
+    .simple-list li {
+      margin: 4px 0;
+    }
 
     .msg.ai.typing .bubble {
       background: #f0f2f5;

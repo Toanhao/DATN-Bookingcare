@@ -15,6 +15,7 @@ import { postPatientBookAppointment } from '../../../../services/userService';
 import { toast } from 'react-toastify';
 import moment from 'moment';
 import LoadingOverlay from 'react-loading-overlay';
+import { withRouter } from 'react-router-dom';
 class BookingModal extends Component {
   constructor(props) {
     super(props);
@@ -36,6 +37,38 @@ class BookingModal extends Component {
   async componentDidMount() {
     this.props.getGenders();
   }
+
+  // Fill user info when modal opens
+  fillUserFromProps = () => {
+    const { isLoggedIn, userInfo } = this.props;
+    if (isLoggedIn && userInfo) {
+      const fullName = userInfo.fullName || `${userInfo.firstName || ''} ${userInfo.lastName || ''}`.trim();
+      const phoneNumber = userInfo.phoneNumber || userInfo.phonenumber || userInfo.phone || '';
+      const email = userInfo.email || '';
+      const address = userInfo.address || '';
+      let birthday = '';
+
+      // find matching gender option (value may be stored as 'gender' or 'genderId')
+      let selectedGender = this.state.selectedGender;
+      const genderKey = userInfo.gender || userInfo.genderId || userInfo.sex || userInfo.gender_key;
+      if (genderKey && this.state.genders && Array.isArray(this.state.genders)) {
+        const match = this.state.genders.find((g) => String(g.value) === String(genderKey));
+        if (match) selectedGender = match;
+      }
+
+      const reason = userInfo.reason || this.state.reason || '';
+
+      this.setState({
+        fullName: fullName || this.state.fullName,
+        phoneNumber: phoneNumber || this.state.phoneNumber,
+        email: email || this.state.email,
+        address: address || this.state.address,
+        birthday: birthday || this.state.birthday,
+        selectedGender: selectedGender,
+        reason: reason,
+      });
+    }
+  };
 
   buildDataGender = (data) => {
     let result = [];
@@ -70,6 +103,27 @@ class BookingModal extends Component {
           doctorId: doctorId,
           timeType: timeType,
         });
+      }
+    }
+
+    // When modal is opened, auto-fill user info or redirect to login
+    if (this.props.isOpenModal && !prevProps.isOpenModal) {
+      if (this.props.isLoggedIn) {
+        // ensure genders list already built, otherwise build then fill
+        if (!this.state.genders || this.state.genders.length === 0) {
+          this.setState({ genders: this.buildDataGender(this.props.genders) }, () => {
+            this.fillUserFromProps();
+          });
+        } else {
+          this.fillUserFromProps();
+        }
+      } else {
+        // not logged in -> redirect to login and close modal
+        if (this.props.closeBookingClose) this.props.closeBookingClose();
+        // use history from withRouter
+        if (this.props.history && this.props.history.push) {
+          this.props.history.push('/login');
+        }
       }
     }
   }
@@ -312,6 +366,8 @@ const mapStateToProps = (state) => {
   return {
     language: state.app.language,
     genders: state.admin.genders,
+    isLoggedIn: state.user && state.user.isLoggedIn,
+    userInfo: state.user && state.user.userInfo,
   };
 };
 
@@ -321,4 +377,4 @@ const mapDispatchToProps = (dispatch) => {
   };
 };
 
-export default connect(mapStateToProps, mapDispatchToProps)(BookingModal);
+export default withRouter(connect(mapStateToProps, mapDispatchToProps)(BookingModal));
