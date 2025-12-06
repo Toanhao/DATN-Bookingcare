@@ -19,6 +19,7 @@ import CustomScrollbars from "../components/CustomScrollbars";
 import { path } from "../utils";
 import Home from "../routes/Home";
 import Login from "../containers/Auth/Login";
+import Register from "../containers/Auth/Register";
 import System from "../routes/System";
 import ConfirmModal from "../components/ConfirmModal";
 import ChatWidget from "../components/ChatWidget/ChatWidget";
@@ -63,6 +64,12 @@ class App extends Component {
                                         path={path.LOGIN}
                                         component={userIsNotAuthenticated(
                                             Login
+                                        )}
+                                    />
+                                    <Route
+                                        path={path.REGISTER}
+                                        component={userIsNotAuthenticated(
+                                            Register
                                         )}
                                     />
                                     <Route

@@ -149,6 +149,20 @@ class Login extends Component {
                                     Forgot your password ?
                                 </span>
                             </div>
+                            <div className="col-12 text-center register-signup">
+                                <span className="text-signup">
+                                    Chưa có tài khoản?{" "}
+                                    <a
+                                        href="/register"
+                                        onClick={(e) => {
+                                            e.preventDefault();
+                                            this.props.navigate("/register");
+                                        }}
+                                    >
+                                        Đăng ký ngay
+                                    </a>
+                                </span>
+                            </div>
                             <div className="col-12 text-center my-3">
                                 <span className="text-other-login">
                                     Or login with:
