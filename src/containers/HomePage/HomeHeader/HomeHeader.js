@@ -268,7 +268,7 @@ Trực thuộc: Công ty CP Công nghệ BookingCare
                   EN
                 </span>
               </div>
-              {this.props.isLoggedIn && (
+              {this.props.isLoggedIn ? (
                 <div
                   className="user-section"
                   style={{
@@ -280,7 +280,7 @@ Trực thuộc: Công ty CP Công nghệ BookingCare
                   ref={this.userMenuRef}
                 >
                   <div
-                    className="user-info"
+                    className="user-Info"
                     title={this.props.userInfo && this.props.userInfo.email}
                     onClick={this.toggleUserMenu}
                     role="button"
@@ -328,6 +328,14 @@ Trực thuộc: Công ty CP Công nghệ BookingCare
                     </div>
                   )}
                 </div>
+              ) : (
+                <Link to="/login" className="login-button">
+                  <i className="fas fa-sign-in-alt"></i>
+                  <FormattedMessage
+                    id="home-header.login"
+                    defaultMessage="Login"
+                  />
+                </Link>
               )}
             </div>
           </div>

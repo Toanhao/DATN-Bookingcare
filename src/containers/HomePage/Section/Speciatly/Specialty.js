@@ -45,7 +45,7 @@ class Specialty extends Component {
               <FormattedMessage id="homepage.specialty" />
             </span>
             <Link className="btn-section" to="/all-directory?tab=specialty">
-              <FormattedMessage id="homepage.more-infor" />
+              <FormattedMessage id="homepage.more-Infor" />
             </Link>
           </div>
           <div className="section-body">

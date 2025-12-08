@@ -38,21 +38,34 @@ class BookingModal extends Component {
     this.props.getGenders();
   }
 
-  // Fill user info when modal opens
+  // Fill user Info when modal opens
   fillUserFromProps = () => {
     const { isLoggedIn, userInfo } = this.props;
     if (isLoggedIn && userInfo) {
-      const fullName = userInfo.fullName || `${userInfo.firstName || ''} ${userInfo.lastName || ''}`.trim();
-      const phoneNumber = userInfo.phoneNumber || userInfo.phonenumber || userInfo.phone || '';
+      const fullName =
+        userInfo.fullName ||
+        `${userInfo.firstName || ''} ${userInfo.lastName || ''}`.trim();
+      const phoneNumber =
+        userInfo.phoneNumber || userInfo.phonenumber || userInfo.phone || '';
       const email = userInfo.email || '';
       const address = userInfo.address || '';
       let birthday = '';
 
       // find matching gender option (value may be stored as 'gender' or 'genderId')
       let selectedGender = this.state.selectedGender;
-      const genderKey = userInfo.gender || userInfo.genderId || userInfo.sex || userInfo.gender_key;
-      if (genderKey && this.state.genders && Array.isArray(this.state.genders)) {
-        const match = this.state.genders.find((g) => String(g.value) === String(genderKey));
+      const genderKey =
+        userInfo.gender ||
+        userInfo.genderId ||
+        userInfo.sex ||
+        userInfo.gender_key;
+      if (
+        genderKey &&
+        this.state.genders &&
+        Array.isArray(this.state.genders)
+      ) {
+        const match = this.state.genders.find(
+          (g) => String(g.value) === String(genderKey)
+        );
         if (match) selectedGender = match;
       }
 
@@ -106,14 +119,17 @@ class BookingModal extends Component {
       }
     }
 
-    // When modal is opened, auto-fill user info or redirect to login
+    // When modal is opened, auto-fill user Info or redirect to login
     if (this.props.isOpenModal && !prevProps.isOpenModal) {
       if (this.props.isLoggedIn) {
         // ensure genders list already built, otherwise build then fill
         if (!this.state.genders || this.state.genders.length === 0) {
-          this.setState({ genders: this.buildDataGender(this.props.genders) }, () => {
-            this.fillUserFromProps();
-          });
+          this.setState(
+            { genders: this.buildDataGender(this.props.genders) },
+            () => {
+              this.fillUserFromProps();
+            }
+          );
         } else {
           this.fillUserFromProps();
         }
@@ -246,7 +262,7 @@ class BookingModal extends Component {
 
             <div className="booking-modal-body">
               {/* {JSON.stringify(dataTime)} */}
-              <div className="doctor-infor">
+              <div className="doctor-Infor">
                 <ProfileDoctor
                   doctorId={doctorId}
                   isShowDescriptionDoctor={false}
@@ -377,4 +393,6 @@ const mapDispatchToProps = (dispatch) => {
   };
 };
 
-export default withRouter(connect(mapStateToProps, mapDispatchToProps)(BookingModal));
+export default withRouter(
+  connect(mapStateToProps, mapDispatchToProps)(BookingModal)
+);

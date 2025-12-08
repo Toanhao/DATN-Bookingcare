@@ -1,4 +1,4 @@
-@import "../styles/common.scss";
+@import '../styles/common.scss';
 
 .toast-container {
   .toast-item {
@@ -18,14 +18,14 @@
       background: $colormain;
     }
 
-    &.Toastify__toast--info {
+    &.Toastify__toast--Info {
       background: $colormain;
     }
 
     .toast-close {
       position: absolute;
       right: 10px;
-      top:10px;
+      top: 10px;
       color: $common-text-color;
       font-size: $base-size;
       padding: 0;

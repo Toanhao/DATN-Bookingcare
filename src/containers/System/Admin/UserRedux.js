@@ -196,7 +196,7 @@ class UserRedux extends Component {
             password: "HARDCODE",
             firstName: user.firstName,
             lastName: user.lastName,
-            phoneNumber: user.phonenumber,
+            phoneNumber: user.phoneNumber,
             address: user.address,
             role: user.roleId,
             gender: user.gender,

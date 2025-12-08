@@ -166,7 +166,7 @@ class DetailDoctor extends Component {
             </div>
           </div>
 
-          <div className="detail-infor-doctor">
+          <div className="detail-Infor-doctor">
             {detailDoctor &&
               detailDoctor.Markdown &&
               detailDoctor.Markdown.contentHTML && (

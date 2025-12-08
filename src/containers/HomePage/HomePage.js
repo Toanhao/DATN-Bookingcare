@@ -7,8 +7,6 @@ import HomeFooter from './HomeFooter/HomeFooter';
 import HandBook from './Section/HandBook/HandBook';
 import MedicalFacility from './Section/MedicalFacility/MedicalFacility';
 import OutStandingDoctor from './Section/OutStandingDoctor/OutStandingDoctor';
-import ChatWidget from '../../components/ChatWidget/ChatWidget';
-import DiagnosisWidget from '../../components/DiagnosisWidget/DiagnosisWidget';
 import './HomePage.scss';
 import 'slick-carousel/slick/slick.css';
 import 'slick-carousel/slick/slick-theme.css';

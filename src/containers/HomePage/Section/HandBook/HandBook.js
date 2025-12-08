@@ -15,7 +15,7 @@ class HandBook extends Component {
               <FormattedMessage id="homepage.handbook" />
             </span>
             <Link className="btn-section" to="/all-directory?tab=all">
-              <FormattedMessage id="homepage.more-infor" />
+              <FormattedMessage id="homepage.more-Infor" />
             </Link>
           </div>
           <div className="section-body">

@@ -74,12 +74,12 @@ class OutStandingDoctor extends Component {
             (res.errCode === 0 || (res.data && res.data.errCode === 0))
           ) {
             const payload = res.data ? res.data.data || res.data : res.data;
-            const info =
+            const Info =
               (payload && payload.Doctor_Infor) ||
               (res.data && res.data.Doctor_Infor) ||
               null;
             const specialtyId =
-              info && info.specialtyId ? info.specialtyId : null;
+              Info && Info.specialtyId ? Info.specialtyId : null;
             if (specialtyId) {
               const found = specialties.find(
                 (s) =>
@@ -126,7 +126,7 @@ class OutStandingDoctor extends Component {
               <FormattedMessage id="homepage.outstanding-doctor" />
             </span>
             <Link className="btn-section" to="/all-directory?tab=doctor">
-              <FormattedMessage id="homepage.more-infor" />
+              <FormattedMessage id="homepage.more-Infor" />
             </Link>
           </div>
           <div className="section-body section-outstanding-doctor">

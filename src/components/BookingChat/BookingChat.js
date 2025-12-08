@@ -33,7 +33,6 @@ const BookingChat = () => {
   const chatContainerRef = useRef(null);
 
   useEffect(() => {
-
     return () => {
       if (recognitionRef.current) {
         try {
@@ -50,7 +49,10 @@ const BookingChat = () => {
   // Handle click outside to close chat
   useEffect(() => {
     const handleClickOutside = (event) => {
-      if (chatContainerRef.current && !chatContainerRef.current.contains(event.target)) {
+      if (
+        chatContainerRef.current &&
+        !chatContainerRef.current.contains(event.target)
+      ) {
         setOpen(false);
       }
     };
@@ -135,13 +137,15 @@ const BookingChat = () => {
         .filter((m) => m.from === 'user')
         .slice(-4)
         .map((m) => m.text);
-      
+
       // Ghép tất cả thành 1 string với label
       let fullMessage = text;
       if (userMessages.length > 0) {
-        fullMessage = `Câu hỏi trước đó: ${userMessages.join(' | ')}\n\nCâu hỏi hiện tại: ${text}`;
+        fullMessage = `Câu hỏi trước đó: ${userMessages.join(
+          ' | '
+        )}\n\nCâu hỏi hiện tại: ${text}`;
       }
-      
+
       const res = await sendChatBooking({ message: fullMessage, language });
       // emulate streaming by revealing characters progressively
       const aiText = res.reply || 'Hệ thống đang bận, vui lòng thử lại sau.';
@@ -155,7 +159,7 @@ const BookingChat = () => {
       setMessages((m) => [...m, aiMsg]);
 
       // progressively reveal
-      for (let i = 0; i <= aiText.length; i+=2) {
+      for (let i = 0; i <= aiText.length; i += 2) {
         await new Promise((r) => setTimeout(r, 12));
         setMessages((cur) => {
           const copy = cur.slice();
@@ -199,11 +203,14 @@ const BookingChat = () => {
   }, [reduxLang]);
 
   return (
-    <div className={`booking-chat ${open ? 'open' : ''}`} ref={chatContainerRef}>
+    <div
+      className={`booking-chat ${open ? 'open' : ''}`}
+      ref={chatContainerRef}
+    >
       <div
         className="chat-toggle"
         onClick={() => setOpen((s) => !s)}
-        title="Chat với AI"
+        title="Hỗ trợ đặt lịch khám"
       >
         <div className="chat-icon">💬</div>
         {unread > 0 && <div className="unread">{unread}</div>}
@@ -211,7 +218,7 @@ const BookingChat = () => {
 
       <div className="chat-panel" role="dialog" aria-hidden={!open}>
         <div className="chat-header">
-          <div className="title">Chat với AI</div>
+          <div className="title">Hỗ trợ đặt lịch khám</div>
           <div className="controls">
             {/* attachment removed from chat widget - use Diagnosis widget for analysis uploads */}
             <select

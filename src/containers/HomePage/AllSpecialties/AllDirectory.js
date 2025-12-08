@@ -58,11 +58,19 @@ const AllDirectory = (props) => {
         setClinics(data2 || []);
 
         // Enrich doctors with specialtyName (similar to OutStandingDoctor)
-        const enrichDoctorsWithSpecialty = async (doctorsList, specialtiesList) => {
+        const enrichDoctorsWithSpecialty = async (
+          doctorsList,
+          specialtiesList
+        ) => {
           if (!doctorsList || doctorsList.length === 0) return [];
           try {
             const detailPromises = doctorsList.map((d) => {
-              const id = d.id || d.userId || d.doctorId || (d.accountId && d.accountId.id) || null;
+              const id =
+                d.id ||
+                d.userId ||
+                d.doctorId ||
+                (d.accountId && d.accountId.id) ||
+                null;
               return id ? getDetailInforDoctor(id) : Promise.resolve(null);
             });
             const responses = await Promise.all(detailPromises);
@@ -74,13 +82,22 @@ const AllDirectory = (props) => {
                 if (res) {
                   // response can be axios shape or raw
                   const payload = res.data ? res.data.data || res.data : res;
-                  const info = (payload && payload.Doctor_Infor) || (res.data && res.data.Doctor_Infor) || null;
-                  const specialtyId = info && info.specialtyId ? info.specialtyId : null;
+                  const Info =
+                    (payload && payload.Doctor_Infor) ||
+                    (res.data && res.data.Doctor_Infor) ||
+                    null;
+                  const specialtyId =
+                    Info && Info.specialtyId ? Info.specialtyId : null;
                   if (specialtyId) {
                     const found = (specialtiesList || []).find(
-                      (s) => s.id === specialtyId || s.id === +specialtyId || String(s.id) === String(specialtyId)
+                      (s) =>
+                        s.id === specialtyId ||
+                        s.id === +specialtyId ||
+                        String(s.id) === String(specialtyId)
                     );
-                    if (found) specialtyName = found.name || found.nameVi || found.nameEn || '';
+                    if (found)
+                      specialtyName =
+                        found.name || found.nameVi || found.nameEn || '';
                   }
                 }
               } catch (e) {
@@ -96,7 +113,10 @@ const AllDirectory = (props) => {
           }
         };
 
-        const enrichedDoctors = await enrichDoctorsWithSpecialty(data3 || [], data1 || []);
+        const enrichedDoctors = await enrichDoctorsWithSpecialty(
+          data3 || [],
+          data1 || []
+        );
         setDoctors(enrichedDoctors || []);
       } catch (e) {
         // ignore errors for now

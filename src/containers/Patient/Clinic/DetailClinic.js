@@ -258,7 +258,7 @@ class DetailClinic extends Component {
                     <div className="doctor-schedule">
                       <DoctorSchedule doctorIdFromParent={item} />
                     </div>
-                    <div className="doctor-extra-infor">
+                    <div className="doctor-extra-Infor">
                       <DoctorExtraInfor doctorIdFromParent={item} />
                     </div>
                   </div>

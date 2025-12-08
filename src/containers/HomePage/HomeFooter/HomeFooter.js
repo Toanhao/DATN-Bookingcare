@@ -160,11 +160,11 @@ class HomeFooter extends Component {
 
         {/* Bottom Bar */}
         <div className="footer-bottom">
-            <p>
-              &copy; 2025 Booking Care. Bảo lưu mọi quyền. |{' '}
-              <Link to="/privacy">Chính sách bảo mật</Link> |{' '}
-              <Link to="/terms">Điều khoản sử dụng</Link>
-            </p>
+          <p>
+            &copy; 2025 Booking Care. Bảo lưu mọi quyền. |{' '}
+            <Link to="/privacy">Chính sách bảo mật</Link> |{' '}
+            <Link to="/terms">Điều khoản sử dụng</Link>
+          </p>
         </div>
       </div>
     );
