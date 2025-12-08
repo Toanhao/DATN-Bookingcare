@@ -99,6 +99,19 @@ const getAllClinic = () => {
   return axios.get('api/get-all-clinic');
 };
 
+
+const createNewHandbook = (data) => {
+  return axios.post('/api/create-new-handbook', data);
+};
+
+const getAllHandbook = () => {
+  return axios.get('api/get-all-handbook');
+};
+
+const getDetailHandbookById = (id) => {
+  return axios.get(`api/get-detail-handbook-by-id?id=${id}`);
+};
+
 const getAllDetailClinicById = (data) => {
   return axios.get(`api/get-detail-clinic-by-id?id=${data.id}`);
 };
@@ -132,6 +145,9 @@ export {
   postVerifyBookAppointment,
   createNewSpecialty,
   getAllSpecialty,
+  createNewHandbook,
+  getAllHandbook,
+  getDetailHandbookById,
   getAllDetailSpecialtyById,
   createNewClinic,
   getAllClinic,

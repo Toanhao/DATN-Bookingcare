@@ -38,7 +38,13 @@ const DirectoryCard = ({ type = 'specialty', item = {}, onClick = () => {}, lang
         <div className="outer-bg">
           <div
             className={`bg-image ${
-              type === 'doctor' ? 'section-outstanding-doctor' : type === 'clinic' ? 'section-medical-facility' : 'section-specialty'
+              type === 'doctor' 
+                ? 'section-outstanding-doctor' 
+                : type === 'clinic' 
+                ? 'section-medical-facility' 
+                : type === 'handbook'
+                ? 'section-handbook'
+                : 'section-specialty'
             }`}
             style={{ backgroundImage: `url(${imageUrl})` }}
           />

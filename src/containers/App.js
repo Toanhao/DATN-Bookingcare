@@ -25,6 +25,7 @@ import ConfirmModal from "../components/ConfirmModal";
 import ChatWidget from "../components/ChatWidget/ChatWidget";
 import DiagnosisWidget from "../components/DiagnosisWidget/DiagnosisWidget.js";
 import BookingChat from "../components/BookingChat/BookingChat.js";
+import DetailHandbook from "./Patient/Handbook/DetailHandbook.js";
 class App extends Component {
     handlePersistorState = () => {
         const { persistor } = this.props;
@@ -46,86 +47,77 @@ class App extends Component {
 
     render() {
         return (
-            <Fragment>
-                <Router history={history}>
-                    <div className="main-container">
-                        <ConfirmModal />
-                        <span className="content-container">
-                            <CustomScrollbars
-                                style={{ height: "100vh", width: "100%" }}
-                            >
-                                <Switch>
-                                    <Route
-                                        path={path.HOME}
-                                        exact
-                                        component={Home}
-                                    />
-                                    <Route
-                                        path={path.LOGIN}
-                                        component={userIsNotAuthenticated(
-                                            Login
-                                        )}
-                                    />
-                                    <Route
-                                        path={path.REGISTER}
-                                        component={userIsNotAuthenticated(
-                                            Register
-                                        )}
-                                    />
-                                    <Route
-                                        path={path.SYSTEM}
-                                        component={userIsAdminOrDoctor(System)}
-                                    />
-                                    <Route
-                                        path={"/doctor"}
-                                        component={userIsAdminOrDoctor(Doctor)}
-                                    />
-                                    <Route
-                                        path={path.HOMEPAGE}
-                                        component={HomePage}
-                                    />
-                                    <Route
-                                        path={path.ALL_DIRECTORY}
-                                        component={AllDirectory}
-                                    />
-                                    <Route
-                                        path={path.DETAIL_SPECIALTY}
-                                        component={DetailSpecialty}
-                                    />
-                                    <Route
-                                        path={path.DETAIL_DOCTOR}
-                                        component={DetailDoctor}
-                                    />
-                                    <Route
-                                        path={path.DETAIL_CLINIC}
-                                        component={DetailClinic}
-                                    />
-                                    <Route
-                                        path={path.VERIFY_EMAIL_BOOKING}
-                                        component={VerifyEmail}
-                                    />
-                                </Switch>
-                            </CustomScrollbars>
-                        </span>
+          <Fragment>
+            <Router history={history}>
+              <div className="main-container">
+                <ConfirmModal />
+                <span className="content-container">
+                  <CustomScrollbars style={{ height: '100vh', width: '100%' }}>
+                    <Switch>
+                      <Route path={path.HOME} exact component={Home} />
+                      <Route
+                        path={path.LOGIN}
+                        component={userIsNotAuthenticated(Login)}
+                      />
+                      <Route
+                        path={path.REGISTER}
+                        component={userIsNotAuthenticated(Register)}
+                      />
+                      <Route
+                        path={path.SYSTEM}
+                        component={userIsAdminOrDoctor(System)}
+                      />
+                      <Route
+                        path={'/doctor'}
+                        component={userIsAdminOrDoctor(Doctor)}
+                      />
+                      <Route path={path.HOMEPAGE} component={HomePage} />
+                      <Route
+                        path={path.ALL_DIRECTORY}
+                        component={AllDirectory}
+                      />
+                      <Route
+                        path={path.DETAIL_SPECIALTY}
+                        component={DetailSpecialty}
+                      />
+                      <Route
+                        path={path.DETAIL_HANDBOOK}
+                        component={DetailHandbook}
+                      />
+                      <Route
+                        path={path.DETAIL_DOCTOR}
+                        component={DetailDoctor}
+                      />
+                      <Route
+                        path={path.DETAIL_CLINIC}
+                        component={DetailClinic}
+                      />
+                      <Route
+                        path={path.VERIFY_EMAIL_BOOKING}
+                        component={VerifyEmail}
+                      />
+                    </Switch>
+                  </CustomScrollbars>
+                </span>
 
-                        <ToastContainer
-                            position="bottom-right"
-                            autoClose={5000}
-                            hideProgressBar={false}
-                            newestOnTop={false}
-                            closeOnClick
-                            rtl={false}
-                            pauseOnFocusLoss
-                            draggable
-                            pauseOnHover
-                            theme="light"
-                        />
-                        <BookingChat />
-                        <ChatWidget />
-                        <DiagnosisWidget />
-                    </div>
-                </Router>
-            </Fragment>
+                <ToastContainer
+                  position="bottom-right"
+                  autoClose={5000}
+                  hideProgressBar={false}
+                  newestOnTop={false}
+                  closeOnClick
+                  rtl={false}
+                  pauseOnFocusLoss
+                  draggable
+                  pauseOnHover
+                  theme="light"
+                />
+                <BookingChat />
+                <ChatWidget />
+                <DiagnosisWidget />
+              </div>
+            </Router>
+          </Fragment>
         );
     }
 }

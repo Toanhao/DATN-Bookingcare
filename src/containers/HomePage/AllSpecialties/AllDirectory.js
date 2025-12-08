@@ -11,6 +11,7 @@ import {
   getAllClinic,
   getAllDoctors,
   getDetailInforDoctor,
+  getAllHandbook,
 } from '../../../services/userService';
 import DirectoryCard from './DirectoryCard';
 import { withRouter } from 'react-router';
@@ -20,6 +21,7 @@ const AllDirectory = (props) => {
   const [specialties, setSpecialties] = useState([]);
   const [clinics, setClinics] = useState([]);
   const [doctors, setDoctors] = useState([]);
+  const [handbooks, setHandbooks] = useState([]);
   const [searchText, setSearchText] = useState('');
   const [filterType, setFilterType] = useState('all');
 
@@ -36,10 +38,11 @@ const AllDirectory = (props) => {
     // fetch data for all tabs in parallel
     const fetchAll = async () => {
       try {
-        const [r1, r2, r3] = await Promise.all([
+        const [r1, r2, r3, r4] = await Promise.all([
           getAllSpecialty(),
           getAllClinic(),
           getAllDoctors(),
+          getAllHandbook(),
         ]);
         const normalize = (res) => {
           if (!res) return [];
@@ -53,9 +56,11 @@ const AllDirectory = (props) => {
         const data1 = normalize(r1);
         const data2 = normalize(r2);
         const data3 = normalize(r3);
+        const data4 = normalize(r4);
 
         setSpecialties(data1 || []);
         setClinics(data2 || []);
+        setHandbooks(data4 || []);
 
         // Enrich doctors with specialtyName (similar to OutStandingDoctor)
         const enrichDoctorsWithSpecialty = async (
@@ -131,6 +136,7 @@ const AllDirectory = (props) => {
       props.history.push(`/detail-specialty/${item.id}`);
     if (type === 'clinic') props.history.push(`/detail-clinic/${item.id}`);
     if (type === 'doctor') props.history.push(`/detail-doctor/${item.id}`);
+    if (type === 'handbook') props.history.push(`/detail-handbook/${item.id}`);
   };
 
   const renderSpecialtyGrid = (items = specialties) => (
@@ -175,16 +181,33 @@ const AllDirectory = (props) => {
     </div>
   );
 
+  const renderHandbookGrid = (items = handbooks) => (
+    <div className="grid">
+      {items.map((h, i) => (
+        <DirectoryCard
+          key={i}
+          type="handbook"
+          item={h}
+          onClick={goDetail}
+          language={props.language}
+        />
+      ))}
+    </div>
+  );
+
   const renderGrid = () => {
     if (tab === 'specialty') return renderSpecialtyGrid();
     if (tab === 'clinic') return renderClinicGrid();
-    return renderDoctorGrid();
+    if (tab === 'doctor') return renderDoctorGrid();
+    if (tab === 'handbook') return renderHandbookGrid();
+    return renderSpecialtyGrid();
   };
 
   const titleMap = {
     specialty: 'Tất cả chuyên khoa',
     clinic: 'Tất cả cơ sở y tế',
     doctor: 'Tất cả bác sĩ',
+    handbook: 'Tất cả cẩm nang',
   };
 
   const pageTitle = titleMap[tab] || titleMap.specialty;
@@ -199,8 +222,8 @@ const AllDirectory = (props) => {
               type="text"
               placeholder={
                 props.language === 'vi'
-                  ? 'Tìm kiếm chuyên khoa, cơ sở, bác sĩ'
-                  : 'Search specialties, facilities, doctors'
+                  ? 'Tìm kiếm chuyên khoa, cơ sở, bác sĩ, cẩm nang'
+                  : 'Search specialties, facilities, doctors, handbooks'
               }
               value={searchText}
               onChange={(e) => setSearchText(e.target.value)}
@@ -220,6 +243,9 @@ const AllDirectory = (props) => {
               </option>
               <option value="doctor">
                 {props.language === 'vi' ? 'Bác sĩ' : 'Doctor'}
+              </option>
+              <option value="handbook">
+                {props.language === 'vi' ? 'Cẩm nang' : 'Handbook'}
               </option>
             </select>
           </div>
@@ -286,6 +312,21 @@ const AllDirectory = (props) => {
                           .includes(searchText.toLowerCase())
                       );
                     })
+                  )}
+                </section>
+              ) : null}
+
+              {filterType === 'all' || filterType === 'handbook' ? (
+                <section>
+                  <h3 className="section-title">
+                    {props.language === 'vi' ? 'Cẩm nang' : 'Handbooks'}
+                  </h3>
+                  {renderHandbookGrid(
+                    handbooks.filter((h) =>
+                      (h.name || '')
+                        .toLowerCase()
+                        .includes(searchText.toLowerCase())
+                    )
                   )}
                 </section>
               ) : null}

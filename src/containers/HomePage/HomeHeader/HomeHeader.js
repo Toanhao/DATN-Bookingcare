@@ -84,7 +84,7 @@ Trực thuộc: Công ty CP Công nghệ BookingCare
     let placeHolder =
       language === LANGUAGES.VI
         ? 'Tìm tất cả chuyên khoa, bác sĩ, cơ sở y tế '
-        : 'Tìm tất cả chuyên khoa, bác sĩ, cơ sở y tế';
+        : 'Find specialty, doctor, clinic';
     return (
       <React.Fragment>
         <div className="home-header-container">
@@ -226,7 +226,16 @@ Trực thuộc: Công ty CP Công nghệ BookingCare
                   <FormattedMessage id="home-header.select-doctor" />
                 </div>
               </Link>
-              <div className="child-content">
+
+              <Link
+                to="/all-directory?tab=handbook"
+                className="child-content"
+                style={{
+                  cursor: 'pointer',
+                  textDecoration: 'none',
+                  color: 'inherit',
+                }}
+              >
                 <div>
                   <b>
                     <FormattedMessage id="home-header.fee" />
@@ -235,7 +244,8 @@ Trực thuộc: Công ty CP Công nghệ BookingCare
                 <div className="subs-title">
                   <FormattedMessage id="home-header.check-health" />
                 </div>
-              </div>
+              </Link>
+
             </div>
             <div className="right-content">
               <div
