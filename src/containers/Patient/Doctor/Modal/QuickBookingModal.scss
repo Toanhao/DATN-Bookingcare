@@ -1,0 +1,550 @@
+/** @format */
+
+.quick-booking-modal-container {
+  .modal-dialog {
+    max-width: 900px;
+  }
+
+  .quick-booking-modal-content {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  }
+
+  .quick-booking-modal-header {
+    background: white;
+    padding: 25px 30px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 3px solid #667eea;
+
+    .header-content {
+      h3 {
+        margin: 0;
+        font-size: 28px;
+        font-weight: 700;
+        color: #667eea;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+
+        i {
+          color: #ffc107;
+          animation: bolt 1.5s ease-in-out infinite;
+        }
+      }
+
+      p {
+        margin: 5px 0 0 0;
+        color: #666;
+        font-size: 14px;
+      }
+    }
+
+    .close-btn {
+      cursor: pointer;
+      font-size: 24px;
+      color: #999;
+      transition: all 0.3s ease;
+      width: 35px;
+      height: 35px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+
+      &:hover {
+        color: #667eea;
+        background: #f0f0f0;
+        transform: rotate(90deg);
+      }
+    }
+  }
+
+  .quick-booking-modal-body {
+    padding: 30px;
+    background: white;
+    min-height: 400px;
+  }
+
+  // Step Indicator
+  .step-indicator {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 40px;
+    position: relative;
+    padding: 0 10px;
+
+    .step {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      position: relative;
+      flex: 1;
+      cursor: pointer;
+      transition: all 0.3s ease;
+
+      .step-number {
+        width: 45px;
+        height: 45px;
+        border-radius: 50%;
+        background: #e0e0e0;
+        color: #999;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 700;
+        font-size: 18px;
+        margin-bottom: 8px;
+        transition: all 0.3s ease;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        z-index: 2;
+      }
+
+      .step-label {
+        font-size: 12px;
+        color: #999;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        text-align: center;
+      }
+
+      .step-line {
+        position: absolute;
+        top: 22px;
+        left: 50%;
+        width: 100%;
+        height: 3px;
+        background: #e0e0e0;
+        z-index: 1;
+        transition: all 0.3s ease;
+      }
+
+      &.active {
+        .step-number {
+          background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+          color: white;
+          box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .step-label {
+          color: #667eea;
+        }
+
+        .step-line {
+          background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+        }
+      }
+
+      &.current {
+        .step-number {
+          animation: pulse 2s ease-in-out infinite;
+          box-shadow: 0 0 0 0 rgba(102, 126, 234, 0.7);
+        }
+      }
+
+      &:hover {
+        .step-number {
+          transform: scale(1.1);
+        }
+      }
+
+      &:last-child {
+        .step-line {
+          display: none;
+        }
+      }
+    }
+  }
+
+  // Step Content
+  .step-content {
+    animation: fadeInUp 0.5s ease;
+    padding: 20px;
+    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+    border-radius: 15px;
+    min-height: 300px;
+
+    .step-title {
+      font-size: 22px;
+      font-weight: 700;
+      color: #333;
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+
+      i {
+        color: #667eea;
+        font-size: 24px;
+      }
+    }
+
+    .step-description {
+      color: #666;
+      margin-bottom: 25px;
+      font-size: 15px;
+    }
+
+    .select-specialty,
+    .select-clinic,
+    .select-doctor {
+      margin-top: 10px;
+    }
+
+    .date-picker-quick {
+      width: 100%;
+      padding: 12px 15px;
+      border: 2px solid #ddd;
+      border-radius: 10px;
+      font-size: 16px;
+      transition: all 0.3s ease;
+
+      &:focus {
+        border-color: #667eea;
+        outline: none;
+        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+      }
+    }
+
+    // Time Slots
+    .time-slots-section {
+      margin-top: 30px;
+      padding: 20px;
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+
+      .time-title {
+        font-size: 18px;
+        font-weight: 600;
+        color: #333;
+        margin-bottom: 15px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+
+        i {
+          color: #667eea;
+        }
+      }
+
+      .time-slots-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+        gap: 12px;
+
+        .time-slot {
+          padding: 12px 15px;
+          background: #f8f9fa;
+          border: 2px solid #e0e0e0;
+          border-radius: 10px;
+          text-align: center;
+          cursor: pointer;
+          transition: all 0.3s ease;
+          font-weight: 600;
+          color: #666;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 8px;
+
+          i {
+            font-size: 14px;
+          }
+
+          &:hover {
+            background: #e3f2fd;
+            border-color: #667eea;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.2);
+          }
+
+          &.selected {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-color: #667eea;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+
+            i {
+              color: white;
+            }
+          }
+        }
+      }
+    }
+  }
+
+  // Patient Info Step
+  .patient-info-content {
+    .booking-summary {
+      background: white;
+      padding: 20px;
+      border-radius: 12px;
+      margin-bottom: 25px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+      border-left: 4px solid #667eea;
+
+      h5 {
+        font-weight: 700;
+        color: #667eea;
+        margin-bottom: 15px;
+        font-size: 16px;
+      }
+
+      .summary-item {
+        padding: 8px 0;
+        border-bottom: 1px solid #f0f0f0;
+        font-size: 14px;
+        color: #555;
+
+        &:last-child {
+          border-bottom: none;
+        }
+
+        strong {
+          color: #333;
+          font-weight: 600;
+          display: inline-block;
+          width: 120px;
+        }
+      }
+    }
+
+    .patient-form {
+      background: white;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+
+      .form-group {
+        margin-bottom: 20px;
+
+        label {
+          font-weight: 600;
+          color: #333;
+          margin-bottom: 8px;
+          display: block;
+          font-size: 14px;
+
+          .required {
+            color: #dc3545;
+            margin-left: 3px;
+          }
+        }
+
+        input,
+        textarea {
+          width: 100%;
+          padding: 12px 15px;
+          border: 2px solid #e0e0e0;
+          border-radius: 8px;
+          font-size: 14px;
+          transition: all 0.3s ease;
+
+          &:focus {
+            border-color: #667eea;
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+          }
+
+          &::placeholder {
+            color: #999;
+          }
+        }
+
+        textarea {
+          resize: vertical;
+          font-family: inherit;
+        }
+      }
+    }
+  }
+
+  // Footer
+  .quick-booking-modal-footer {
+    background: white;
+    padding: 20px 30px;
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    border-top: 2px solid #f0f0f0;
+
+    button {
+      padding: 12px 25px;
+      border: none;
+      border-radius: 10px;
+      font-weight: 600;
+      font-size: 15px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+
+      &:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      }
+
+      &:active {
+        transform: translateY(0);
+      }
+    }
+
+    .btn-prev {
+      background: #6c757d;
+      color: white;
+
+      &:hover {
+        background: #5a6268;
+      }
+    }
+
+    .btn-next {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+
+      &:hover {
+        box-shadow: 0 6px 20px rgba(102, 126, 234, 0.5);
+      }
+    }
+
+    .btn-confirm {
+      background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+      color: white;
+      box-shadow: 0 4px 15px rgba(56, 239, 125, 0.4);
+
+      &:hover {
+        box-shadow: 0 6px 20px rgba(56, 239, 125, 0.5);
+      }
+    }
+
+    .btn-cancel {
+      background: #f8f9fa;
+      color: #666;
+      border: 2px solid #e0e0e0;
+
+      &:hover {
+        background: #e0e0e0;
+        color: #333;
+      }
+    }
+  }
+}
+
+// Animations
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes pulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(102, 126, 234, 0.7);
+  }
+  70% {
+    box-shadow: 0 0 0 15px rgba(102, 126, 234, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(102, 126, 234, 0);
+  }
+}
+
+@keyframes bolt {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.2);
+  }
+}
+
+// Responsive
+@media (max-width: 768px) {
+  .quick-booking-modal-container {
+    .modal-dialog {
+      max-width: 95%;
+      margin: 10px auto;
+    }
+
+    .step-indicator {
+      .step {
+        .step-label {
+          font-size: 10px;
+        }
+
+        .step-number {
+          width: 35px;
+          height: 35px;
+          font-size: 14px;
+        }
+      }
+    }
+
+    .step-content {
+      .time-slots-section {
+        .time-slots-grid {
+          grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+        }
+      }
+    }
+
+    .quick-booking-modal-footer {
+      flex-wrap: wrap;
+
+      button {
+        flex: 1;
+        min-width: 45%;
+      }
+    }
+  }
+}
+
+// Custom Select Styles
+.quick-booking-modal-container {
+  .css-1s2u09g-control,
+  .css-1pahdxg-control {
+    border: 2px solid #e0e0e0;
+    border-radius: 10px;
+    padding: 5px;
+    transition: all 0.3s ease;
+
+    &:hover {
+      border-color: #667eea;
+    }
+  }
+
+  .css-1pahdxg-control {
+    border-color: #667eea;
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+  }
+
+  .css-26l3qy-menu {
+    border-radius: 10px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+    overflow: hidden;
+  }
+
+  .css-1n7v3ny-option {
+    background: #667eea;
+    color: white;
+  }
+
+  .css-9gakcf-option {
+    &:active {
+      background: #667eea;
+    }
+  }
+}

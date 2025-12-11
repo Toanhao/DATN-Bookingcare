@@ -12,6 +12,7 @@ import { changeLanguageApp, processLogout } from '../../../store/actions';
 import { withRouter } from 'react-router';
 import { Link } from 'react-router-dom';
 import { Sidebar } from 'primereact/sidebar';
+import QuickBookingModal from '../../Patient/Doctor/Modal/QuickBookingModal';
 
 class HomeHeader extends Component {
   changeLanguage = (language) => {
@@ -23,6 +24,7 @@ class HomeHeader extends Component {
     this.state = {
       visible: false,
       showUserMenu: false,
+      isOpenQuickBookingModal: false,
     };
 
     this.userMenuRef = React.createRef();
@@ -55,6 +57,12 @@ class HomeHeader extends Component {
   handleLogoutFromMenu = () => {
     this.setState({ showUserMenu: false });
     this.props.processLogout();
+  };
+
+  toggleQuickBookingModal = () => {
+    this.setState({
+      isOpenQuickBookingModal: !this.state.isOpenQuickBookingModal,
+    });
   };
 
   goToAllDirectory = (tab) => {
@@ -245,39 +253,18 @@ Trực thuộc: Công ty CP Công nghệ BookingCare
                   <FormattedMessage id="home-header.check-health" />
                 </div>
               </Link>
-
             </div>
             <div className="right-content">
-              <div
-                className="support"
-                onClick={() => this.handleSupportClick()}
-                style={{ cursor: 'pointer' }}
+              <button
+                className="quick-booking-header-btn"
+                onClick={this.toggleQuickBookingModal}
+                title="Đặt lịch khám nhanh"
               >
-                <i className="fas fa-question-circle"></i>
-                <FormattedMessage id="home-header.support" />
-              </div>
-              <div
-                className={
-                  language === LANGUAGES.VI
-                    ? 'language-vi active'
-                    : 'language-vi'
-                }
-              >
-                <span onClick={() => this.changeLanguage(LANGUAGES.VI)}>
-                  VN
-                </span>
-              </div>
-              <div
-                className={
-                  language === LANGUAGES.EN
-                    ? 'language-en active'
-                    : 'language-en'
-                }
-              >
-                <span onClick={() => this.changeLanguage(LANGUAGES.EN)}>
-                  EN
-                </span>
-              </div>
+                <i className="fas fa-calendar-plus"></i>
+                <span>Đặt lịch nhanh</span>
+              </button>
+
+              {/* User Menu */}
               {this.props.isLoggedIn ? (
                 <div
                   className="user-section"
@@ -320,7 +307,57 @@ Trực thuộc: Công ty CP Công nghệ BookingCare
 
                   {this.state.showUserMenu && (
                     <div className="user-dropdown">
-                      {/* you can add more items here (Profile, Settings...) */}
+                      {/* Language Settings */}
+                      <div className="user-dropdown-item language-item">
+                        <span className="label">
+                          <i className="fas fa-globe"></i> Ngôn ngữ:
+                        </span>
+                        <div className="language-buttons">
+                          <button
+                            className={`lang-btn ${
+                              this.props.language === LANGUAGES.VI
+                                ? 'active'
+                                : ''
+                            }`}
+                            onClick={() => {
+                              this.changeLanguage(LANGUAGES.VI);
+                            }}
+                          >
+                            VN
+                          </button>
+                          <button
+                            className={`lang-btn ${
+                              this.props.language === LANGUAGES.EN
+                                ? 'active'
+                                : ''
+                            }`}
+                            onClick={() => {
+                              this.changeLanguage(LANGUAGES.EN);
+                            }}
+                          >
+                            EN
+                          </button>
+                        </div>
+                      </div>
+
+                      <div className="dropdown-divider"></div>
+
+                      {/* Support */}
+                      <div
+                        className="user-dropdown-item"
+                        onClick={() => {
+                          this.handleSupportClick();
+                        }}
+                      >
+                        <i className="fas fa-question-circle"></i>
+                        <span>
+                          <FormattedMessage id="home-header.support" />
+                        </span>
+                      </div>
+
+                      <div className="dropdown-divider"></div>
+
+                      {/* Logout */}
                       <div
                         className="user-dropdown-item"
                         onClick={this.handleLogoutFromMenu}
@@ -421,6 +458,12 @@ Trực thuộc: Công ty CP Công nghệ BookingCare
             </div>
           </div>
         )}
+
+        {/* Quick Booking Modal */}
+        <QuickBookingModal
+          isOpenModal={this.state.isOpenQuickBookingModal}
+          closeModal={this.toggleQuickBookingModal}
+        />
       </React.Fragment>
     );
   }

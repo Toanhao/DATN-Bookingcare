@@ -6,7 +6,7 @@ import './ManageSchedule.scss';
 import { FormattedMessage } from 'react-intl';
 import * as actions from '../../../store/actions';
 import Select from 'react-select';
-import { LANGUAGES } from '../../../utils';
+import { LANGUAGES, USER_ROLE } from '../../../utils';
 import DatePicker from '../../../components/Input/DatePicker';
 import moment from 'moment';
 import { toast } from 'react-toastify';
@@ -31,6 +31,20 @@ class ManageSchedule extends Component {
     // await this.getAllDoctor();
     this.props.fetchAllDoctors();
     this.props.fetchAllScheduleTime();
+    
+    // Nếu là bác sĩ đăng nhập, tự động set selectedDoctor là chính mình
+    let { userInfo } = this.props;
+    if (userInfo && userInfo.roleId === USER_ROLE.DOCTOR) {
+      let labelVi = `${userInfo.lastName} ${userInfo.firstName}`;
+      let labelEn = `${userInfo.firstName} ${userInfo.lastName}`;
+      let selectedDoctor = {
+        label: this.props.language === LANGUAGES.VI ? labelVi : labelEn,
+        value: userInfo.id
+      };
+      this.setState({
+        selectedDoctor: selectedDoctor
+      });
+    }
   }
 
   componentDidUpdate(prevProps, prevState, snapshot) {
@@ -162,17 +176,20 @@ class ManageSchedule extends Component {
 
         <div className="container">
           <div className="row">
-            <div className="col-6 form-group ">
-              <label>
-                <FormattedMessage id="manage-schedule.choose-doctor" />
-              </label>
-              <Select
-                value={this.state.selectedDoctor}
-                onChange={this.handleChangeSelect}
-                options={this.state.listDoctors}
-              />
-            </div>
-            <div className="col-6 form-group ">
+            {/* Chỉ hiển thị dropdown chọn bác sĩ nếu là Admin */}
+            {this.props.userInfo && this.props.userInfo.roleId === USER_ROLE.ADMIN && (
+              <div className="col-6 form-group ">
+                <label>
+                  <FormattedMessage id="manage-schedule.choose-doctor" />
+                </label>
+                <Select
+                  value={this.state.selectedDoctor}
+                  onChange={this.handleChangeSelect}
+                  options={this.state.listDoctors}
+                />
+              </div>
+            )}
+            <div className={this.props.userInfo && this.props.userInfo.roleId === USER_ROLE.DOCTOR ? "col-12 form-group" : "col-6 form-group"}>
               <label>
                 <FormattedMessage id="manage-schedule.choose-date" />
               </label>
@@ -220,6 +237,7 @@ class ManageSchedule extends Component {
 const mapStateToProps = (state) => {
   return {
     isLoggedIn: state.user.isLoggedIn,
+    userInfo: state.user.userInfo,
     allDoctors: state.admin.allDoctors,
     language: state.app.language,
     allScheduleTime: state.admin.allScheduleTime,

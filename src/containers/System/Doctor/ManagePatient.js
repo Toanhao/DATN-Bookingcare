@@ -19,7 +19,7 @@ class ManagePatient extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      currentDate: new Date(),
+      currentDate: null,
       // moment(new Date()).startOf("day").valueOf()
       dataPatient: [],
       isOpenRemedyModal: false,
@@ -140,6 +140,7 @@ class ManagePatient extends Component {
                     <th>Thời gian</th>
                     <th>Họ và tên</th>
                     <th>Địa chỉ</th>
+                    <th>Số điện thoại</th>
                     <th>Giới tính</th>
                     <th>Actions</th>
                   </tr>
@@ -149,8 +150,9 @@ class ManagePatient extends Component {
                         <tr key={index}>
                           <td>{index + 1}</td>
                           <td>{item.timeTypeDataPatient.valueVi}</td>
-                          <td>{item.patientData.firstName}</td>
+                          <td>{`${item.patientData.lastName} ${item.patientData.firstName}`}</td>
                           <td>{item.patientData.address}</td>
+                          <td>{item.patientData.phoneNumber}</td>
                           <td>{item.patientData.genderData.valueVi}</td>
                           <td>
                             <button
@@ -168,7 +170,7 @@ class ManagePatient extends Component {
                   ) : (
                     <tr>
                       <td colSpan={6} style={{ textAlign: 'center' }}>
-                        no data
+                        Chưa có bệnh nhân nào đặt lịch khám trong ngày
                       </td>
                     </tr>
                   )}

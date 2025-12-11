@@ -10,10 +10,7 @@ import computeImageUrl from '../../../../utils/imageUtils';
 import userAvatar from '../../../../assets/images/user.svg';
 import { withRouter } from 'react-router';
 import { Link } from 'react-router-dom';
-import {
-  getDetailInforDoctor,
-  getAllSpecialty,
-} from '../../../../services/userService';
+import { getAllSpecialty } from '../../../../services/userService';
 class OutStandingDoctor extends Component {
   constructor(props) {
     super(props);
@@ -25,7 +22,6 @@ class OutStandingDoctor extends Component {
 
   componentDidUpdate(prevProps, prevState, snapshot) {
     if (prevProps.topDoctorsRedux !== this.props.topDoctorsRedux) {
-      // enrich doctors with specialty name (use doctor id -> Doctor_Infor.specialtyId)
       this.enrichDoctorsWithSpecialty(this.props.topDoctorsRedux);
     }
   }
@@ -52,58 +48,40 @@ class OutStandingDoctor extends Component {
     }
   };
 
-  enrichDoctorsWithSpecialty = async (doctors) => {
+  enrichDoctorsWithSpecialty = (doctors) => {
     if (!doctors || doctors.length === 0) {
       this.setState({ arrDoctors: [] });
       return;
     }
 
-    try {
-      // fetch details for each doctor in parallel
-      const detailPromises = doctors.map((d) => getDetailInforDoctor(d.id));
-      const responses = await Promise.all(detailPromises);
+    const specialties = this.state.specialties || [];
 
-      const specialties = this.state.specialties || [];
-
-      const enriched = doctors.map((doc, idx) => {
-        const res = responses[idx];
-        let specialtyName = '';
-        try {
-          if (
-            res &&
-            (res.errCode === 0 || (res.data && res.data.errCode === 0))
-          ) {
-            const Info =
-              (res.data && (res.data.Doctor_Info || res.data.Doctor_Infor)) ||
-              null;
-            const specialtyId = Info && Info.specialtyId ? Info.specialtyId : null;
-            if (specialtyId) {
-              const found = specialties.find(
-                (s) =>
-                  s.id === specialtyId ||
-                  s.id === +specialtyId ||
-                  String(s.id) === String(specialtyId)
-              );
-              if (found) {
-                specialtyName =
-                  found.name || found.nameVi || found.nameEn || '';
-              }
-            }
-          }
-        } catch (e) {
-          // ignore per-doctor errors
+    const enriched = doctors.map((doc) => {
+      let specialtyName = '';
+      
+      // Lấy specialtyId trực tiếp từ Doctor_Info (đã có sẵn trong topDoctorsRedux)
+      const doctorInfo = doc.Doctor_Info || doc.Doctor_Infor;
+      const specialtyId = doctorInfo && doctorInfo.specialtyId;
+      
+      if (specialtyId) {
+        const found = specialties.find(
+          (s) =>
+            s.id === specialtyId ||
+            s.id === +specialtyId ||
+            String(s.id) === String(specialtyId)
+        );
+        if (found) {
+          specialtyName = found.name || found.nameVi || found.nameEn || '';
         }
+      }
 
-        return {
-          ...doc,
-          specialtyName: specialtyName,
-        };
-      });
+      return {
+        ...doc,
+        specialtyName: specialtyName,
+      };
+    });
 
-      this.setState({ arrDoctors: enriched });
-    } catch (e) {
-      this.setState({ arrDoctors: doctors });
-    }
+    this.setState({ arrDoctors: enriched });
   };
 
   handleViewDetailDoctor = (doctor) => {
