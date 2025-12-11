@@ -2,7 +2,6 @@
 
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import './Specialty.scss';
 import { FormattedMessage } from 'react-intl';
 import Slider from 'react-slick';
 import 'slick-carousel/slick/slick.css';
@@ -55,17 +54,21 @@ class Specialty extends Component {
                 dataSpecialty.map((item, index) => {
                   return (
                     <div
-                      className="section-customize specialty-child"
+                      className="section-customize"
                       key={index}
                       onClick={() => this.handleViewDetailSpecialty(item)}
                     >
-                      <div
-                        className="bg-image section-specialty"
-                        style={{
-                          backgroundImage: `url(${item.image})`,
-                        }}
-                      />
-                      <div className="specialty-name">{item.name}</div>
+                      <div className="customize-border">
+                        <div className="outer-bg">
+                          <div
+                            className="bg-image section-specialty"
+                            style={{ backgroundImage: `url(${item.image})` }}
+                          />
+                        </div>
+                        <div className="position text-center">
+                          <div className="specialty-name">{item.name}</div>
+                        </div>
+                      </div>
                     </div>
                   );
                 })}

@@ -132,18 +132,16 @@ const BookingChat = () => {
     setIsTyping(true);
 
     try {
-      // Lấy 3-4 tin nhắn user trước đó + message hiện tại
-      const userMessages = messages
-        .filter((m) => m.from === 'user')
-        .slice(-4)
-        .map((m) => m.text);
+      // Lấy lịch sử hội thoại (cả user và AI) - giới hạn 6 tin nhắn gần nhất
+      const recentHistory = messages.slice(-6);
 
-      // Ghép tất cả thành 1 string với label
+      // Ghép lịch sử thành context
       let fullMessage = text;
-      if (userMessages.length > 0) {
-        fullMessage = `Câu hỏi trước đó: ${userMessages.join(
-          ' | '
-        )}\n\nCâu hỏi hiện tại: ${text}`;
+      if (recentHistory.length > 0) {
+        const historyContext = recentHistory
+          .map((m) => `${m.from === 'user' ? 'User' : 'AI'}: ${m.text}`)
+          .join('\n');
+        fullMessage = `Lịch sử hội thoại:\n${historyContext}\n\nCâu hỏi hiện tại: ${text}`;
       }
 
       const res = await sendChatBooking({ message: fullMessage, language });
@@ -212,7 +210,13 @@ const BookingChat = () => {
         onClick={() => setOpen((s) => !s)}
         title="Hỗ trợ đặt lịch khám"
       >
-        <div className="chat-icon">💬</div>
+        <div className="chat-toggle-content">
+          <div className="chat-icon">
+            {' '}
+            <i className="fas fa-calendar-alt"></i>
+          </div>
+          <div className="chat-toggle-text">Đặt lịch</div>
+        </div>
         {unread > 0 && <div className="unread">{unread}</div>}
       </div>
 
@@ -234,7 +238,7 @@ const BookingChat = () => {
               onClick={clearHistory}
               title="Xóa lịch sử"
             >
-              🗑
+              <i className="fas fa-trash-alt"></i>
             </button>
             <button className="close-btn" onClick={() => setOpen(false)}>
               ✕

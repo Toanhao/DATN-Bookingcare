@@ -73,13 +73,10 @@ class OutStandingDoctor extends Component {
             res &&
             (res.errCode === 0 || (res.data && res.data.errCode === 0))
           ) {
-            const payload = res.data ? res.data.data || res.data : res.data;
             const Info =
-              (payload && payload.Doctor_Infor) ||
-              (res.data && res.data.Doctor_Infor) ||
+              (res.data && (res.data.Doctor_Info || res.data.Doctor_Infor)) ||
               null;
-            const specialtyId =
-              Info && Info.specialtyId ? Info.specialtyId : null;
+            const specialtyId = Info && Info.specialtyId ? Info.specialtyId : null;
             if (specialtyId) {
               const found = specialties.find(
                 (s) =>

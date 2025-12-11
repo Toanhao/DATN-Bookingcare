@@ -114,7 +114,7 @@ class App extends Component {
                 />
                 <BookingChat />
                 <ChatWidget />
-                <DiagnosisWidget />
+                {/* <DiagnosisWidget /> */}
               </div>
             </Router>
           </Fragment>

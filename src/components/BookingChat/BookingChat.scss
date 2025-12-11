@@ -1,21 +1,44 @@
 .booking-chat {
   position: fixed;
   right: 24px;
-  bottom: 140px;
+  bottom: 110px;
   z-index: 9997;
 
   .chat-toggle {
-    width: 56px;
-    height: 56px;
-    border-radius: 50%;
-    background: linear-gradient(135deg, #2d9cdb, #2b6ef6);
     display: flex;
+    flex-direction: column;
     align-items: center;
-    justify-content: center;
+    justify-content: flex-start;
     color: white;
     cursor: pointer;
-    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.15);
     position: relative;
+    gap: 6px;
+
+    .chat-toggle-content {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .chat-icon {
+      width: 56px;
+      height: 56px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #2d9cdb, #2b6ef6);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      box-shadow: 0 6px 18px rgba(0, 0, 0, 0.15);
+    }
+
+    .chat-toggle-text {
+      font-size: 12px;
+      font-weight: 500;
+      white-space: nowrap;
+      color : #000;
+    }
 
     .unread {
       position: absolute;

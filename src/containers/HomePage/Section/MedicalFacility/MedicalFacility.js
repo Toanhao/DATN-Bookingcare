@@ -2,7 +2,6 @@
 
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import './MedicalFacility.scss';
 import { FormattedMessage } from 'react-intl';
 import Slider from 'react-slick';
 import { getAllClinic } from '../../../../services/userService';
@@ -51,17 +50,21 @@ class MedicalFacility extends Component {
                 dataClinics.map((item, index) => {
                   return (
                     <div
-                      className="section-customize clinic-child"
+                      className="section-customize"
                       key={index}
                       onClick={() => this.handleViewDetailClinic(item)}
                     >
-                      <div
-                        className="bg-image section-medical-facility"
-                        style={{
-                          backgroundImage: `url(${item.image})`,
-                        }}
-                      />
-                      <div className="clinic-name">{item.name}</div>
+                      <div className="customize-border">
+                        <div className="outer-bg">
+                          <div
+                            className="bg-image section-medical-facility"
+                            style={{ backgroundImage: `url(${item.image})` }}
+                          />
+                        </div>
+                        <div className="position text-center">
+                          <div className="specialty-name">{item.name}</div>
+                        </div>
+                      </div>
                     </div>
                   );
                 })}

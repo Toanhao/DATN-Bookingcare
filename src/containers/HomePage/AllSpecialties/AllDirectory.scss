@@ -128,17 +128,7 @@
   width: 260px; /* unify card width for consistent grid */
 }
 
-.section-customize .customize-border {
-  border: 1px solid rgba(255, 165, 0, 0.95);
-  padding: 14px;
-  border-radius: 8px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  min-height: 220px; /* make titles align across cards */
-  box-sizing: border-box;
-  background: #fff;
-}
+
 
 .section-customize .outer-bg {
   display: flex;

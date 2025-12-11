@@ -107,7 +107,8 @@ const ChatWidget = () => {
 
   useEffect(() => {
     // Initialize SpeechRecognition if available
-    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    const SpeechRecognition =
+      window.SpeechRecognition || window.webkitSpeechRecognition;
     if (SpeechRecognition) {
       try {
         const rec = new SpeechRecognition();
@@ -125,7 +126,11 @@ const ChatWidget = () => {
     // cleanup when unmount
     return () => {
       if (recognitionRef.current) {
-        try { recognitionRef.current.onresult = null; recognitionRef.current.onend = null; recognitionRef.current.onerror = null; } catch (e) {}
+        try {
+          recognitionRef.current.onresult = null;
+          recognitionRef.current.onend = null;
+          recognitionRef.current.onerror = null;
+        } catch (e) {}
       }
     };
     // run once
@@ -135,7 +140,10 @@ const ChatWidget = () => {
   // Handle click outside to close chat
   useEffect(() => {
     const handleClickOutside = (event) => {
-      if (chatContainerRef.current && !chatContainerRef.current.contains(event.target)) {
+      if (
+        chatContainerRef.current &&
+        !chatContainerRef.current.contains(event.target)
+      ) {
         setOpen(false);
       }
     };
@@ -150,7 +158,8 @@ const ChatWidget = () => {
 
   const startRecording = () => {
     const rec = recognitionRef.current;
-    if (!rec) return alert('Trình duyệt không hỗ trợ microphone (SpeechRecognition).');
+    if (!rec)
+      return alert('Trình duyệt không hỗ trợ microphone (SpeechRecognition).');
     rec.lang = language === 'vi' ? 'vi-VN' : 'en-US';
     rec.onresult = (event) => {
       const transcript = Array.from(event.results)
@@ -188,14 +197,16 @@ const ChatWidget = () => {
   };
 
   const toggleRecording = () => {
-    if (!supportsSpeech) return alert('Speech API không khả dụng trên trình duyệt này.');
+    if (!supportsSpeech)
+      return alert('Speech API không khả dụng trên trình duyệt này.');
     if (isRecording) stopRecording();
     else startRecording();
   };
 
   const speakText = (text, lang) => {
     if (!text) return;
-    if (!window.speechSynthesis) return alert('SpeechSynthesis không được hỗ trợ trên trình duyệt này.');
+    if (!window.speechSynthesis)
+      return alert('SpeechSynthesis không được hỗ trợ trên trình duyệt này.');
     try {
       window.speechSynthesis.cancel();
       const utt = new SpeechSynthesisUtterance(text);
@@ -212,7 +223,11 @@ const ChatWidget = () => {
   // effect: Store a truncated copy of messages to avoid very large localStorage entries
   useEffect(() => {
     try {
-      const msgArray = Array.isArray(messages) ? messages : messages ? [messages] : [];
+      const msgArray = Array.isArray(messages)
+        ? messages
+        : messages
+        ? [messages]
+        : [];
       const toStore = msgArray.map((m) => {
         if (m && m.from === 'ai' && m.text) {
           return {
@@ -229,7 +244,11 @@ const ChatWidget = () => {
     } catch (e) {
       // fallback
       try {
-        const safe = Array.isArray(messages) ? messages : messages ? [messages] : [];
+        const safe = Array.isArray(messages)
+          ? messages
+          : messages
+          ? [messages]
+          : [];
         localStorage.setItem(STORAGE_KEY, JSON.stringify(safe));
       } catch (err) {
         // ignore storage errors
@@ -283,11 +302,9 @@ const ChatWidget = () => {
 
       let instruction = '';
       if (language === 'vi') {
-        instruction =
-          'trả lời bằng tiếng Việt, ngắn gọn, súc tích';
+        instruction = 'trả lời bằng tiếng Việt, ngắn gọn, súc tích';
       } else {
-        instruction =
-          'Answer concisely and to the point';
+        instruction = 'Answer concisely and to the point';
       }
 
       const prompt = buildPromptWithLimit(
@@ -364,7 +381,14 @@ const ChatWidget = () => {
         onClick={() => setOpen((s) => !s)}
         title="Chat với AI"
       >
-        <div className="chat-icon">💬</div>
+        <div className="chat-toggle-content">
+          <img
+            src="https://cdn.bookingcare.vn/fo/w128/2024/03/27/151956-chatboticon.png"
+            alt="Chat AI"
+            className="chat-icon-img"
+          />
+          <div className="chat-toggle-text">Trợ lý AI</div>
+        </div>
         {unread > 0 && <div className="unread">{unread}</div>}
       </div>
 
@@ -386,7 +410,7 @@ const ChatWidget = () => {
               onClick={clearHistory}
               title="Xóa lịch sử"
             >
-              🗑
+              <i className="fas fa-trash-alt"></i>
             </button>
             <button className="close-btn" onClick={() => setOpen(false)}>
               ✕

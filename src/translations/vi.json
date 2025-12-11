@@ -6,8 +6,8 @@
     "select-room": "Chọn bệnh viện phòng khám",
     "doctor": "Bác sĩ",
     "select-doctor": "Chọn bác sĩ giỏi",
-    "fee": "Cẩm nang ",
-    "check-health": "Bài viết kiến thức sức khỏe",
+    "fee": "Bài viết ",
+    "check-health": "Cẩm nang sức khoẻ",
     "support": "Hỗ trợ",
     "welcome": "Xin chào, "
   },
@@ -32,8 +32,8 @@
       "manage-clinic": "Quản lý phòng khám",
       "specialty": "Chuyên khoa",
       "manage-specialty": "Quản lý chuyên khoa",
-      "handbook": "Cẩm nang",
-      "manage-handbook": "Quản lý cẩm nang"
+      "handbook": "Cẩm nang sức khoẻ",
+      "manage-handbook": "Quản lý bài viết"
     },
     "doctor": {
       "manage-schedule": "Quản lý kế hoạch khám bệnh",
@@ -58,7 +58,7 @@
   "homepage": {
     "outstanding-doctor": "Bác sĩ nổi bật tuần qua",
     "more-Infor": "Xem thêm",
-    "handbook": "Cẩm nang",
+    "handbook": "Cẩm nang sức khoẻ",
     "specialty": "Chuyên khoa phổ biến",
     "facilities": "Cơ sở y tế nổi bật",
     "about": "Truyền thông nói về Booking Care"

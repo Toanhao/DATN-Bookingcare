@@ -89,6 +89,70 @@ class DetailDoctor extends Component {
     }));
   };
 
+  handleToggleCommentLike = (commentId) => {
+    this.setState((prev) => ({
+      comments: prev.comments.map((c) => {
+        if (c.id === commentId) {
+          const likedByUser = !c.likedByUser;
+          const likesCount = likedByUser
+            ? (c.likesCount || 0) + 1
+            : (c.likesCount || 0) - 1;
+          return { ...c, likedByUser, likesCount };
+        }
+        return c;
+      }),
+    }));
+  };
+
+  handleStartReply = (commentId) => {
+    this.setState({ replyingToId: commentId, replyText: '' });
+  };
+
+  handleReplyChange = (e) => {
+    this.setState({ replyText: e.target.value });
+  };
+
+  handleSubmitReply = (commentId) => {
+    const { replyText } = this.state;
+    if (!replyText || !replyText.trim()) return;
+    const newReply = {
+      id: Date.now(),
+      user: 'Bạn',
+      text: replyText.trim(),
+      date: new Date().toISOString(),
+      likesCount: 0,
+      likedByUser: false,
+    };
+    this.setState((prev) => ({
+      comments: prev.comments.map((c) =>
+        c.id === commentId
+          ? { ...c, replies: [...(c.replies || []), newReply] }
+          : c
+      ),
+      replyingToId: null,
+      replyText: '',
+    }));
+  };
+
+  handleToggleReplyLike = (commentId, replyId) => {
+    this.setState((prev) => ({
+      comments: prev.comments.map((c) => {
+        if (c.id !== commentId) return c;
+        return {
+          ...c,
+          replies: (c.replies || []).map((r) => {
+            if (r.id !== replyId) return r;
+            const likedByUser = !r.likedByUser;
+            const likesCount = likedByUser
+              ? (r.likesCount || 0) + 1
+              : (r.likesCount || 0) - 1;
+            return { ...r, likedByUser, likesCount };
+          }),
+        };
+      }),
+    }));
+  };
+
   componentDidUpdate(prevProps, prevState, snapshot) {}
 
   render() {

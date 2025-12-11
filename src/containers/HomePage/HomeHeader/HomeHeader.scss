@@ -183,10 +183,6 @@
   flex-direction: column;
 
   .content-up {
-    background-image: linear-gradient(
-      rgba(126, 126, 126, 0.25),
-      rgba(255, 255, 255, 0.1)
-    );
     padding-top: 15px;
     height: 65%;
 
@@ -196,14 +192,14 @@
       font-size: 30px;
       text-shadow: 1px 1px 1px #333;
       margin-bottom: 15px;
-      color: white;
+      color: #000;
     }
 
     .title2 {
       text-align: center;
       font-size: 30px;
       text-shadow: 1px 1px 1px #333;
-      color: white;
+      color: #000;
       margin-bottom: 15px;
     }
 

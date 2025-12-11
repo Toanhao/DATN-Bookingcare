@@ -73,10 +73,10 @@ class HandBook extends Component {
   render() {
     return (
       <div className="manage-handbook-container">
-        <div className="ms-title">Quản lý cẩm nang tin tức</div>
+        <div className="ms-title">Quản lý bài viết</div>
         <div className="add-new-handbook row">
           <div className="col-6 form-group">
-            <label>Tên cẩm nang</label>
+            <label>Tên bài viết</label>
             <input
               className="form-control"
               type="text"
@@ -85,7 +85,7 @@ class HandBook extends Component {
             />
           </div>
           <div className="col-6 form-group">
-            <label>Ảnh cẩm nang</label>
+            <label>Ảnh bài viết</label>
             <input
               className="form-control-file"
               type="file"

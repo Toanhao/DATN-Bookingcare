@@ -40,7 +40,7 @@ class HandBook extends Component {
               {' '}
               <FormattedMessage id="homepage.handbook" />
             </span>
-            <Link className="btn-section" to="/all-directory?tab=all">
+            <Link className="btn-section" to="/all-directory?tab=handbook">
               <FormattedMessage id="homepage.more-Infor" />
             </Link>
           </div>
@@ -55,13 +55,17 @@ class HandBook extends Component {
                       key={index}
                       onClick={() => this.handleViewDetailHandbook(item)}
                     >
-                      <div
-                        className="bg-image section-handbook"
-                        style={{
-                          backgroundImage: `url(${item.image})`,
-                        }}
-                      />
-                      <div>{item.title}</div>
+                      <div className="customize-border">
+                        <div className="outer-bg">
+                          <div
+                            className="bg-image section-handbook"
+                            style={{ backgroundImage: `url(${item.image})` }}
+                          />
+                        </div>
+                        <div className="position text-center">
+                          <div className="specialty-name">{item.name}</div>
+                        </div>
+                      </div>
                     </div>
                   );
                 })}

@@ -86,10 +86,8 @@ const AllDirectory = (props) => {
               try {
                 if (res) {
                   // response can be axios shape or raw
-                  const payload = res.data ? res.data.data || res.data : res;
                   const Info =
-                    (payload && payload.Doctor_Infor) ||
-                    (res.data && res.data.Doctor_Infor) ||
+                    (res.data && (res.data.Doctor_Info || res.data.Doctor_Infor)) ||
                     null;
                   const specialtyId =
                     Info && Info.specialtyId ? Info.specialtyId : null;
@@ -207,7 +205,7 @@ const AllDirectory = (props) => {
     specialty: 'Tất cả chuyên khoa',
     clinic: 'Tất cả cơ sở y tế',
     doctor: 'Tất cả bác sĩ',
-    handbook: 'Tất cả cẩm nang',
+    handbook: 'Tất cả bài viết',
   };
 
   const pageTitle = titleMap[tab] || titleMap.specialty;
@@ -222,7 +220,7 @@ const AllDirectory = (props) => {
               type="text"
               placeholder={
                 props.language === 'vi'
-                  ? 'Tìm kiếm chuyên khoa, cơ sở, bác sĩ, cẩm nang'
+                  ? 'Tìm kiếm chuyên khoa, cơ sở, bác sĩ, bài viết'
                   : 'Search specialties, facilities, doctors, handbooks'
               }
               value={searchText}
@@ -245,7 +243,7 @@ const AllDirectory = (props) => {
                 {props.language === 'vi' ? 'Bác sĩ' : 'Doctor'}
               </option>
               <option value="handbook">
-                {props.language === 'vi' ? 'Cẩm nang' : 'Handbook'}
+                {props.language === 'vi' ? 'Bài viết' : 'Handbook'}
               </option>
             </select>
           </div>
