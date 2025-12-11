@@ -1,53 +1,90 @@
 #TableManageUser {
-    font-family: Arial, Helvetica, sans-serif;
-    border-collapse: collapse;
-    width: 100%;
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  background: #fff;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 6px 18px rgba(15, 23, 42, 0.06);
+  margin-top: 8px;
 }
 
-#TableManageUser td,
-#TableManageUser th {
-    border: 1px solid #ddd;
-    padding: 8px;
-}
-
-#TableManageUser tr:nth-child(even) {
-    background-color: #f2f2f2;
-}
-
-#TableManageUser tr:hover {
-    background-color: #ddd;
+#TableManageUser tr:first-child {
+  background: linear-gradient(135deg, #2563eb, #1d4ed8);
 }
 
 #TableManageUser th {
-    padding-top: 12px;
-    padding-bottom: 12px;
-    text-align: left;
-    background-color: #04aa6d;
-    color: white;
+  color: #fff;
+  font-weight: 700;
+  font-size: 13px;
+  letter-spacing: 0.35px;
+  padding: 11px 14px;
+  text-align: left;
+  border: none;
+}
+
+#TableManageUser td {
+  padding: 10px 14px;
+  border-bottom: 1px solid #e5e7eb;
+  color: #0f172a;
+  font-size: 14px;
+  background: #fff;
+}
+
+#TableManageUser tr:nth-child(even):not(:first-child) td {
+  background: #f8fafc;
+}
+
+#TableManageUser tr:last-child td {
+  border-bottom: none;
+}
+
+#TableManageUser tr:hover td {
+  background: #eef2ff;
+}
+
+.btn-edit,
+.btn-delete {
+  width: 34px;
+  height: 34px;
+  border: none;
+  outline: none;
+  border-radius: 9px;
+  background: #e0e7ff;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s ease;
+  font-size: 14px;
+  box-shadow: 0 4px 12px rgba(15, 23, 42, 0.12);
 }
 
 .btn-edit {
-    width: 50px;
-    border: none;
-    outline: none;
-    background: transparent;
-    color: orange;
-
-    &:hover{
-        background-color: transparent !important;
-        color: orange !important;
-    }
+  color: #1d4ed8;
+  margin-right: 4px;
 }
 
 .btn-delete {
-    width: 50px;
-    border: none;
-    outline: none;
-    background: transparent;
-    color: rgb(255, 15, 15);
+  color: #dc2626;
+  background: #fee2e2;
+}
 
-    &:hover{
-        background-color: transparent !important;
-        color: rgb(235, 15, 15) !important;
-    }
+.btn-edit:hover {
+  background: #dbeafe;
+  transform: translateY(-1px);
+  box-shadow: 0 8px 18px rgba(29, 78, 216, 0.16);
+}
+
+.btn-delete:hover {
+  background: #fecdd3;
+  transform: translateY(-1px);
+  box-shadow: 0 8px 18px rgba(220, 38, 38, 0.16);
+}
+
+@media (max-width: 768px) {
+  #TableManageUser {
+    display: block;
+    overflow-x: auto;
+    white-space: nowrap;
+  }
 }

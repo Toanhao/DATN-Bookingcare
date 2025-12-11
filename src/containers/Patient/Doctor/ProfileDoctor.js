@@ -133,11 +133,11 @@ class ProfileDoctor extends Component {
           <div className="price">
             <FormattedMessage id="patient.booking-modal.price" />
             {dataProfile &&
-              dataProfile.Doctor_Infor &&
+              dataProfile.Doctor_Info &&
               language === LANGUAGES.VI && (
                 <NumberFormat
                   className="currency"
-                  value={dataProfile.Doctor_Infor.priceTypeData.valueVi}
+                  value={dataProfile.Doctor_Info.priceTypeData.valueVi}
                   displayType="text"
                   thousandSeparator={true}
                   suffix={'VND'}

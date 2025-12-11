@@ -15,7 +15,7 @@ class Home extends Component {
 
     // Admin -> system user redux; Doctor -> doctor manage patient
     if (roleId === 'R1') return <Redirect to="/system/user-redux" />;
-    if (roleId === 'R2') return <Redirect to="/doctor/manage-patient" />;
+    if (roleId === 'R2') return <Redirect to="/doctor/manage-schedule" />;
 
     // Fallback
     return <Redirect to="/home" />;

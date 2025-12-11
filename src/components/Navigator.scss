@@ -1,104 +1,203 @@
-@import "../styles/common.scss";
+@import '../styles/common.scss';
 
 .navigator-menu {
-    display: flex;
-    margin: 0;
-    padding: 0;
-    &.list-unstyled,
-    .list-unstyled {
-        list-style-type: none;
-    }
-    .menu-group {
-        &:hover {
-            cursor: pointer;
-            background-color: darken($colormain, 5);
-        }
-        .menu-group-name {
-            line-height: 40px;
-            padding: 0 15px;
-            border-right: 1px solid $border;
-            &:first-child {
-                border-left: 1px solid $border;
-            }
-        }
-        .menu-list {
-            display: none;
-            background-color: $bg-menu-color;
-            box-shadow: 2px 2px 4px 0 $box-shadow-color;
-            -webkit-box-shadow: 2px 2px 4px 0 $box-shadow-color;
-            color: $text-in-light;
-            position: absolute;
-            padding: 0;
-            .menu {
-                width: 100%;
-                padding: 0 15px;
-                height: 35px;
-                line-height: 35px;
-                text-transform: none;
+  display: flex;
+  margin: 0;
+  padding: 0;
 
-                &.active {
-                    a {
-                        color: orange;
-                    }
-                    background-color: #ededed;
-                }
+  &.list-unstyled,
+  .list-unstyled {
+    list-style-type: none;
+  }
 
-                .menu-link {
-                    text-decoration: none;
-                    color: $text-in-light;
-                }
-                .sub-menu-list {
-                    display: none;
-                    background-color: $bg-menu-color;
-                    box-shadow: 2px 2px 4px 0 $box-shadow-color;
-                    -webkit-box-shadow: 2px 2px 4px 0 $box-shadow-color;
-                    position: absolute;
-                    top: 0;
-                    left: 205px;
-                    padding: 0;
-                    .sub-menu {
-                        padding: 0 15px;
-                        height: 35px;
-                        line-height: 35px;
-                        white-space: nowrap;
-                        &:hover {
-                            background-color: darken($bg-menu-color, 5);
-                        }
-                        .sub-menu-link {
-                            text-decoration: none;
-                            color: $text-in-light;
-                        }
-                        a {
-                            display: block;
-                        }
-                        &.active a {
-                            font-weight: 500;
-                            color: $colormain;
-                        }
-                    }
-                }
-                &.active span {
-                    font-weight: 500;
-                    color: orange;
-                }
-                &:hover {
-                    background-color: darken($bg-menu-color, 3);
-                    .sub-menu-list {
-                        display: block;
-                    }
-                }
-                .icon-right {
-                    display: block;
-                    position: absolute;
-                    top: 0;
-                    right: 10px;
-                }
-            }
-        }
-        &:hover {
-            .menu-list {
-                display: block;
-            }
-        }
+  .menu-group {
+    position: relative;
+
+    &:hover {
+      cursor: pointer;
+      background-color: rgba(0, 0, 0, 0.05);
+
+      .menu-list {
+        display: block;
+        pointer-events: auto;
+      }
     }
+
+    .menu-group-name {
+      line-height: 40px;
+      font-size: 16px;
+      font-weight: 500;
+      padding: 0 15px;
+      border-right: 1px solid #e0e0e0;
+      transition: background-color 0.2s ease;
+
+      &:first-child {
+        border-left: 1px solid #e0e0e0;
+      }
+    }
+
+    .menu-list {
+      display: none;
+      background-color: #ffffff;
+      border-radius: 6px;
+      color: #333;
+      position: absolute;
+      top: calc(100% - 2px);
+      left: 0;
+      // padding: 8px 0;
+      min-width: 240px;
+      border: 1px solid rgba(0, 0, 0, 0.08);
+      animation: slideDown 0.2s ease-out;
+      z-index: 1000;
+      pointer-events: none;
+
+      @keyframes slideDown {
+        from {
+          opacity: 0;
+          transform: translateY(-8px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      .menu {
+        width: 100%;
+        padding: 12px 18px;
+        min-height: 40px;
+        line-height: 20px;
+        text-transform: none;
+        transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        position: relative;
+        margin: 2px 0;
+
+        &.active {
+          background: linear-gradient(
+            90deg,
+            rgba($colormain, 0.08) 0%,
+            rgba($colormain, 0.04) 100%
+          );
+          border-left: 3px solid $colormain;
+          padding-left: 15px;
+
+          a {
+            color: $colormain;
+            font-weight: 600;
+          }
+        }
+
+        .menu-link {
+          text-decoration: none;
+          color: #2c3e50;
+          display: block;
+          width: 100%;
+          font-size: 14px;
+          font-weight: 500;
+        }
+
+        .sub-menu-list {
+          display: none;
+          background-color: #ffffff;
+          box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15),
+            0 2px 6px rgba(0, 0, 0, 0.1);
+          border-radius: 6px;
+          border: 1px solid rgba(0, 0, 0, 0.08);
+          position: absolute;
+          top: -8px;
+          left: 100%;
+          margin-left: 8px;
+          padding: 8px 0;
+          min-width: 240px;
+          animation: slideRight 0.2s ease-out;
+          z-index: 1001;
+
+          @keyframes slideRight {
+            from {
+              opacity: 0;
+              transform: translateX(-8px);
+            }
+            to {
+              opacity: 1;
+              transform: translateX(0);
+            }
+          }
+
+          .sub-menu {
+            padding: 10px 18px;
+            min-height: 40px;
+            line-height: 20px;
+            white-space: nowrap;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            margin: 2px 0;
+            position: relative;
+
+            &:hover {
+              background-color: rgba(0, 0, 0, 0.04);
+              padding-left: 22px;
+            }
+
+            .sub-menu-link {
+              text-decoration: none;
+              color: #2c3e50;
+              font-size: 14px;
+              font-weight: 500;
+            }
+
+            a {
+              display: block;
+            }
+
+            &.active {
+              background: linear-gradient(
+                90deg,
+                rgba($colormain, 0.08) 0%,
+                rgba($colormain, 0.04) 100%
+              );
+              border-left: 3px solid $colormain;
+              padding-left: 15px;
+
+              a {
+                font-weight: 600;
+                color: $colormain;
+              }
+            }
+          }
+        }
+
+        &.active span {
+          font-weight: 600;
+          color: $colormain;
+        }
+
+        &:hover {
+          background-color: rgba(0, 0, 0, 0.04);
+          padding-left: 22px;
+
+          .sub-menu-list {
+            display: block;
+          }
+        }
+
+        .icon-right {
+          display: flex;
+          align-items: center;
+          margin-left: 12px;
+          transition: transform 0.2s ease;
+
+          i {
+            font-size: 11px;
+            color: #95a5a6;
+          }
+        }
+
+        &:hover .icon-right {
+          transform: translateX(2px);
+        }
+      }
+    }
+  }
 }

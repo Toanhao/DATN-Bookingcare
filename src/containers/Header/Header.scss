@@ -1,48 +1,66 @@
-@import "../../styles/common.scss";
+@import '../../styles/common.scss';
 
 .header-container {
-    z-index: 99;
-    display: flex;
-    justify-content: space-between;
-    background-color: $colormain;
+  z-index: 99;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background-color: $colormain;
+  color: $common-text-color;
+  height: 60px;
+  position: relative;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
+
+  .btn-logout {
     color: $common-text-color;
-    height: 40px;
-    position: relative;
+    line-height: 60px;
+    height: 60px;
+    padding: 0 20px;
+    transition: all 0.2s ease;
 
-    .btn-logout {
-        color: $common-text-color;
-        line-height: 40px;
-        height: 40px;
-        padding: 0 10px;
-        &:hover {
-            background-color: darken($colormain, 5);
-        }
-        i {
-            font-size: $base-size + 1px;
-        }
+    &:hover {
+      background-color: rgba(0, 0, 0, 0.1);
+      cursor: pointer;
     }
 
-    .languages {
-        .welcome {
-            margin-right: 10px;
-        }
-        .language-en {
-            margin-right: 15px;
-            margin-left: 10px;
-            cursor: pointer;
-            opacity: 0.8;
-            &.active {
-                opacity: 1;
-                color: #30d663;
-            }
-        }
-        .language-vi {
-            cursor: pointer;
-            opacity: 0.8;
-            &.active {
-                opacity: 1;
-                color: orange;
-            }
-        }
+    i {
+      font-size: $base-size + 1px;
     }
+  }
+
+  .languages {
+    display: flex;
+    align-items: center;
+    padding: 0 20px;
+      font-size: 16px;
+      font-weight: 500;
+
+    .welcome {
+      margin-right: 15px;
+      font-weight: 500;
+    }
+
+    .language-en,
+    .language-vi {
+      cursor: pointer;
+      padding: 5px 10px;
+      border-radius: 4px;
+      transition: all 0.2s ease;
+      font-weight: 500;
+
+      &:hover {
+        background-color: rgba(255, 255, 255, 0.1);
+      }
+
+      &.active {
+        background-color: rgba(255, 255, 255, 0.15);
+        color: #ffffff;
+      }
+    }
+
+    .language-en {
+      margin-left: 5px;
+      margin-right: 5px;
+    }
+  }
 }

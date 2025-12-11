@@ -57,7 +57,7 @@ class HandBook extends Component {
   handleSaveNewHandbook = async () => {
     let res = await createNewHandbook(this.state);
     if (res && res.errCode === 0) {
-      toast.success('add a new handbook succeed!');
+      toast.success('Thêm bài viết mới thành công');
       this.setState({
         name: '',
         imageBase64: '',
@@ -65,7 +65,7 @@ class HandBook extends Component {
         descriptionMarkdown: '',
       });
     } else {
-      toast.error('add a new handbook error!');
+      toast.error('Thêm bài viết mới thất bại!');
       console.log('check res', res);
     }
   };

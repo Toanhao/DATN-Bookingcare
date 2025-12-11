@@ -221,10 +221,10 @@ class BookingModal extends Component {
 
     this.setState({ isShowLoading: false });
     if (res && res.errCode === 0) {
-      toast.success('booking a new appointment succeed!');
+      toast.success('Đặt lịch hẹn mới thành công!');
       this.props.closeBookingClose();
     } else {
-      toast.error('booking a new appointment error!');
+      toast.error('Đặt lịch hẹn mới thất bại!');
     }
 
     console.log('Booking a new appointment', this.state);

@@ -105,20 +105,18 @@ class ManagePatient extends Component {
       this.setState({
         isShowLoading: false,
       });
-      toast.success('Send Remedy Success');
+      toast.success('Gửi hoá đơn thành công !');
       this.closeRemedyModal();
       await this.getDataPatient();
     } else {
       this.setState({
         isShowLoading: false,
       });
-      toast.error('Something wrongs ...');
-      console.log('error send remedy: ', res);
+      toast.error('Gửi hoá đơn thất bại !');
     }
   };
 
   render() {
-    // console.log("check state", this.state);
     let { dataPatient, isOpenRemedyModal, dataModal } = this.state;
 
     return (
