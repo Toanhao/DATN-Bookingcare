@@ -10,7 +10,6 @@ import {
   getAllSpecialty,
   getAllClinic,
   getAllDoctors,
-  getDetailInforDoctor,
   getAllHandbook,
 } from '../../../services/userService';
 import DirectoryCard from './DirectoryCard';
@@ -62,61 +61,37 @@ const AllDirectory = (props) => {
         setClinics(data2 || []);
         setHandbooks(data4 || []);
 
-        // Enrich doctors with specialtyName (similar to OutStandingDoctor)
-        const enrichDoctorsWithSpecialty = async (
-          doctorsList,
-          specialtiesList
-        ) => {
+        // Enrich doctors with specialtyName (lấy từ Doctor_Info đã có sẵn)
+        const enrichDoctorsWithSpecialty = (doctorsList, specialtiesList) => {
           if (!doctorsList || doctorsList.length === 0) return [];
-          try {
-            const detailPromises = doctorsList.map((d) => {
-              const id =
-                d.id ||
-                d.userId ||
-                d.doctorId ||
-                (d.accountId && d.accountId.id) ||
-                null;
-              return id ? getDetailInforDoctor(id) : Promise.resolve(null);
-            });
-            const responses = await Promise.all(detailPromises);
 
-            return doctorsList.map((doc, idx) => {
-              const res = responses[idx];
-              let specialtyName = '';
-              try {
-                if (res) {
-                  // response can be axios shape or raw
-                  const Info =
-                    (res.data && (res.data.Doctor_Info || res.data.Doctor_Infor)) ||
-                    null;
-                  const specialtyId =
-                    Info && Info.specialtyId ? Info.specialtyId : null;
-                  if (specialtyId) {
-                    const found = (specialtiesList || []).find(
-                      (s) =>
-                        s.id === specialtyId ||
-                        s.id === +specialtyId ||
-                        String(s.id) === String(specialtyId)
-                    );
-                    if (found)
-                      specialtyName =
-                        found.name || found.nameVi || found.nameEn || '';
-                  }
-                }
-              } catch (e) {
-                // ignore per-doctor errors
-              }
-              return {
-                ...doc,
-                specialtyName,
-              };
-            });
-          } catch (e) {
-            return doctorsList;
-          }
+          return doctorsList.map((doc) => {
+            let specialtyName = '';
+
+            // Lấy specialtyId trực tiếp từ Doctor_Info (đã có sẵn từ getAllDoctors)
+            const doctorInfo = doc.Doctor_Info || doc.Doctor_Infor;
+            const specialtyId = doctorInfo && doctorInfo.specialtyId;
+
+            if (specialtyId) {
+              const found = (specialtiesList || []).find(
+                (s) =>
+                  s.id === specialtyId ||
+                  s.id === +specialtyId ||
+                  String(s.id) === String(specialtyId)
+              );
+              if (found)
+                specialtyName =
+                  found.name || found.nameVi || found.nameEn || '';
+            }
+
+            return {
+              ...doc,
+              specialtyName,
+            };
+          });
         };
 
-        const enrichedDoctors = await enrichDoctorsWithSpecialty(
+        const enrichedDoctors = enrichDoctorsWithSpecialty(
           data3 || [],
           data1 || []
         );

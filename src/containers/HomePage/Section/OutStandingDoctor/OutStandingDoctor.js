@@ -22,7 +22,10 @@ class OutStandingDoctor extends Component {
 
   componentDidUpdate(prevProps, prevState, snapshot) {
     if (prevProps.topDoctorsRedux !== this.props.topDoctorsRedux) {
-      this.enrichDoctorsWithSpecialty(this.props.topDoctorsRedux);
+      // Only enrich if specialties are already loaded
+      if (this.state.specialties && this.state.specialties.length > 0) {
+        this.enrichDoctorsWithSpecialty(this.props.topDoctorsRedux);
+      }
     }
   }
 
@@ -36,13 +39,20 @@ class OutStandingDoctor extends Component {
     try {
       let res = await getAllSpecialty();
       // getAllSpecialty returns axios response; backend may wrap with errCode/data
+      let specialtiesData = [];
       if (res && res.data && res.data.errCode === 0) {
-        this.setState({ specialties: res.data.data });
+        specialtiesData = res.data.data;
       } else if (res && Array.isArray(res.data)) {
-        this.setState({ specialties: res.data });
+        specialtiesData = res.data;
       } else if (Array.isArray(res)) {
-        this.setState({ specialties: res });
+        specialtiesData = res;
       }
+      this.setState({ specialties: specialtiesData }, () => {
+        // After specialties are loaded, re-enrich doctors if topDoctorsRedux is already available
+        if (this.props.topDoctorsRedux && this.props.topDoctorsRedux.length > 0) {
+          this.enrichDoctorsWithSpecialty(this.props.topDoctorsRedux);
+        }
+      });
     } catch (e) {
       console.error('loadAllSpecialties error:', e);
     }
