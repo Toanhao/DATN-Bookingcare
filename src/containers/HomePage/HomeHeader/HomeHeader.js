@@ -13,6 +13,7 @@ import { withRouter } from 'react-router';
 import { Link } from 'react-router-dom';
 import { Sidebar } from 'primereact/sidebar';
 import QuickBookingModal from '../../Patient/Doctor/Modal/QuickBookingModal';
+import BookingHistoryModal from '../../Patient/BookingHistory/BookingHistoryModal';
 
 class HomeHeader extends Component {
   changeLanguage = (language) => {
@@ -25,6 +26,7 @@ class HomeHeader extends Component {
       visible: false,
       showUserMenu: false,
       isOpenQuickBookingModal: false,
+      isOpenBookingHistoryModal: false,
     };
 
     this.userMenuRef = React.createRef();
@@ -62,6 +64,13 @@ class HomeHeader extends Component {
   toggleQuickBookingModal = () => {
     this.setState({
       isOpenQuickBookingModal: !this.state.isOpenQuickBookingModal,
+    });
+  };
+
+  toggleBookingHistoryModal = () => {
+    this.setState({
+      isOpenBookingHistoryModal: !this.state.isOpenBookingHistoryModal,
+      showUserMenu: false,
     });
   };
 
@@ -342,11 +351,23 @@ Trực thuộc: Công ty CP Công nghệ BookingCare
 
                       <div className="dropdown-divider"></div>
 
+                      {/* Booking History */}
+                      <div
+                        className="user-dropdown-item"
+                        onClick={this.toggleBookingHistoryModal}
+                      >
+                        <i className="fas fa-history"></i>
+                        <span>Lịch sử khám</span>
+                      </div>
+
+                      <div className="dropdown-divider"></div>
+
                       {/* Support */}
                       <div
                         className="user-dropdown-item"
                         onClick={() => {
                           this.handleSupportClick();
+                          this.setState({ showUserMenu: false });
                         }}
                       >
                         <i className="fas fa-question-circle"></i>
@@ -463,6 +484,12 @@ Trực thuộc: Công ty CP Công nghệ BookingCare
         <QuickBookingModal
           isOpenModal={this.state.isOpenQuickBookingModal}
           closeModal={this.toggleQuickBookingModal}
+        />
+
+        {/* Booking History Modal */}
+        <BookingHistoryModal
+          isOpen={this.state.isOpenBookingHistoryModal}
+          closeModal={this.toggleBookingHistoryModal}
         />
       </React.Fragment>
     );

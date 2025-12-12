@@ -126,6 +126,14 @@ const postSendRemedy = (data) => {
   return axios.post('/api/send-remedy', data);
 };
 
+const getPatientBookingHistory = (patientId) => {
+  return axios.get(`/api/get-patient-booking-history?patientId=${patientId}`);
+};
+
+const cancelPatientBooking = (data) => {
+  return axios.post('/api/cancel-patient-booking', data);
+};
+
 export {
   handleLoginApi,
   getAllUsers,
@@ -154,4 +162,6 @@ export {
   getAllDetailClinicById,
   getAllPatientForDoctor,
   postSendRemedy,
+  getPatientBookingHistory,
+  cancelPatientBooking,
 };
