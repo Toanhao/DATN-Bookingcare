@@ -216,15 +216,12 @@ class ManageDoctor extends Component {
     });
 
     let res = await getDetailInforDoctor(selectedDoctor.value);
-    if (res && res.errCode === 0 && res.data && res.data.Markdown) {
-      let markdown = res.data.Markdown;
+    if (res && res.errCode === 0 && res.data && res.data.Doctor_Info) {
+      const info = res.data.Doctor_Info;
+      const hasContent =
+        info.descriptionHTML || info.descriptionMarkdown || info.description;
 
-      // Check if markdown actually has content
-      if (
-        markdown.contentHTML ||
-        markdown.contentMarkdown ||
-        markdown.description
-      ) {
+      if (hasContent) {
         let note = '',
           paymentId = '',
           priceId = '',
@@ -236,31 +233,23 @@ class ManageDoctor extends Component {
           selectedProvince = '',
           selectedSpecialty = '',
           selectedClinic = '';
-        if (res.data.Doctor_Info) {
-          note = res.data.Doctor_Info.note;
-          paymentId = res.data.Doctor_Info.paymentId;
-          priceId = res.data.Doctor_Info.priceId;
-          provinceId = res.data.Doctor_Info.provinceId;
-          specialtyId = res.data.Doctor_Info.specialtyId;
-          clinicId = res.data.Doctor_Info.clinicId;
-          selectedPayment = listPayment.find(
-            (item) => item.value === paymentId
-          );
-          selectedPrice = listPrice.find((item) => item.value === priceId);
-          selectedProvince = listProvince.find(
-            (item) => item.value === provinceId
-          );
-          selectedSpecialty = listSpecialty.find((item) => {
-            return item && item.value === specialtyId;
-          });
-          selectedClinic = listClinic.find((item) => {
-            return item && item.value === clinicId;
-          });
-        }
+
+        note = info.note;
+        paymentId = info.paymentId;
+        priceId = info.priceId;
+        provinceId = info.provinceId;
+        specialtyId = info.specialtyId;
+        clinicId = info.clinicId;
+        selectedPayment = listPayment.find((item) => item.value === paymentId);
+        selectedPrice = listPrice.find((item) => item.value === priceId);
+        selectedProvince = listProvince.find((item) => item.value === provinceId);
+        selectedSpecialty = listSpecialty.find((item) => item && item.value === specialtyId);
+        selectedClinic = listClinic.find((item) => item && item.value === clinicId);
+
         this.setState({
-          contentHTML: markdown.contentHTML,
-          contentMarkdown: markdown.contentMarkdown,
-          description: markdown.description,
+          contentHTML: info.descriptionHTML,
+          contentMarkdown: info.descriptionMarkdown,
+          description: info.description,
           hasOldData: true,
           note: note,
           selectedPayment: selectedPayment,

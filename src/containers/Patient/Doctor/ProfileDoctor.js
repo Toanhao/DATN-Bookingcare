@@ -112,9 +112,9 @@ class ProfileDoctor extends Component {
               {isShowDescriptionDoctor === true ? (
                 <>
                   {dataProfile &&
-                    dataProfile.Markdown &&
-                    dataProfile.Markdown.description && (
-                      <span>{dataProfile.Markdown.description}</span>
+                    dataProfile.Doctor_Info &&
+                    dataProfile.Doctor_Info.description && (
+                      <span>{dataProfile.Doctor_Info.description}</span>
                     )}
                 </>
               ) : (
@@ -145,11 +145,11 @@ class ProfileDoctor extends Component {
               )}
 
             {dataProfile &&
-              dataProfile.priceTypeData &&
+              dataProfile.Doctor_Info &&
               language === LANGUAGES.EN && (
                 <NumberFormat
                   className="currency"
-                  value={dataProfile.priceTypeData.valueEn}
+                  value={dataProfile.Doctor_Info.priceTypeData.valueEn}
                   displayType="text"
                   thousandSeparator={true}
                   suffix={'$'}
