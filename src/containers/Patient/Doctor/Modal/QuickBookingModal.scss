@@ -57,7 +57,6 @@
       &:hover {
         color: #667eea;
         background: #f0f0f0;
-        transform: rotate(90deg);
       }
     }
   }
@@ -414,7 +413,7 @@
     }
 
     .btn-confirm {
-      background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+      background: #0866ff;
       color: white;
       box-shadow: 0 4px 15px rgba(56, 239, 125, 0.4);
 

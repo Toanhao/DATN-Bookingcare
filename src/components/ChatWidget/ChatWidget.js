@@ -30,6 +30,7 @@ const ChatWidget = () => {
   const recognitionRef = useRef(null);
   const [supportsSpeech, setSupportsSpeech] = useState(false);
   const [isTyping, setIsTyping] = useState(false);
+  const [isSpeaking, setIsSpeaking] = useState(false);
   const [unread, setUnread] = useState(0);
   const listRef = useRef(null);
   const chatContainerRef = useRef(null);
@@ -203,19 +204,39 @@ const ChatWidget = () => {
     else startRecording();
   };
 
+  const stopSpeech = () => {
+    try {
+      if (window.speechSynthesis) {
+        window.speechSynthesis.cancel();
+      }
+    } catch (e) {
+      // ignore
+    } finally {
+      setIsSpeaking(false);
+    }
+  };
+
   const speakText = (text, lang) => {
     if (!text) return;
     if (!window.speechSynthesis)
       return alert('SpeechSynthesis không được hỗ trợ trên trình duyệt này.');
+    // If currently speaking, toggle to stop
+    if (isSpeaking) {
+      stopSpeech();
+      return;
+    }
     try {
-      window.speechSynthesis.cancel();
       const utt = new SpeechSynthesisUtterance(text);
       utt.lang = lang === 'vi' ? 'vi-VN' : 'en-US';
       utt.rate = 1;
       utt.pitch = 1;
+      utt.onstart = () => setIsSpeaking(true);
+      utt.onend = () => setIsSpeaking(false);
+      utt.onerror = () => setIsSpeaking(false);
       window.speechSynthesis.speak(utt);
     } catch (e) {
       console.error('speakText error', e);
+      setIsSpeaking(false);
     }
   };
   // Use markdown-it to render Markdown safely (no raw HTML)
@@ -440,11 +461,15 @@ const ChatWidget = () => {
                 />
                 {m.from === 'ai' && (
                   <button
-                    className="play-btn"
+                    className={`play-btn ${isSpeaking ? 'speaking' : ''}`}
                     onClick={() => speakText(m.text, m.language || language)}
-                    title="Phát âm"
+                    title={isSpeaking ? 'Dừng phát âm' : 'Phát âm'}
                   >
-                    🔊
+                    {isSpeaking ? (
+                      <i className="fas fa-stop"></i>
+                    ) : (
+                      <i className="fas fa-volume-up"></i>
+                    )}
                   </button>
                 )}
               </div>
@@ -479,7 +504,7 @@ const ChatWidget = () => {
             onClick={toggleRecording}
             title={isRecording ? 'Dừng ghi âm' : 'Ghi âm (nói)'}
           >
-            {isRecording ? '●' : '🎤'}
+            {isRecording ? '●' : <i className="fas fa-microphone"></i>}
           </button>
           <button
             className="send-btn"

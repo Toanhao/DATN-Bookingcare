@@ -7,6 +7,7 @@ import { LANGUAGES } from '../../../utils';
 import { getExtraInforDoctorById } from '../../../services/userService';
 import { FormattedMessage } from 'react-intl';
 import NumberFormat from 'react-number-format';
+import { Link } from 'react-router-dom';
 
 class DoctorExtraInfor extends Component {
   constructor(props) {
@@ -56,12 +57,24 @@ class DoctorExtraInfor extends Component {
           <div className="text-address">
             <FormattedMessage id="patient.extra-Infor-doctor.text-address" />
           </div>
+
           <div className="name-clinic">
-            {extraInfor && extraInfor.nameClinic ? extraInfor.nameClinic : ''}
+            {extraInfor &&
+            extraInfor.clinicData &&
+            extraInfor.clinicData.name &&
+            extraInfor.clinicId ? (
+              <Link to={`/detail-clinic/${extraInfor.clinicId}`}>
+                {extraInfor.clinicData.name}
+              </Link>
+            ) : (
+              ''
+            )}
           </div>
           <div className="detail-address">
-            {extraInfor && extraInfor.addressClinic
-              ? extraInfor.addressClinic
+            {extraInfor &&
+            extraInfor.clinicData &&
+            extraInfor.clinicData.address
+              ? extraInfor.clinicData.address
               : ''}
           </div>
         </div>

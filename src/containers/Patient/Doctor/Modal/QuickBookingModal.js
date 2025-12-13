@@ -177,7 +177,7 @@ class QuickBookingModal extends Component {
       if (res && res.errCode === 0) {
         let clinicOptions = res.data.map((item) => ({
           value: item.id,
-          label: item.address,
+          label: item.name,
           data: item,
         }));
         this.setState({ clinics: clinicOptions });
@@ -602,7 +602,7 @@ class QuickBookingModal extends Component {
             </p>
             <p>
               <strong>Tên cơ sở:</strong>{' '}
-              {this.state.selectedClinic.data.address}
+              {this.state.selectedClinic.data.name}
             </p>
             <p>
               <strong>Địa chỉ:</strong> {this.state.selectedClinic.data.name}

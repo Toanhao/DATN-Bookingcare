@@ -250,7 +250,7 @@ const BookingChat = () => {
           {messages.length === 0 && (
             <div className="empty">
               <div>
-                Chào bạn! Bạn có thể hỏi về đặt lịch khám, bác sĩ, và dịch vụ.
+                Chào bạn! Bạn có thể hỏi thông tin về đặt lịch khám, bác sĩ, và các thông tin liên quan.
               </div>
             </div>
           )}
