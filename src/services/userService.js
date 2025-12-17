@@ -3,7 +3,7 @@
 import axios from '../axios';
 
 const handleLoginApi = (userEmail, userPassword) => {
-  return axios.post('/api/login', {
+  return axios.post('/api/users/login', {
     email: userEmail,
     password: userPassword,
   });
@@ -16,7 +16,7 @@ const getAllUsers = (inputId) => {
 
 const createNewUserService = (data) => {
   console.log('check data from service: ', data);
-  return axios.post(`/api/create-new-user`, data);
+  return axios.post(`/api/users/register`, data);
 };
 
 const deleteUserService = (userId) => {
@@ -31,8 +31,15 @@ const editUserService = (inputData) => {
   return axios.put('/api/edit-user', inputData);
 };
 
-const getAllCodeService = (inputType) => {
-  return axios.get(`/api/allcode?type=${inputType}`);
+// Legacy allcode removed in new backend; use specific resources instead
+
+// TimeSlots
+export const getTimeSlots = () => {
+  return axios.get('/api/time-slots');
+};
+
+export const createScheduleBulkNew = (data) => {
+  return axios.post('/api/schedules/bulk', data);
 };
 
 const getTopDoctorHomeService = (limit) => {
@@ -99,7 +106,6 @@ const getAllClinic = () => {
   return axios.get('api/get-all-clinic');
 };
 
-
 const createNewHandbook = (data) => {
   return axios.post('/api/create-new-handbook', data);
 };
@@ -140,7 +146,6 @@ export {
   createNewUserService,
   deleteUserService,
   editUserService,
-  getAllCodeService,
   getTopDoctorHomeService,
   getAllDoctors,
   saveDetailDoctorService,

@@ -17,6 +17,7 @@ export const userLoginFail = () => ({
 // processLogout as thunk: dispatch logout then navigate to login page
 export const processLogout = () => {
   return (dispatch, getState) => {
+    localStorage.removeItem('access_token');
     dispatch({ type: actionTypes.PROCESS_LOGOUT });
     // after clearing user state redirect to login
     try {

@@ -11,7 +11,7 @@ import DatePicker from '../../../components/Input/DatePicker';
 import moment from 'moment';
 import { toast } from 'react-toastify';
 import _ from 'lodash';
-import { saveBulkScheduleDoctor } from '../../../services/userService';
+import { createScheduleBulkNew, getTimeSlots } from '../../../services/userService';
 
 // import Header from "../containers/Header/Header";
 
@@ -27,16 +27,27 @@ class ManageSchedule extends Component {
     };
   }
 
-  componentDidMount() {
+  async componentDidMount()  {
     // await this.getAllDoctor();
     this.props.fetchAllDoctors();
-    this.props.fetchAllScheduleTime();
+    // Load timeslots from new backend
+    try {
+      const res = await getTimeSlots();
+      const data = (res && res.data) || res; // axios interceptor returns data
+      let rangeTime = Array.isArray(data)
+        ? data.map((t) => ({ ...t, isSelected: false }))
+        : [];
+      this.setState({ rangeTime });
+    } catch (e) {
+      this.setState({ rangeTime: [] });
+    }
     
     // Nếu là bác sĩ đăng nhập, tự động set selectedDoctor là chính mình
     let { userInfo } = this.props;
-    if (userInfo && userInfo.roleId === USER_ROLE.DOCTOR) {
-      let labelVi = `${userInfo.lastName} ${userInfo.firstName}`;
-      let labelEn = `${userInfo.firstName} ${userInfo.lastName}`;
+    if (userInfo && userInfo.role === 'DOCTOR') {
+      const name = userInfo.fullName || `${userInfo.firstName || ''} ${userInfo.lastName || ''}`.trim();
+      let labelVi = name;
+      let labelEn = name;
       let selectedDoctor = {
         label: this.props.language === LANGUAGES.VI ? labelVi : labelEn,
         value: userInfo.id
@@ -55,20 +66,7 @@ class ManageSchedule extends Component {
       });
     }
 
-    if (prevProps.allScheduleTime !== this.props.allScheduleTime) {
-      let data = this.props.allScheduleTime;
-      if (data && data.length > 0) {
-        // data.map(item => {
-        //   item.isSelected = false;
-        //   return item;
-        // })
-        data = data.map((item) => ({ ...item, isSelected: false }));
-      }
-
-      this.setState({
-        rangeTime: data,
-      });
-    }
+    // timeslots loaded once on mount; no redux updates here
     // if (prevProps.language !== this.props.language) {
     //   let dataSelect = this.buildDataInputSelect(this.props.language);
     //   this.setState({
@@ -105,7 +103,6 @@ class ManageSchedule extends Component {
   };
 
   handleClickBtnTime = (time) => {
-    console.log('onClickBtnTime', time);
     let { rangeTime } = this.state;
     if (rangeTime && rangeTime.length > 0) {
       rangeTime = rangeTime.map((item) => {
@@ -132,36 +129,34 @@ class ManageSchedule extends Component {
       return;
     }
 
-    //let formatedDate = moment(currentDate).format(dateFormat.SEND_TO_SERVER);
-    // let formatedDate = moment(currentDate).unix()
-    let formatedDate = new Date(currentDate).getTime();
+    // Backend expects a date (DATE type); use ISO string
+    let formatedDate = new Date(currentDate).toISOString();
 
     if (rangeTime && rangeTime.length > 0) {
       let selectedTime = rangeTime.filter((item) => item.isSelected === true);
       if (selectedTime && selectedTime.length > 0) {
-        selectedTime.map((schedule, index) => {
-          console.log('check selected time', schedule, index, selectedDoctor);
-          let object = {};
-          object.doctorId = selectedDoctor.value; //value: label
-          object.date = formatedDate;
-          object.timeType = schedule.keyMap;
-          return result.push(object);
-        });
+        const ids = selectedTime.map((s) => s.id);
+        result = ids;
       } else {
         toast.error('Thời gian được chọn không hợp lệ!');
         return;
       }
     }
-    let res = await saveBulkScheduleDoctor({
-      arrSchedule: result,
-      doctorId: selectedDoctor.value,
-      date: formatedDate,
-    });
-    if (res && res.errCode === 0) {
-      toast.success('Lưu thông tin thành công!');
-    } else {
-      toast.error('Lưu thông tin thất bại!');
-      console.log('error', res);
+    try {
+      const payload = {
+        doctorId: selectedDoctor.value,
+        workDate: formatedDate,
+        timeSlotIds: result,
+        maxPatient: 20,
+      };
+      const res = await createScheduleBulkNew(payload);
+      if (res && (res.createdCount || res.schedules)) {
+        toast.success('Lưu thông tin thành công!');
+      } else {
+        toast.success('Lưu thông tin thành công!');
+      }
+    } catch (e) {
+      toast.error(e?.message || 'Lưu thông tin thất bại!');
     }
   };
   render() {
@@ -177,7 +172,7 @@ class ManageSchedule extends Component {
         <div className="container">
           <div className="row">
             {/* Chỉ hiển thị dropdown chọn bác sĩ nếu là Admin */}
-            {this.props.userInfo && this.props.userInfo.roleId === USER_ROLE.ADMIN && (
+            {this.props.userInfo && this.props.userInfo.role === USER_ROLE.ADMIN && (
               <div className="col-6 form-group ">
                 <label>
                   <FormattedMessage id="manage-schedule.choose-doctor" />
@@ -189,7 +184,7 @@ class ManageSchedule extends Component {
                 />
               </div>
             )}
-            <div className={this.props.userInfo && this.props.userInfo.roleId === USER_ROLE.DOCTOR ? "col-12 form-group" : "col-6 form-group"}>
+            <div className={this.props.userInfo && this.props.userInfo.role === USER_ROLE.DOCTOR ? "col-12 form-group" : "col-6 form-group"}>
               <label>
                 <FormattedMessage id="manage-schedule.choose-date" />
               </label>
@@ -214,7 +209,7 @@ class ManageSchedule extends Component {
                       key={index}
                       onClick={() => this.handleClickBtnTime(item)}
                     >
-                      {language === LANGUAGES.VI ? item.valueVi : item.valueEn}
+                      {item.label}
                     </button>
                   );
                 })}
@@ -240,14 +235,12 @@ const mapStateToProps = (state) => {
     userInfo: state.user.userInfo,
     allDoctors: state.admin.allDoctors,
     language: state.app.language,
-    allScheduleTime: state.admin.allScheduleTime,
   };
 };
 
 const mapDispatchToProps = (dispatch) => {
   return {
     fetchAllDoctors: () => dispatch(actions.fetchAllDoctors()),
-    fetchAllScheduleTime: () => dispatch(actions.fetchAllScheduleTime()),
   };
 };
 

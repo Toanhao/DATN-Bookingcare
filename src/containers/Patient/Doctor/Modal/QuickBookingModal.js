@@ -66,34 +66,31 @@ class QuickBookingModal extends Component {
   async componentDidMount() {
     await this.loadSpecialties();
     await this.loadClinics();
-    this.props.getGenders();
+    // Use static gender list instead of Redux allcode
+    const genders = [
+      { keyMap: 'Nam', valueVi: 'Nam', valueEn: 'Male' },
+      { keyMap: 'Nữ', valueVi: 'Nữ', valueEn: 'Female' },
+      { keyMap: 'Khác', valueVi: 'Khác', valueEn: 'Other' },
+    ];
+    this.setState({ genders: this.buildDataGender(genders) });
   }
 
   componentDidUpdate(prevProps, prevState) {
     if (this.props.language !== prevProps.language) {
-      this.setState({
-        genders: this.buildDataGender(this.props.genders),
-      });
+      const genders = [
+        { keyMap: 'Nam', valueVi: 'Nam', valueEn: 'Male' },
+        { keyMap: 'Nữ', valueVi: 'Nữ', valueEn: 'Female' },
+        { keyMap: 'Khác', valueVi: 'Khác', valueEn: 'Other' },
+      ];
+      this.setState({ genders: this.buildDataGender(genders) });
     }
-    if (this.props.genders !== prevProps.genders) {
-      this.setState({
-        genders: this.buildDataGender(this.props.genders),
-      });
-    }
+    // No longer need to react to props.genders
 
     // Auto-fill user info when modal opens
     if (this.props.isOpenModal && !prevProps.isOpenModal) {
       if (this.props.isLoggedIn) {
-        if (!this.state.genders || this.state.genders.length === 0) {
-          this.setState(
-            { genders: this.buildDataGender(this.props.genders) },
-            () => {
-              this.fillUserFromProps();
-            }
-          );
-        } else {
-          this.fillUserFromProps();
-        }
+        // Genders already built; just fill user info
+        this.fillUserFromProps();
       } else {
         if (this.props.closeModal) this.props.closeModal();
         if (this.props.history && this.props.history.push) {
@@ -605,7 +602,7 @@ class QuickBookingModal extends Component {
               {this.state.selectedClinic.data.name}
             </p>
             <p>
-              <strong>Địa chỉ:</strong> {this.state.selectedClinic.data.name}
+              <strong>Địa chỉ:</strong> {this.state.selectedClinic.data.address}
             </p>
           </div>
         )}
@@ -955,16 +952,13 @@ class QuickBookingModal extends Component {
 const mapStateToProps = (state) => {
   return {
     language: state.app.language,
-    genders: state.admin.genders,
     isLoggedIn: state.user && state.user.isLoggedIn,
     userInfo: state.user && state.user.userInfo,
   };
 };
 
 const mapDispatchToProps = (dispatch) => {
-  return {
-    getGenders: () => dispatch(actions.fetchGenderStart()),
-  };
+  return {};
 };
 
 export default withRouter(

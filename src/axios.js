@@ -1,9 +1,23 @@
 import axios from 'axios';
 
 const instance = axios.create({
-    baseURL: process.env.REACT_APP_BACKEND_URL,
-    // withCredentials: true
+  baseURL: process.env.REACT_APP_BACKEND_URL,
+  // withCredentials: true
 });
+
+// Request interceptor để tự động thêm token vào header
+instance.interceptors.request.use(
+  (config) => {
+    const token = localStorage.getItem('access_token');
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+    return config;
+  },
+  (error) => {
+    return Promise.reject(error);
+  }
+);
 
 // const createError = (httpStatusCode, statusCode, errorMessage, problems, errorCode = '') => {
 //     const error = new Error();
@@ -22,42 +36,25 @@ const instance = axios.create({
 // };
 
 instance.interceptors.response.use(
-    (response) => {
-        // Thrown error for request with OK status code
-        // Use destructured data so eslint recognizes it as used.
-        const { data } = response;
-        // if (data.hasOwnProperty('s') && !isSuccessStatusCode(data['s']) && data.hasOwnProperty('errmsg')) {
-        //     return Promise.reject(createError(response.status, data['s'], data['errmsg'], null, data['errcode'] ? data['errcode'] : ""));
-        // }
-
-        // // Return direct data to callback
-        // if (data.hasOwnProperty('s') && data.hasOwnProperty('d')) {
-        //     return data['d'];
-        // }
-        // // Handle special case
-        // if (data.hasOwnProperty('s') && _.keys(data).length === 1) {
-        //     return null;
-        // }
-        return response.data;
-    },
-    // (error) => {
-    //     const { response } = error;
-    //     if (response == null) {
-    //         return Promise.reject(error);
-    //     }
-
-    //     const { data } = response;
-
-    //     if (data.hasOwnProperty('s') && data.hasOwnProperty('errmsg')) {
-    //         return Promise.reject(createError(response.status, data['s'], data['errmsg']));
-    //     }
-
-    //     if (data.hasOwnProperty('code') && data.hasOwnProperty('message')) {
-    //         return Promise.reject(createError(response.status, data['code'], data['message'], data['problems']));
-    //     }
-
-    //     return Promise.reject(createError(response.status));
-    // }
+  (response) => {
+    // Thrown error for request with OK status code
+    // Use destructured data so eslint recognizes it as used.
+    const { data } = response;
+    return response.data;
+  },
+  (error) => {
+    // Error handler
+    if (error.response) {
+      // Server responded with error status
+      return Promise.reject(error.response.data || error);
+    } else if (error.request) {
+      // Request made but no response received
+      return Promise.reject(error);
+    } else {
+      // Error in request setup
+      return Promise.reject(error);
+    }
+  }
 );
 
 export default instance;

@@ -10,16 +10,16 @@ class Login extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      username: '',
+      email: '',
       password: '',
       isShowPassword: false,
       errMessage: '',
     };
   }
 
-  handleOnChangeUsername = (event) => {
+  handleOnChangeEmail = (event) => {
     this.setState({
-      username: event.target.value,
+      email: event.target.value,
     });
   };
 
@@ -33,28 +33,52 @@ class Login extends Component {
     this.setState({
       errMessage: '',
     });
-    // console.log(`username:` , this.state.username, `password: ` , this.state.password);
-    // console.log(`all state: `, this.state);
     try {
-      let data = await handleLoginApi(this.state.username, this.state.password);
-      if (data && data.errCode !== 0) {
+      const res = await handleLoginApi(this.state.email, this.state.password);
+      if (!res || res.errCode !== 0) {
         this.setState({
-          errMessage: data.message,
+          errMessage: res?.message || 'Login failed',
         });
+        return;
       }
 
-      if (data && data.errCode === 0) {
-        this.props.userLoginSuccess(data.user);
-        console.log('login sucess');
+      // Trích xuất user và token từ response
+      const userData = res.data || {};
+      const { user, token } = userData;
+      
+      // Lưu token vào localStorage nếu có
+      if (token) {
+        localStorage.setItem('access_token', token);
+      }
+      
+      // Nếu user có id thì đăng nhập thành công, lưu vào Redux
+      if (user && user.id) {
+        this.props.userLoginSuccess(user);
+        
+        // Điều hướng tới trang khác nhau tùy theo role
+        const role = user.role;
+        if (role === 'ADMIN') {
+          this.props.navigate('/system/user-redux');
+        } else if (role === 'DOCTOR') {
+          this.props.navigate('/doctor/manage-schedule');
+        } else if (role === 'PATIENT') {
+          this.props.navigate('/home');
+        } else {
+          this.props.navigate('/home');
+        }
+      } else {
+        this.setState({
+          errMessage: 'Invalid user data',
+        });
       }
     } catch (error) {
-      if (error.response) {
-        if (error.response.data) {
-          this.setState({
-            errMessage: error.response.data.message,
-          });
-        }
-      }
+      const message =
+        error?.data?.message ||
+        error?.message ||
+        'Login failed';
+      this.setState({
+        errMessage: message,
+      });
     }
   };
 
@@ -80,13 +104,13 @@ class Login extends Component {
             <div className="login-content row">
               <div className="col-12 text-login">Login</div>
               <div className="col-12 form-group login-input">
-                <label>Username</label>
+                <label>Email</label>
                 <input
                   type="text"
                   className="form-control"
-                  placeholder="Enter your Username"
-                  value={this.state.username}
-                  onChange={(event) => this.handleOnChangeUsername(event)}
+                  placeholder="Enter your Email"
+                  value={this.state.email}
+                  onChange={(event) => this.handleOnChangeEmail(event)}
                 />
               </div>
 
@@ -97,6 +121,7 @@ class Login extends Component {
                     type={this.state.isShowPassword ? 'text' : 'password'}
                     className="form-control"
                     placeholder="Enter your Password"
+                    value={this.state.password}
                     onChange={(event) => {
                       this.handleOnChangePassword(event);
                     }}

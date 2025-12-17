@@ -7,10 +7,7 @@ import HomeHeader from '../../HomePage/HomeHeader/HomeHeader';
 import ProfileDoctor from '../Doctor/ProfileDoctor';
 import DoctorSchedule from '../Doctor/DoctorSchedule';
 import DoctorExtraInfor from '../Doctor/DoctorExtraInfor';
-import {
-  getAllDetailSpecialtyById,
-  getAllCodeService,
-} from '../../../services/userService';
+import { getAllDetailSpecialtyById } from '../../../services/userService';
 import _ from 'lodash';
 import { LANGUAGES } from '../../../utils';
 import HomeFooter from '../../HomePage/HomeFooter/HomeFooter';
@@ -37,14 +34,7 @@ class DetailSpecialty extends Component {
         location: 'ALL',
       });
 
-      let resProvince = await getAllCodeService('PROVINCE');
-
-      if (
-        res &&
-        res.errCode === 0 &&
-        resProvince &&
-        resProvince.errCode === 0
-      ) {
+      if (res && res.errCode === 0) {
         let data = res.data;
         let arrDoctorId = [];
         if (data && !_.isEmpty(res.data)) {
@@ -56,21 +46,15 @@ class DetailSpecialty extends Component {
           }
         }
 
-        let dataProvince = resProvince.data;
-        if (dataProvince && dataProvince.length > 0) {
-          dataProvince.unshift({
-            createdAt: null,
-            keyMap: 'ALL',
-            type: 'PROVINCE',
-            valueEn: 'ALL',
-            valueVi: 'Toàn quốc',
-          });
-        }
+        // Backend đã bỏ bảng allcode, dùng danh sách tĩnh hoặc build từ dữ liệu
+        const dataProvince = [
+          { keyMap: 'ALL', valueEn: 'ALL', valueVi: 'Toàn quốc' },
+        ];
 
         this.setState({
           dataDetailSpecialty: res.data,
           arrDoctorId: arrDoctorId,
-          listProvince: resProvince.data ? dataProvince : [],
+          listProvince: dataProvince,
         });
       }
     }

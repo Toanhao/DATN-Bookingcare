@@ -15,31 +15,18 @@ class Register extends Component {
       email: '',
       password: '',
       confirmPassword: '',
-      firstName: '',
-      lastName: '',
+      fullName: '',
       phoneNumber: '',
       address: '',
+      birthday: '',
       gender: '',
-      genderArr: [],
       previewImgURL: '',
-      avatar: '',
+      image: '',
       isLoading: false,
     };
   }
 
-  async componentDidMount() {
-    this.props.getGenderStart();
-  }
-
-  componentDidUpdate(prevProps, prevState) {
-    if (prevProps.genderRedux !== this.props.genderRedux) {
-      let arrGenders = this.props.genderRedux;
-      this.setState({
-        genderArr: arrGenders,
-        gender: arrGenders && arrGenders.length > 0 ? arrGenders[0].keyMap : '',
-      });
-    }
-  }
+  async componentDidMount() {}
 
   handleOnChangeInput = (event, id) => {
     let copyState = { ...this.state };
@@ -57,7 +44,7 @@ class Register extends Component {
       let objectUrl = URL.createObjectURL(file);
       this.setState({
         previewImgURL: objectUrl,
-        avatar: base64,
+        image: base64,
       });
     }
   };
@@ -68,10 +55,11 @@ class Register extends Component {
       'email',
       'password',
       'confirmPassword',
-      'firstName',
-      'lastName',
+      'fullName',
       'phoneNumber',
       'address',
+      'birthday',
+      'gender',
     ];
 
     for (let i = 0; i < arrCheck.length; i++) {
@@ -124,27 +112,28 @@ class Register extends Component {
       let res = await createNewUserService({
         email: this.state.email,
         password: this.state.password,
-        firstName: this.state.firstName,
-        lastName: this.state.lastName,
+        fullName: this.state.fullName,
         address: this.state.address,
-        phonenumber: this.state.phoneNumber,
+        phoneNumber: this.state.phoneNumber,
+        birthday: this.state.birthday,
         gender: this.state.gender,
-        roleId: 'R3',
-        positionId: 'POS1',
-        avatar: this.state.avatar,
+        image: this.state.image,
       });
 
       this.setState({ isLoading: false });
 
       if (res && res.errCode === 0) {
-        toast.success('Đăng ký tài khoản thành công! Chuyển hướng đến trang đăng nhập...');
+        toast.success(
+          'Đăng ký tài khoản thành công! Chuyển hướng đến trang đăng nhập...'
+        );
         setTimeout(() => this.props.navigate('/login'), 2000);
       } else {
         toast.error(res.message || 'Đăng ký thất bại');
       }
     } catch (error) {
       this.setState({ isLoading: false });
-      const errorMsg = error.response?.data?.message || 'Có lỗi xảy ra, vui lòng thử lại';
+      const errorMsg =
+        error.response?.data?.message || 'Có lỗi xảy ra, vui lòng thử lại';
       toast.error(errorMsg);
     }
   };
@@ -156,7 +145,17 @@ class Register extends Component {
   };
 
   render() {
-    const { email, password, confirmPassword, firstName, lastName, phoneNumber, address, gender, genderArr, isLoading } = this.state;
+    const {
+      email,
+      password,
+      confirmPassword,
+      fullName,
+      phoneNumber,
+      address,
+      birthday,
+      gender,
+      isLoading,
+    } = this.state;
 
     return (
       <LoadingOverlay active={isLoading} spinner text="Đang xử lý...">
@@ -166,175 +165,169 @@ class Register extends Component {
               <div className="col-12 text-register">Đăng Ký Tài Khoản</div>
 
               <div className="col-md-6 col-sm-12 form-group register-input">
-                  <label>Email</label>
+                <label>Email</label>
+                <input
+                  type="email"
+                  className="form-control"
+                  placeholder="Nhập email của bạn"
+                  value={email}
+                  onChange={(event) => this.handleOnChangeInput(event, 'email')}
+                  disabled={isLoading}
+                />
+              </div>
+
+              <div className="col-md-6 col-sm-12 form-group register-input">
+                <label>Số Điện Thoại</label>
+                <input
+                  type="text"
+                  className="form-control"
+                  placeholder="Nhập số điện thoại"
+                  value={phoneNumber}
+                  onChange={(event) =>
+                    this.handleOnChangeInput(event, 'phoneNumber')
+                  }
+                  disabled={isLoading}
+                />
+              </div>
+
+              <div className="col-md-6 col-sm-12 form-group register-input">
+                <label>Họ Tên</label>
+                <input
+                  type="text"
+                  className="form-control"
+                  placeholder="Nhập họ tên của bạn"
+                  value={fullName}
+                  onChange={(event) =>
+                    this.handleOnChangeInput(event, 'fullName')
+                  }
+                  disabled={isLoading}
+                />
+              </div>
+
+              <div className="col-md-6 col-sm-12 form-group register-input">
+                <label>Mật Khẩu</label>
+                <input
+                  type="password"
+                  className="form-control"
+                  placeholder="Nhập mật khẩu (tối thiểu 6 ký tự)"
+                  value={password}
+                  onChange={(event) =>
+                    this.handleOnChangeInput(event, 'password')
+                  }
+                  disabled={isLoading}
+                  onKeyDown={(event) => this.handleKeyDown(event)}
+                />
+              </div>
+
+              <div className="col-md-6 col-sm-12 form-group register-input">
+                <label>Xác Nhận Mật Khẩu</label>
+                <input
+                  type="password"
+                  className="form-control"
+                  placeholder="Nhập lại mật khẩu"
+                  value={confirmPassword}
+                  onChange={(event) =>
+                    this.handleOnChangeInput(event, 'confirmPassword')
+                  }
+                  disabled={isLoading}
+                  onKeyDown={(event) => this.handleKeyDown(event)}
+                />
+              </div>
+
+              <div className="col-md-6 col-sm-12 form-group register-input">
+                <label>Ngày Sinh</label>
+                <input
+                  type="date"
+                  className="form-control"
+                  value={birthday}
+                  onChange={(event) =>
+                    this.handleOnChangeInput(event, 'birthday')
+                  }
+                  disabled={isLoading}
+                />
+              </div>
+
+              <div className="col-md-6 col-sm-12 form-group register-input">
+                <label>Giới Tính</label>
+                <select
+                  className="form-control"
+                  value={gender}
+                  onChange={(event) =>
+                    this.handleOnChangeInput(event, 'gender')
+                  }
+                  disabled={isLoading}
+                >
+                  <option value="">-- Chọn giới tính --</option>
+                  <option value="Nam">Nam</option>
+                  <option value="Nữ">Nữ</option>
+                  <option value="Khác">Khác</option>
+                </select>
+              </div>
+
+              <div className="col-md-6 col-sm-12 form-group register-input">
+                <label>Ảnh Đại Diện</label>
+                <div className="preview-img-container">
                   <input
-                    type="email"
-                    className="form-control"
-                    placeholder="Nhập email của bạn"
-                    value={email}
-                    onChange={(event) =>
-                      this.handleOnChangeInput(event, 'email')
-                    }
+                    id="previewImg"
+                    type="file"
+                    hidden
+                    onChange={(event) => this.handleOnChangeImage(event)}
                     disabled={isLoading}
                   />
+                  <label className="label-upload" htmlFor="previewImg">
+                    Tải ảnh <i className="fas fa-upload"></i>
+                  </label>
+                  <div
+                    className="preview-image"
+                    style={{
+                      backgroundImage: `url(${this.state.previewImgURL})`,
+                    }}
+                  ></div>
                 </div>
+              </div>
 
-                <div className="col-md-6 col-sm-12 form-group register-input">
-                  <label>Số Điện Thoại</label>
-                  <input
-                    type="text"
-                    className="form-control"
-                    placeholder="Nhập số điện thoại"
-                    value={phoneNumber}
-                    onChange={(event) =>
-                      this.handleOnChangeInput(event, 'phoneNumber')
-                    }
-                    disabled={isLoading}
-                  />
-                </div>
+              <div className="col-12 form-group register-input">
+                <label>Địa Chỉ</label>
+                <input
+                  type="text"
+                  className="form-control"
+                  placeholder="Nhập địa chỉ của bạn"
+                  value={address}
+                  onChange={(event) =>
+                    this.handleOnChangeInput(event, 'address')
+                  }
+                  disabled={isLoading}
+                  onKeyDown={(event) => this.handleKeyDown(event)}
+                />
+              </div>
 
-                <div className="col-md-6 col-sm-12 form-group register-input">
-                  <label>Họ</label>
-                  <input
-                    type="text"
-                    className="form-control"
-                    placeholder="Nhập họ của bạn"
-                    value={lastName}
-                    onChange={(event) =>
-                      this.handleOnChangeInput(event, 'lastName')
-                    }
-                    disabled={isLoading}
-                  />
-                </div>
+              <div className="col-12 form-group">
+                <button
+                  className="btn-register"
+                  onClick={() => this.handleRegister()}
+                  disabled={isLoading}
+                >
+                  {isLoading ? 'Đang xử lý...' : 'Đăng Ký'}
+                </button>
+              </div>
 
-                <div className="col-md-6 col-sm-12 form-group register-input">
-                  <label>Tên</label>
-                  <input
-                    type="text"
-                    className="form-control"
-                    placeholder="Nhập tên của bạn"
-                    value={firstName}
-                    onChange={(event) =>
-                      this.handleOnChangeInput(event, 'firstName')
-                    }
-                    disabled={isLoading}
-                  />
-                </div>
-
-                <div className="col-md-6 col-sm-12 form-group register-input">
-                  <label>Mật Khẩu</label>
-                  <input
-                    type="password"
-                    className="form-control"
-                    placeholder="Nhập mật khẩu (tối thiểu 6 ký tự)"
-                    value={password}
-                    onChange={(event) =>
-                      this.handleOnChangeInput(event, 'password')
-                    }
-                    disabled={isLoading}
-                    onKeyDown={(event) => this.handleKeyDown(event)}
-                  />
-                </div>
-
-                <div className="col-md-6 col-sm-12 form-group register-input">
-                  <label>Xác Nhận Mật Khẩu</label>
-                  <input
-                    type="password"
-                    className="form-control"
-                    placeholder="Nhập lại mật khẩu"
-                    value={confirmPassword}
-                    onChange={(event) =>
-                      this.handleOnChangeInput(event, 'confirmPassword')
-                    }
-                    disabled={isLoading}
-                    onKeyDown={(event) => this.handleKeyDown(event)}
-                  />
-                </div>
-
-                <div className="col-md-6 col-sm-12 form-group register-input">
-                  <label>Giới Tính</label>
-                  <select
-                    className="form-control"
-                    value={gender}
-                    onChange={(event) =>
-                      this.handleOnChangeInput(event, 'gender')
-                    }
-                    disabled={isLoading}
+              <div className="col-12 text-center my-3">
+                <span className="login-link">
+                  Đã có tài khoản?{' '}
+                  <a
+                    href="/login"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      this.props.navigate('/login');
+                    }}
                   >
-                    {genderArr &&
-                      genderArr.length > 0 &&
-                      genderArr.map((item, index) => {
-                        return (
-                          <option key={index} value={item.keyMap}>
-                            {item.valueVi}
-                          </option>
-                        );
-                      })}
-                  </select>
-                </div>
-
-                <div className="col-md-6 col-sm-12 form-group register-input">
-                  <label>Ảnh Đại Diện</label>
-                  <div className="preview-img-container">
-                    <input
-                      id="previewImg"
-                      type="file"
-                      hidden
-                      onChange={(event) => this.handleOnChangeImage(event)}
-                      disabled={isLoading}
-                    />
-                    <label className="label-upload" htmlFor="previewImg">
-                      Tải ảnh <i className="fas fa-upload"></i>
-                    </label>
-                    <div
-                      className="preview-image"
-                      style={{ backgroundImage: `url(${this.state.previewImgURL})` }}
-                    ></div>
-                  </div>
-                </div>
-
-                <div className="col-12 form-group register-input">
-                  <label>Địa Chỉ</label>
-                  <input
-                    type="text"
-                    className="form-control"
-                    placeholder="Nhập địa chỉ của bạn"
-                    value={address}
-                    onChange={(event) =>
-                      this.handleOnChangeInput(event, 'address')
-                    }
-                    disabled={isLoading}
-                    onKeyDown={(event) => this.handleKeyDown(event)}
-                  />
-                </div>
-
-                <div className="col-12 form-group">
-                  <button
-                    className="btn-register"
-                    onClick={() => this.handleRegister()}
-                    disabled={isLoading}
-                  >
-                    {isLoading ? 'Đang xử lý...' : 'Đăng Ký'}
-                  </button>
-                </div>
-
-                <div className="col-12 text-center my-3">
-                  <span className="login-link">
-                    Đã có tài khoản?{' '}
-                    <a
-                      href="/login"
-                      onClick={(e) => {
-                        e.preventDefault();
-                        this.props.navigate('/login');
-                      }}
-                    >
-                      Đăng Nhập
-                    </a>
-                  </span>
-                </div>
+                    Đăng Nhập
+                  </a>
+                </span>
               </div>
             </div>
           </div>
+        </div>
       </LoadingOverlay>
     );
   }
@@ -343,14 +336,12 @@ class Register extends Component {
 const mapStateToProps = (state) => {
   return {
     language: state.app.language,
-    genderRedux: state.admin.genders,
   };
 };
 
 const mapDispatchToProps = (dispatch) => {
   return {
     navigate: (path) => dispatch(push(path)),
-    getGenderStart: () => dispatch(actions.fetchGenderStart()),
   };
 };
 

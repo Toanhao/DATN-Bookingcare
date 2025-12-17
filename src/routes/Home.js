@@ -9,13 +9,13 @@ class Home extends Component {
     // If not logged in -> public home
     if (!isLoggedIn) return <Redirect to="/home" />;
 
-    // If logged in and role is patient (R3) -> public home
-    const roleId = userInfo && userInfo.roleId ? userInfo.roleId : null;
-    if (roleId === 'R3') return <Redirect to="/home" />;
+    // Nếu là patient → public home
+    const role = userInfo && userInfo.role ? userInfo.role : null;
+    if (role === 'PATIENT') return <Redirect to="/home" />;
 
-    // Admin -> system user redux; Doctor -> doctor manage patient
-    if (roleId === 'R1') return <Redirect to="/system/user-redux" />;
-    if (roleId === 'R2') return <Redirect to="/doctor/manage-schedule" />;
+    // Admin → system user redux; Doctor → doctor manage schedule
+    if (role === 'ADMIN') return <Redirect to="/system/user-redux" />;
+    if (role === 'DOCTOR') return <Redirect to="/doctor/manage-schedule" />;
 
     // Fallback
     return <Redirect to="/home" />;

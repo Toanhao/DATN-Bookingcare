@@ -41,7 +41,7 @@ export const CRUD_ACTIONS = {
 };
 
 export const USER_ROLE = {
-    ADMIN: "R1",
-    DOCTOR: "R2",
-    PATIENT: "R3",
+    ADMIN: 'ADMIN',
+    DOCTOR: 'DOCTOR',
+    PATIENT: 'PATIENT',
 };

@@ -24,23 +24,26 @@ class Header extends Component {
   };
 
   componentDidMount() {
-    let { userInfo } = this.props;
+    this.syncMenuFromUser(this.props.userInfo);
+  }
+
+  componentDidUpdate(prevProps) {
+    if (prevProps.userInfo !== this.props.userInfo) {
+      this.syncMenuFromUser(this.props.userInfo);
+    }
+  }
+
+  syncMenuFromUser = (userInfo) => {
     let menu = [];
     if (userInfo && !_.isEmpty(userInfo)) {
-      let role = userInfo.roleId;
-      if (role === USER_ROLE.ADMIN) {
-        menu = adminMenu;
-      }
-
-      if (role === USER_ROLE.DOCTOR) {
-        menu = doctorMenu;
-      }
+      // Prefer new backend field `role` (ADMIN/DOCTOR/PATIENT)
+      const role = userInfo.role ? userInfo.role : 'ADMIN';
+      if (role === 'ADMIN') menu = adminMenu;
+      if (role === 'DOCTOR') menu = doctorMenu;
     }
 
-    this.setState({
-      menuApp: menu,
-    });
-  }
+    this.setState({ menuApp: menu });
+  };
 
   render() {
     const { processLogout, language, userInfo } = this.props;
@@ -55,7 +58,10 @@ class Header extends Component {
         <div className="languages">
           <span className="welcome">
             <FormattedMessage id="home-header.welcome" />
-            {userInfo ? userInfo.firstName + ' ' + userInfo.lastName : ''} !
+            {userInfo
+              ? (userInfo.fullName)
+              : ''}
+            !
           </span>
           <span
             className={

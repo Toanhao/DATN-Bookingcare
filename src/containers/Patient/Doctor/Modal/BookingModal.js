@@ -35,7 +35,13 @@ class BookingModal extends Component {
   }
 
   async componentDidMount() {
-    this.props.getGenders();
+    // Use static gender list instead of fetching from Redux allcode
+    const genders = [
+      { keyMap: 'Nam', valueVi: 'Nam', valueEn: 'Male' },
+      { keyMap: 'Nữ', valueVi: 'Nữ', valueEn: 'Female' },
+      { keyMap: 'Khác', valueVi: 'Khác', valueEn: 'Other' },
+    ];
+    this.setState({ genders: this.buildDataGender(genders) });
   }
 
   // Fill user Info when modal opens
@@ -99,15 +105,14 @@ class BookingModal extends Component {
 
   async componentDidUpdate(prevProps, prevState, snapshot) {
     if (this.props.language !== prevProps.language) {
-      this.setState({
-        genders: this.buildDataGender(this.props.genders),
-      });
+      const genders = [
+        { keyMap: 'Nam', valueVi: 'Nam', valueEn: 'Male' },
+        { keyMap: 'Nữ', valueVi: 'Nữ', valueEn: 'Female' },
+        { keyMap: 'Khác', valueVi: 'Khác', valueEn: 'Other' },
+      ];
+      this.setState({ genders: this.buildDataGender(genders) });
     }
-    if (this.props.genders !== prevProps.genders) {
-      this.setState({
-        genders: this.buildDataGender(this.props.genders),
-      });
-    }
+    // No longer need to react to props.genders
     if (this.props.dataTime !== prevProps.dataTime) {
       if (this.props.dataTime && !_.isEmpty(this.props.dataTime)) {
         let doctorId = this.props.dataTime.doctorId;
@@ -122,17 +127,8 @@ class BookingModal extends Component {
     // When modal is opened, auto-fill user Info or redirect to login
     if (this.props.isOpenModal && !prevProps.isOpenModal) {
       if (this.props.isLoggedIn) {
-        // ensure genders list already built, otherwise build then fill
-        if (!this.state.genders || this.state.genders.length === 0) {
-          this.setState(
-            { genders: this.buildDataGender(this.props.genders) },
-            () => {
-              this.fillUserFromProps();
-            }
-          );
-        } else {
-          this.fillUserFromProps();
-        }
+        // Genders already built statically in componentDidMount; just fill user info
+        this.fillUserFromProps();
       } else {
         // not logged in -> redirect to login and close modal
         if (this.props.closeBookingClose) this.props.closeBookingClose();
@@ -381,16 +377,13 @@ class BookingModal extends Component {
 const mapStateToProps = (state) => {
   return {
     language: state.app.language,
-    genders: state.admin.genders,
     isLoggedIn: state.user && state.user.isLoggedIn,
     userInfo: state.user && state.user.userInfo,
   };
 };
 
 const mapDispatchToProps = (dispatch) => {
-  return {
-    getGenders: () => dispatch(actions.fetchGenderStart()),
-  };
+  return {};
 };
 
 export default withRouter(

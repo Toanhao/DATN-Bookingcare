@@ -1,6 +1,5 @@
 import actionTypes from './actionTypes';
 import {
-  getAllCodeService,
   createNewUserService,
   getAllUsers,
   deleteUserService,
@@ -13,85 +12,7 @@ import {
 } from '../../services/userService';
 import { toast } from 'react-toastify';
 
-// export const fetchGenderStart = () => ({
-//     type: actionTypes.FETCH_GENDER_START
-// })
-
-export const fetchGenderStart = () => {
-  return async (dispatch, getState) => {
-    try {
-      dispatch({ type: actionTypes.FETCH_GENDER_START });
-      let res = await getAllCodeService('GENDER');
-      if (res && res.errCode === 0) {
-        dispatch(fetchGenderSuccess(res.data));
-      } else {
-        dispatch(fetchGenderFailed());
-      }
-    } catch (e) {
-      dispatch(fetchGenderFailed());
-      console.log('fetch gender start error', e);
-    }
-  };
-};
-
-export const fetchGenderSuccess = (genderData) => ({
-  type: actionTypes.FETCH_GENDER_SUCCESS,
-  data: genderData,
-});
-
-export const fetchGenderFailed = () => ({
-  type: actionTypes.FETCH_GENDER_FAILED,
-});
-
-export const fetchPositionSuccess = (positionData) => ({
-  type: actionTypes.FETCH_POSITION_SUCCESS,
-  data: positionData,
-});
-
-export const fetchPositionFailed = () => ({
-  type: actionTypes.FETCH_POSITION_FAILED,
-});
-
-export const fetchRoleSuccess = (roleData) => ({
-  type: actionTypes.FETCH_ROLE_SUCCESS,
-  data: roleData,
-});
-
-export const fetchRoleFailed = () => ({
-  type: actionTypes.FETCH_ROLE_FAILED,
-});
-
-export const fetchPositionStart = () => {
-  return async (dispatch, getState) => {
-    try {
-      let res = await getAllCodeService('POSITION');
-      if (res && res.errCode === 0) {
-        dispatch(fetchPositionSuccess(res.data));
-      } else {
-        dispatch(fetchPositionFailed());
-      }
-    } catch (e) {
-      dispatch(fetchPositionFailed());
-      console.log('fetch position start error', e);
-    }
-  };
-};
-
-export const fetchRoleStart = () => {
-  return async (dispatch, getState) => {
-    try {
-      let res = await getAllCodeService('ROLE');
-      if (res && res.errCode === 0) {
-        dispatch(fetchRoleSuccess(res.data));
-      } else {
-        dispatch(fetchRoleFailed());
-      }
-    } catch (e) {
-      dispatch(fetchRoleFailed());
-      console.log('fetch role start error', e);
-    }
-  };
-};
+// Allcode endpoints removed in new backend; gender/role/position are managed locally in components.
 
 export const createNewUser = (data) => {
   return async (dispatch, getState) => {
@@ -273,55 +194,20 @@ export const saveDetailDoctor = (data) => {
   };
 };
 
-export const fetchAllScheduleTime = () => {
-  return async (dispatch, getState) => {
-    try {
-      let res = await getAllCodeService('TIME');
-      if (res && res.errCode === 0) {
-        dispatch({
-          type: actionTypes.FETCH_ALLCODE_SCHEDULE_TIME_SUCCESS,
-          dataTime: res.data,
-        });
-      } else {
-        dispatch({
-          type: actionTypes.FETCH_ALLCODE_SCHEDULE_TIME_FAILED,
-        });
-      }
-    } catch (e) {
-      console.log('FETCH_ALLCODE_SCHEDULE_TIME_FAILED', e);
-      dispatch({
-        type: actionTypes.FETCH_ALLCODE_SCHEDULE_TIME_FAILED,
-      });
-    }
-  };
-};
+// Schedule time now handled via /api/time-slots in components; remove allcode schedule fetch.
 
 export const getRequiredDoctorInfor = () => {
   return async (dispatch, getState) => {
     try {
       dispatch({ type: actionTypes.FETCH_REQUIRED_DOCTOR_Infor_START });
-
-      let resPrice = await getAllCodeService('PRICE');
-      let resPayment = await getAllCodeService('PAYMENT');
-      let resProvince = await getAllCodeService('PROVINCE');
       let resSpecialty = await getAllSpecialty();
       let resClinic = await getAllClinic();
-      if (
-        resPrice &&
-        resPrice.errCode === 0 &&
-        resPayment &&
-        resPayment.errCode === 0 &&
-        resProvince &&
-        resProvince.errCode === 0 &&
-        resSpecialty &&
-        resSpecialty.errCode === 0 &&
-        resClinic &&
-        resClinic.errCode === 0
-      ) {
-        let data = {
-          resPrice: resPrice.data,
-          resPayment: resPayment.data,
-          resProvince: resProvince.data,
+      if (resSpecialty && resSpecialty.errCode === 0 && resClinic && resClinic.errCode === 0) {
+        // Since allcode is removed, provide minimal placeholders for price/payment/province
+        const data = {
+          resPrice: [],
+          resPayment: [],
+          resProvince: [],
           resSpecialty: resSpecialty.data,
           resClinic: resClinic.data,
         };

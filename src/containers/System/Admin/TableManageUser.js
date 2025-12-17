@@ -14,8 +14,6 @@ class TableManageUser extends Component {
 
   componentDidMount() {
     this.props.fetchUserRedux();
-    // ensure roles are loaded so we can display role names in the table
-    if (this.props.fetchRoleRedux) this.props.fetchRoleRedux();
   }
 
   componentDidUpdate(prevProps, prevState, snapshot) {
@@ -43,8 +41,7 @@ class TableManageUser extends Component {
           <tbody>
             <tr>
               <th>Email</th>
-              <th>First name</th>
-              <th>Last name</th>
+              <th>Full name</th>
               <th>Phone</th>
               <th>Address</th>
               <th>Role</th>
@@ -56,24 +53,10 @@ class TableManageUser extends Component {
                 return (
                   <tr key={index}>
                     <td>{item.email}</td>
-                    <td>{item.firstName}</td>
-                    <td>{item.lastName}</td>
-                    <td>{item.phonenumber}</td>
+                    <td>{item.fullName || [item.firstName, item.lastName].filter(Boolean).join(' ')}</td>
+                    <td>{item.phoneNumber || item.phonenumber}</td>
                     <td>{item.address}</td>
-
-                    <td>
-                      {(() => {
-                        const roles = this.props.roleRedux || [];
-                        const found = roles.find(
-                          (r) =>
-                            r.keyMap === item.roleId ||
-                            r.keyMap === (item.roleId && item.roleId.toString())
-                        );
-                        if (found)
-                          return found.valueVi || found.valueEn || found.keyMap;
-                        return item.roleId || '';
-                      })()}
-                    </td>
+                    <td>{item.role || item.roleId || ''}</td>
                     <td>
                       <button
                         onClick={() => {
@@ -103,7 +86,6 @@ class TableManageUser extends Component {
 const mapStateToProps = (state) => {
   return {
     listUsers: state.admin.users,
-    roleRedux: state.admin.roles,
     language: state.app.language,
   };
 };
@@ -111,7 +93,6 @@ const mapStateToProps = (state) => {
 const mapDispatchToProps = (dispatch) => {
   return {
     fetchUserRedux: () => dispatch(actions.fetchAllUsersStart()),
-    fetchRoleRedux: () => dispatch(actions.fetchRoleStart()),
     deleteAUserRedux: (id) => dispatch(actions.deleteAUser(id)),
   };
 };

@@ -18,18 +18,16 @@ export const userIsNotAuthenticated = connectedRouterRedirect({
   allowRedirectBack: false,
 });
 
-// Only allow access to admin/doctor system pages. If the user is a patient
-// (roleId === 'R3') redirect them to the public home page.
+// Chỉ cho phép admin/doctor vào system pages. Patient redirect về home.
 export const userIsAdminOrDoctor = connectedRouterRedirect({
   authenticatedSelector: (state) => {
     const isLoggedIn = state.user && state.user.isLoggedIn;
-    const roleId =
-      state.user && state.user.userInfo && state.user.userInfo.roleId;
-    return isLoggedIn && roleId && roleId !== 'R3';
+    const role =
+      state.user && state.user.userInfo && state.user.userInfo.role;
+    return isLoggedIn && role && role !== 'PATIENT';
   },
   wrapperDisplayName: 'UserIsAdminOrDoctor',
-  // If user is not logged in send them to login (so login can redirect back).
-  // If user is logged in but is a patient (roleId === 'R3') send them to public home.
+  // Nếu chưa login → /login; nếu là patient → /home
   redirectPath: (state) => {
     if (!state.user || !state.user.isLoggedIn) return '/login';
     return '/home';
