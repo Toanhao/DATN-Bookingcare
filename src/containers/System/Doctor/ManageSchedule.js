@@ -82,10 +82,17 @@ class ManageSchedule extends Component {
       inputData.map((item, index) => {
         console.log('item', item);
         let object = {};
-        let labelVi = `${item.lastName} ${item.firstName}`;
-        let labelEn = `${item.firstName} ${item.lastName}`;
-        object.label = language === LANGUAGES.VI ? labelVi : labelEn;
-        object.value = item.id;
+        // Backend mới trả về doctor với user.fullName
+        if (item.user && item.user.fullName) {
+          object.label = item.user.fullName;
+          object.value = item.id;
+        } else if (item.firstName && item.lastName) {
+          // Fallback cho format cũ
+          let labelVi = `${item.lastName} ${item.firstName}`;
+          let labelEn = `${item.firstName} ${item.lastName}`;
+          object.label = language === LANGUAGES.VI ? labelVi : labelEn;
+          object.value = item.id;
+        }
         return result.push(object);
       });
     }

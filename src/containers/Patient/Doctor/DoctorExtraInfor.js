@@ -22,7 +22,22 @@ class DoctorExtraInfor extends Component {
     if (this.props.doctorIdFromParent) {
       let res = await getExtraInforDoctorById(this.props.doctorIdFromParent);
       if (res && res.errCode === 0) {
-        this.setState({ extraInfor: res.data });
+        // Map dữ liệu từ backend mới sang format cũ
+        const doctor = res.data;
+        const mappedData = {
+          clinicId: doctor.clinicId,
+          clinicData: doctor.clinic || {},
+          priceTypeData: {
+            valueVi: doctor.fee ? `${doctor.fee.toLocaleString('vi-VN')}` : '0',
+            valueEn: doctor.fee ? `${doctor.fee}` : '0',
+          },
+          paymentTypeData: {
+            valueVi: 'Thanh toán sau khám',
+            valueEn: 'Payment after examination',
+          },
+          note: doctor.title || '',
+        };
+        this.setState({ extraInfor: mappedData });
       }
     }
   }
@@ -34,8 +49,23 @@ class DoctorExtraInfor extends Component {
     if (this.props.doctorIdFromParent !== prevProps.doctorIdFromParent) {
       let res = await getExtraInforDoctorById(this.props.doctorIdFromParent);
       if (res && res.errCode === 0) {
+        // Map dữ liệu từ backend mới sang format cũ
+        const doctor = res.data;
+        const mappedData = {
+          clinicId: doctor.clinicId,
+          clinicData: doctor.clinic || {},
+          priceTypeData: {
+            valueVi: doctor.fee ? `${doctor.fee.toLocaleString('vi-VN')}` : '0',
+            valueEn: doctor.fee ? `${doctor.fee}` : '0',
+          },
+          paymentTypeData: {
+            valueVi: 'Thanh toán sau khám',
+            valueEn: 'Payment after examination',
+          },
+          note: doctor.title || '',
+        };
         this.setState({
-          extraInfor: res.data,
+          extraInfor: mappedData,
         });
       }
     }

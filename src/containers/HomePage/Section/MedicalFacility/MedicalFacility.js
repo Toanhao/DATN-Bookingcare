@@ -17,11 +17,14 @@ class MedicalFacility extends Component {
   }
 
   async componentDidMount() {
-    let res = await getAllClinic();
-    if (res && res.errCode === 0) {
-      this.setState({
-        dataClinics: res.data ? res.data : [],
-      });
+    try {
+      // axios interceptor trả thẳng response.data
+      let res = await getAllClinic();
+      if (Array.isArray(res)) {
+        this.setState({ dataClinics: res });
+      }
+    } catch (error) {
+      console.error('Error fetching clinics:', error);
     }
   }
 

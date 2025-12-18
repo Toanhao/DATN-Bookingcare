@@ -6,6 +6,7 @@ import {
   editUserService,
   getTopDoctorHomeService,
   getAllDoctors,
+  getAllDoctorsUser,
   saveDetailDoctorService,
   getAllSpecialty,
   getAllClinic,
@@ -169,6 +170,29 @@ export const fetchAllDoctors = () => {
   };
 };
 
+export const fetchAllDoctorsUser = () => {
+  return async (dispatch, getState) => {
+    try {
+      let res = await getAllDoctorsUser();
+      if (res && res.errCode === 0) {
+        dispatch({
+          type: actionTypes.FETCH_ALL_DOCTORS_SUCCESS,
+          dataDr: res.data,
+        });
+      } else {
+        dispatch({
+          type: actionTypes.FETCH_ALL_DOCTORS_FAILED,
+        });
+      }
+    } catch (e) {
+      console.log('FETCH_ALL_DOCTORS_USER_FAILED', e);
+      dispatch({
+        type: actionTypes.FETCH_ALL_DOCTORS_FAILED,
+      });
+    }
+  };
+};
+
 export const saveDetailDoctor = (data) => {
   return async (dispatch, getState) => {
     try {
@@ -202,7 +226,12 @@ export const getRequiredDoctorInfor = () => {
       dispatch({ type: actionTypes.FETCH_REQUIRED_DOCTOR_Infor_START });
       let resSpecialty = await getAllSpecialty();
       let resClinic = await getAllClinic();
-      if (resSpecialty && resSpecialty.errCode === 0 && resClinic && resClinic.errCode === 0) {
+      if (
+        resSpecialty &&
+        resSpecialty.errCode === 0 &&
+        resClinic &&
+        resClinic.errCode === 0
+      ) {
         // Since allcode is removed, provide minimal placeholders for price/payment/province
         const data = {
           resPrice: [],

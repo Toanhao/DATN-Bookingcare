@@ -44,7 +44,9 @@ class Login extends Component {
 
       // Trích xuất user và token từ response
       const userData = res.data || {};
-      const { user, token } = userData;
+      const { user: rawUser, token } = userData;
+      // Chuẩn hóa user trả về từ Sequelize (có thể nằm trong dataValues)
+      const user = rawUser && rawUser.dataValues ? { ...rawUser.dataValues } : rawUser;
       
       // Lưu token vào localStorage nếu có
       if (token) {
@@ -73,7 +75,7 @@ class Login extends Component {
       }
     } catch (error) {
       const message =
-        error?.data?.message ||
+        error?.response?.data?.message ||
         error?.message ||
         'Login failed';
       this.setState({
@@ -89,7 +91,6 @@ class Login extends Component {
   };
 
   handleKeyDown = (event) => {
-    console.log('keydown', event);
     if (event.key === 'Enter' || event.keyCode === 13) {
       this.handleLogin();
     }

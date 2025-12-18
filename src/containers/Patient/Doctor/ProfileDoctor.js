@@ -31,7 +31,23 @@ class ProfileDoctor extends Component {
     if (id) {
       let res = await getProfileDoctorById(id);
       if (res && res.errCode === 0) {
-        result = res.data;
+        // Map dữ liệu từ backend mới sang format cũ
+        const doctor = res.data;
+        result = {
+          ...doctor.user,
+          image: doctor.user?.image || '',
+          Doctor_Info: {
+            description: doctor.title || '',
+            priceTypeData: {
+              valueVi: doctor.fee ? `${doctor.fee.toLocaleString('vi-VN')}` : '0',
+              valueEn: doctor.fee ? `${doctor.fee}` : '0',
+            },
+          },
+          positionData: {
+            valueVi: 'Bác sĩ',
+            valueEn: 'Doctor',
+          },
+        };
       }
     }
     return result;

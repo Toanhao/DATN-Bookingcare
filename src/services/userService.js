@@ -11,24 +11,20 @@ const handleLoginApi = (userEmail, userPassword) => {
 
 const getAllUsers = (inputId) => {
   //template String
-  return axios.get(`/api/get-all-users?id=${inputId}`);
+  return axios.get(`/api/users`);
 };
 
 const createNewUserService = (data) => {
   console.log('check data from service: ', data);
-  return axios.post(`/api/users/register`, data);
+  return axios.post(`/api/users/create`, data); // Admin tạo user với role tùy chỉnh
 };
 
 const deleteUserService = (userId) => {
-  return axios.delete('/api/delete-user/', {
-    data: {
-      id: userId,
-    },
-  });
+  return axios.delete(`/api/users/${userId}`);
 };
 
 const editUserService = (inputData) => {
-  return axios.put('/api/edit-user', inputData);
+  return axios.put(`/api/users/${inputData.id}`, inputData);
 };
 
 // Legacy allcode removed in new backend; use specific resources instead
@@ -47,15 +43,24 @@ const getTopDoctorHomeService = (limit) => {
 };
 
 const getAllDoctors = () => {
-  return axios.get(`/api/get-all-doctors`);
+  return axios.get(`/api/doctors`);
+};
+
+const getAllDoctorsUser = () => {
+  return axios.get(`/api/users/getAllDoctors`);
 };
 
 const saveDetailDoctorService = (data) => {
-  return axios.post(`/api/save-Info-doctor`, data);
+  if (data.action === 'CREATE') {
+    return axios.post(`/api/doctors`, data);
+  } else {
+    const doctorId = data.id;
+    return axios.patch(`/api/doctors/${doctorId}`, data);
+  }
 };
 
 const getDetailInforDoctor = (inputId) => {
-  return axios.get(`/api/get-detail-doctor-by-id?id=${inputId}`);
+  return axios.get(`/api/doctors/${inputId}`);
 };
 
 const saveBulkScheduleDoctor = (data) => {
@@ -69,11 +74,11 @@ const getScheduleDoctorByDate = (doctorId, date) => {
 };
 
 const getExtraInforDoctorById = (doctorId) => {
-  return axios.get(`/api/get-extra-Info-doctor-by-id?doctorId=${doctorId}`);
+  return axios.get(`/api/doctors/${doctorId}`);
 };
 
 const getProfileDoctorById = (doctorId) => {
-  return axios.get(`/api/get-profile-doctor-by-id?doctorId=${doctorId}`);
+  return axios.get(`/api/doctors/${doctorId}`);
 };
 
 const postPatientBookAppointment = (data) => {
@@ -85,11 +90,11 @@ const postVerifyBookAppointment = (data) => {
 };
 
 const createNewSpecialty = (data) => {
-  return axios.post('/api/create-new-specialty', data);
+  return axios.post('/api/specialties', data);
 };
 
 const getAllSpecialty = () => {
-  return axios.get('api/get-all-specialty');
+  return axios.get('/api/specialties');
 };
 
 const getAllDetailSpecialtyById = (data) => {
@@ -99,11 +104,15 @@ const getAllDetailSpecialtyById = (data) => {
 };
 
 const createNewClinic = (data) => {
-  return axios.post('/api/create-new-clinic', data);
+  return axios.post('/api/clinics', data);
 };
 
 const getAllClinic = () => {
-  return axios.get('api/get-all-clinic');
+  return axios.get('/api/clinics');
+};
+
+const getAllDetailClinicById = (id) => {
+  return axios.get(`/api/clinics/${id}`);
 };
 
 const createNewHandbook = (data) => {
@@ -116,10 +125,6 @@ const getAllHandbook = () => {
 
 const getDetailHandbookById = (id) => {
   return axios.get(`api/get-detail-handbook-by-id?id=${id}`);
-};
-
-const getAllDetailClinicById = (data) => {
-  return axios.get(`api/get-detail-clinic-by-id?id=${data.id}`);
 };
 
 const getAllPatientForDoctor = (data) => {
@@ -148,6 +153,7 @@ export {
   editUserService,
   getTopDoctorHomeService,
   getAllDoctors,
+  getAllDoctorsUser,
   saveDetailDoctorService,
   getDetailInforDoctor,
   saveBulkScheduleDoctor,

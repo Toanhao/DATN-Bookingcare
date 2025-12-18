@@ -44,6 +44,8 @@ class TableManageUser extends Component {
               <th>Full name</th>
               <th>Phone</th>
               <th>Address</th>
+              <th>Gender</th>
+              <th>Birthday</th>
               <th>Role</th>
               <th>Action</th>
             </tr>
@@ -56,6 +58,8 @@ class TableManageUser extends Component {
                     <td>{item.fullName || [item.firstName, item.lastName].filter(Boolean).join(' ')}</td>
                     <td>{item.phoneNumber || item.phonenumber}</td>
                     <td>{item.address}</td>
+                    <td>{item.gender}</td>
+                    <td>{item.birthday ? new Date(item.birthday).toLocaleDateString('vi-VN') : ''}</td>
                     <td>{item.role || item.roleId || ''}</td>
                     <td>
                       <button

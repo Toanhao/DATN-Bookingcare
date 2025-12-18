@@ -23,9 +23,10 @@ class UserRedux extends Component {
       fullName: '',
       phoneNumber: '',
       address: '',
+      birthday: '',
       gender: '',
       role: '',
-      avatar: '',
+      image: '',
       action: '',
       userEditId: '',
     };
@@ -39,15 +40,14 @@ class UserRedux extends Component {
       { keyMap: 'Khác', valueVi: 'Khác', valueEn: 'Other' },
     ];
     const roles = [
-      { keyMap: 'ADMIN', valueVi: 'Quản trị', valueEn: 'Admin' },
-      { keyMap: 'DOCTOR', valueVi: 'Bác sĩ', valueEn: 'Doctor' },
       { keyMap: 'PATIENT', valueVi: 'Bệnh nhân', valueEn: 'Patient' },
+      { keyMap: 'DOCTOR', valueVi: 'Bác sĩ', valueEn: 'Doctor' },
     ];
     this.setState({
       genderArr: genders,
       roleArr: roles,
       gender: genders[0].keyMap,
-      role: roles[2].keyMap,
+      role: roles[0].keyMap,
     });
   }
 
@@ -61,9 +61,10 @@ class UserRedux extends Component {
         fullName: '',
         phoneNumber: '',
         address: '',
+        birthday: '',
         role: roleArr && roleArr.length > 0 ? roleArr[0].keyMap : '',
         gender: genderArr && genderArr.length > 0 ? genderArr[0].keyMap : '',
-        avatar: '',
+        image: '',
         action: CRUD_ACTIONS.CREATE,
         previewImgURL: '',
       });
@@ -78,7 +79,7 @@ class UserRedux extends Component {
       let objectUrl = URL.createObjectURL(file);
       this.setState({
         previewImgURL: objectUrl,
-        avatar: base64,
+        image: base64,
       });
     }
   };
@@ -103,9 +104,10 @@ class UserRedux extends Component {
         fullName: this.state.fullName,
         address: this.state.address,
         phoneNumber: this.state.phoneNumber,
+        birthday: this.state.birthday,
         gender: this.state.gender,
         role: this.state.role,
-        avatar: this.state.avatar,
+        image: this.state.image,
       });
     }
     if (action === CRUD_ACTIONS.EDIT) {
@@ -116,22 +118,17 @@ class UserRedux extends Component {
         fullName: this.state.fullName,
         address: this.state.address,
         phoneNumber: this.state.phoneNumber,
+        birthday: this.state.birthday,
         gender: this.state.gender,
         role: this.state.role,
-        avatar: this.state.avatar,
+        image: this.state.image,
       });
     }
   };
 
   checkValidateInput = () => {
     let isValid = true;
-    let arrCheck = [
-      'email',
-      'password',
-      'fullName',
-      'phoneNumber',
-      'address',
-    ];
+    let arrCheck = ['email', 'password', 'fullName', 'phoneNumber', 'address'];
     for (let i = 0; i < arrCheck.length; i++) {
       if (!this.state[arrCheck[i]]) {
         isValid = false;
@@ -156,15 +153,26 @@ class UserRedux extends Component {
     if (user.image) {
       imageBase64 = new Buffer(user.image, 'base64').toString('binary');
     }
+    
+    // Convert birthday to YYYY-MM-DD format for input type="date"
+    let birthdayFormatted = '';
+    if (user.birthday) {
+      const date = new Date(user.birthday);
+      birthdayFormatted = date.toISOString().split('T')[0];
+    }
+    
     this.setState({
       email: user.email,
       password: 'HARDCODE',
-      fullName: user.fullName || [user.firstName, user.lastName].filter(Boolean).join(' '),
+      fullName:
+        user.fullName ||
+        [user.firstName, user.lastName].filter(Boolean).join(' '),
       phoneNumber: user.phoneNumber,
       address: user.address,
+      birthday: birthdayFormatted,
       role: user.role,
       gender: user.gender,
-      avatar: '',
+      image: '',
       previewImgURL: imageBase64,
       action: CRUD_ACTIONS.EDIT,
       userEditId: user.id,
@@ -183,6 +191,7 @@ class UserRedux extends Component {
       fullName,
       phoneNumber,
       address,
+      birthday,
       gender,
       position,
       role,
@@ -266,6 +275,18 @@ class UserRedux extends Component {
                   value={address}
                   onChange={(event) => {
                     this.onChangeInput(event, 'address');
+                  }}
+                />
+              </div>
+
+              <div className="col-3">
+                <label>Ngày sinh</label>
+                <input
+                  className="form-control"
+                  type="date"
+                  value={birthday}
+                  onChange={(event) => {
+                    this.onChangeInput(event, 'birthday');
                   }}
                 />
               </div>
@@ -396,8 +417,6 @@ const mapDispatchToProps = (dispatch) => {
     createNewUser: (data) => dispatch(actions.createNewUser(data)),
     fetchUserRedux: () => dispatch(actions.fetchAllUsersStart()),
     editAUserRedux: (data) => dispatch(actions.editAUser(data)),
-    // processLogout: () => dispatch(actions.processLogout()),
-    // changeLanguageAppRedux: (language) => dispatch(actions.changeLanguageApp(language)),
   };
 };
 
