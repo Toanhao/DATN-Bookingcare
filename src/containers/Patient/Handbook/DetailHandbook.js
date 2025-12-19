@@ -34,23 +34,19 @@ class DetailHandbook extends Component {
       this.props.match.params.id
     ) {
       let id = this.props.match.params.id;
-      
+
       try {
         // Fetch detail handbook
-        let detailRes = await getDetailHandbookById(id);
-        if (detailRes && detailRes.errCode === 0) {
-          this.setState({
-            dataDetailHandbook: detailRes.data ? detailRes.data : {},
-          });
-        }
+        const detailRes = await getDetailHandbookById(id);
+        this.setState({
+          dataDetailHandbook: detailRes?.data ? detailRes.data : detailRes || {},
+        });
 
         // Fetch all handbooks for sidebar
-        let allRes = await getAllHandbook();
-        if (allRes && allRes.errCode === 0) {
-          this.setState({
-            allHandbooks: allRes.data ? allRes.data : [],
-          });
-        }
+        const allRes = await getAllHandbook();
+        this.setState({
+          allHandbooks: Array.isArray(allRes) ? allRes : allRes?.data || [],
+        });
       } catch (error) {
         console.log('Error fetching handbooks:', error);
       }
@@ -81,20 +77,18 @@ class DetailHandbook extends Component {
               {dataDetailHandbook && !_.isEmpty(dataDetailHandbook) && (
                 <div>
                   <div className="handbook-header">
-                    <div
-                      className="handbook-image"
-                      style={{
-                        backgroundImage: `url(${dataDetailHandbook.image})`,
-                      }}
-                    ></div>
-                    <h1 className="handbook-title">
-                      {dataDetailHandbook.name}
-                    </h1>
+                    {dataDetailHandbook.image && (
+                      <div
+                        className="handbook-image"
+                        style={{ backgroundImage: `url(${dataDetailHandbook.image})` }}
+                      ></div>
+                    )}
+                    <h1 className="handbook-title">{dataDetailHandbook.title}</h1>
                   </div>
                   <div
                     className="handbook-html"
                     dangerouslySetInnerHTML={{
-                      __html: dataDetailHandbook.descriptionHTML,
+                      __html: dataDetailHandbook.content,
                     }}
                   ></div>
                 </div>
@@ -115,12 +109,14 @@ class DetailHandbook extends Component {
                         onClick={() => this.handleSelectHandbook(handbook.id)}
                       >
                         <div className="sidebar-item-image">
-                          <img src={handbook.image} alt={handbook.name} />
+                          {handbook.image ? (
+                            <img src={handbook.image} alt={handbook.title} />
+                          ) : (
+                            <div className="sidebar-placeholder" />
+                          )}
                         </div>
                         <div className="sidebar-item-info">
-                          <h4 className="sidebar-item-title">
-                            {handbook.name}
-                          </h4>
+                          <h4 className="sidebar-item-title">{handbook.title}</h4>
                         </div>
                       </div>
                     ))

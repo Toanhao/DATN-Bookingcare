@@ -4,7 +4,7 @@ import { Route, Switch } from 'react-router-dom';
 import ManageSchedule from '../containers/System/Doctor/ManageSchedule';
 import Header from '../containers/Header/Header';
 import ManagePatient from '../containers/System/Doctor/ManagePatient';
-import HandBook from '../containers/System/HandBook/HandBook';
+import ManageHandbook from '../containers/System/HandBook/ManageHandbook';
 class Doctor extends Component {
   render() {
     const { isLoggedIn } = this.props;
@@ -19,7 +19,10 @@ class Doctor extends Component {
                 path="/doctor/manage-schedule"
                 component={ManageSchedule}
               />
-              <Route path="/doctor/manage-handbook" component={HandBook} />
+              <Route
+                path="/doctor/manage-handbook"
+                component={ManageHandbook}
+              />
             </Switch>
           </div>
         </div>

@@ -11,7 +11,7 @@ import DatePicker from '../../../components/Input/DatePicker';
 import moment from 'moment';
 import { toast } from 'react-toastify';
 import _ from 'lodash';
-import { createScheduleBulkNew, getTimeSlots } from '../../../services/userService';
+import { createScheduleBulkNew, getTimeSlots, getSchedules } from '../../../services/userService';
 
 // import Header from "../containers/Header/Header";
 
@@ -21,39 +21,40 @@ class ManageSchedule extends Component {
     this.state = {
       listDoctors: [],
       selectedDoctor: {},
-      currentDate: '',
+      currentDate: new Date(),
       rangeTime: [],
+      maxPatient: 2,
+      loadingSlots: false,
       minDate: moment().subtract(1, 'days'),
     };
   }
 
-  async componentDidMount()  {
-    // await this.getAllDoctor();
+  async componentDidMount() {
     this.props.fetchAllDoctors();
-    // Load timeslots from new backend
+    
     try {
+      this.setState({ loadingSlots: true });
       const res = await getTimeSlots();
-      const data = (res && res.data) || res; // axios interceptor returns data
-      let rangeTime = Array.isArray(data)
-        ? data.map((t) => ({ ...t, isSelected: false }))
+      const timeSlots = (res?.data) || res;
+      const rangeTime = Array.isArray(timeSlots)
+        ? timeSlots.map((t) => ({ ...t, isSelected: false }))
         : [];
       this.setState({ rangeTime });
     } catch (e) {
       this.setState({ rangeTime: [] });
+    } finally {
+      this.setState({ loadingSlots: false });
     }
     
-    // Nếu là bác sĩ đăng nhập, tự động set selectedDoctor là chính mình
-    let { userInfo } = this.props;
-    if (userInfo && userInfo.role === 'DOCTOR') {
+    // Auto-select doctor for DOCTOR role
+    const { userInfo, language } = this.props;
+    if (userInfo?.role === 'DOCTOR') {
       const name = userInfo.fullName || `${userInfo.firstName || ''} ${userInfo.lastName || ''}`.trim();
-      let labelVi = name;
-      let labelEn = name;
-      let selectedDoctor = {
-        label: this.props.language === LANGUAGES.VI ? labelVi : labelEn,
-        value: userInfo.id
-      };
       this.setState({
-        selectedDoctor: selectedDoctor
+        selectedDoctor: {
+          label: name,
+          value: userInfo.id,
+        },
       });
     }
   }
@@ -66,41 +67,40 @@ class ManageSchedule extends Component {
       });
     }
 
-    // timeslots loaded once on mount; no redux updates here
-    // if (prevProps.language !== this.props.language) {
-    //   let dataSelect = this.buildDataInputSelect(this.props.language);
-    //   this.setState({
-    //     listDoctors: dataSelect,
-    //   });
-    // }
+    // When doctor or date changes and we have slots, refresh existed slots
+    const doctorChanged = prevState.selectedDoctor?.value !== this.state.selectedDoctor?.value;
+    const dateChanged = !moment(prevState.currentDate).isSame(this.state.currentDate, 'day');
+    if ((doctorChanged || dateChanged) && this.state.selectedDoctor?.value) {
+      this.refreshExistedSlots();
+    }
   }
 
   buildDataInputSelect = (inputData) => {
-    let result = [];
     let { language } = this.props;
-    if (inputData && inputData.length > 0) {
-      inputData.map((item, index) => {
-        console.log('item', item);
-        let object = {};
-        // Backend mới trả về doctor với user.fullName
-        if (item.user && item.user.fullName) {
-          object.label = item.user.fullName;
-          object.value = item.id;
-        } else if (item.firstName && item.lastName) {
-          // Fallback cho format cũ
-          let labelVi = `${item.lastName} ${item.firstName}`;
-          let labelEn = `${item.firstName} ${item.lastName}`;
-          object.label = language === LANGUAGES.VI ? labelVi : labelEn;
-          object.value = item.id;
-        }
-        return result.push(object);
-      });
-    }
-    return result;
+    if (!inputData || inputData.length === 0) return [];
+    
+    return inputData.reduce((result, item) => {
+      let object = {};
+      if (item.user?.fullName) {
+        object = {
+          label: item.user.fullName,
+          value: item.id,
+        };
+      } else if (item.firstName && item.lastName) {
+        const labelVi = `${item.lastName} ${item.firstName}`;
+        const labelEn = `${item.firstName} ${item.lastName}`;
+        object = {
+          label: language === LANGUAGES.VI ? labelVi : labelEn,
+          value: item.id,
+        };
+      }
+      if (object.value) result.push(object);
+      return result;
+    }, []);
   };
 
-  handleChangeSelect = async (selectedDoctor) => {
-    this.setState({ selectedDoctor: selectedDoctor });
+  handleChangeSelect = (selectedDoctor) => {
+    this.setState({ selectedDoctor });
   };
 
   handleOnChangeDatePicker = (date) => {
@@ -122,52 +122,90 @@ class ManageSchedule extends Component {
     }
   };
 
-  handleSaveSchedule = async () => {
-    let { rangeTime, selectedDoctor, currentDate } = this.state;
-    let result = [];
+  refreshExistedSlots = async () => {
+    const { selectedDoctor, currentDate, rangeTime } = this.state;
+    if (!selectedDoctor?.value || !currentDate || !Array.isArray(rangeTime)) return;
 
+    const workDate = moment(currentDate).format('YYYY-MM-DD');
+    try {
+      const res = await getSchedules(selectedDoctor.value, workDate);
+      const schedules = (res?.data) || res;
+      const existedSlotIds = Array.isArray(schedules) 
+        ? schedules.map((s) => s.timeSlotId) 
+        : [];
+      
+      const updated = rangeTime.map((t) => ({
+        ...t,
+        isSelected: existedSlotIds.includes(t.id),
+      }));
+      this.setState({ rangeTime: updated });
+    } catch (e) {
+      // On error, clear all selections
+      const updated = rangeTime.map((t) => ({ ...t, isSelected: false }));
+      this.setState({ rangeTime: updated });
+    }
+  };
+
+  handleSelectAll = () => {
+    const updated = this.state.rangeTime.map((t) => ({
+      ...t,
+      isSelected: true,
+    }));
+    this.setState({ rangeTime: updated });
+  };
+
+  handleClear = () => {
+    const updated = this.state.rangeTime.map((t) => ({
+      ...t,
+      isSelected: false,
+    }));
+    this.setState({ rangeTime: updated });
+  };
+
+  handleSaveSchedule = async () => {
+    const { rangeTime, selectedDoctor, currentDate, maxPatient } = this.state;
+
+    // Validation
     if (!currentDate) {
       toast.error('Ngày không hợp lệ!');
       return;
     }
 
-    if (selectedDoctor && _.isEmpty(selectedDoctor)) {
+    if (!selectedDoctor?.value) {
       toast.error('Bác sĩ được chọn không hợp lệ!');
       return;
     }
 
-    // Backend expects a date (DATE type); use ISO string
-    let formatedDate = new Date(currentDate).toISOString();
-
-    if (rangeTime && rangeTime.length > 0) {
-      let selectedTime = rangeTime.filter((item) => item.isSelected === true);
-      if (selectedTime && selectedTime.length > 0) {
-        const ids = selectedTime.map((s) => s.id);
-        result = ids;
-      } else {
-        toast.error('Thời gian được chọn không hợp lệ!');
-        return;
-      }
+    if (!maxPatient || Number.isNaN(Number(maxPatient)) || Number(maxPatient) <= 0) {
+      toast.error('Số bệnh nhân tối đa không hợp lệ!');
+      return;
     }
+
+    const selectedIds = rangeTime
+      .filter((item) => item.isSelected)
+      .map((s) => s.id);
+
     try {
       const payload = {
         doctorId: selectedDoctor.value,
-        workDate: formatedDate,
-        timeSlotIds: result,
-        maxPatient: 20,
+        workDate: moment(currentDate).format('YYYY-MM-DD'),
+        timeSlotIds: selectedIds,
+        maxPatient: Number(maxPatient),
       };
-      const res = await createScheduleBulkNew(payload);
-      if (res && (res.createdCount || res.schedules)) {
-        toast.success('Lưu thông tin thành công!');
-      } else {
-        toast.success('Lưu thông tin thành công!');
-      }
+      await createScheduleBulkNew(payload);
+      
+      const message = selectedIds.length === 0 
+        ? 'Đã xóa hết lịch của ngày này!'
+        : 'Lưu thông tin thành công!';
+      toast.success(message);
+      
+      await this.refreshExistedSlots();
     } catch (e) {
-      toast.error(e?.message || 'Lưu thông tin thất bại!');
+      toast.error(e?.response?.data?.message || e?.message || 'Lưu thông tin thất bại!');
     }
   };
   render() {
-    let { rangeTime } = this.state;
+    let { rangeTime, maxPatient, loadingSlots } = this.state;
     let { language } = this.props;
     let yesterday = new Date(new Date().setDate(new Date().getDate() - 1));
     return (
@@ -202,7 +240,27 @@ class ManageSchedule extends Component {
                 minDate={yesterday}
               />
             </div>
+            <div className="col-6 form-group">
+              <label>
+                Số bệnh nhân tối đa/khung giờ
+              </label>
+              <input
+                className="form-control"
+                type="number"
+                min={1}
+                value={maxPatient}
+                onChange={(e) => this.setState({ maxPatient: e.target.value })}
+              />
+            </div>
             <div className="col-12 pick-hour-container">
+              <div className="mb-2 d-flex gap-2">
+                <button className="btn btn-outline-secondary" onClick={this.handleSelectAll} disabled={loadingSlots || rangeTime.length === 0}>
+                  Chọn tất cả
+                </button>
+                <button className="btn btn-outline-secondary" onClick={this.handleClear} disabled={loadingSlots || rangeTime.length === 0}>
+                  Bỏ chọn
+                </button>
+              </div>
               {rangeTime &&
                 rangeTime.length > 0 &&
                 rangeTime.map((item, index) => {

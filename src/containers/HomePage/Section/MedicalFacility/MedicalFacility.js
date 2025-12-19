@@ -18,10 +18,9 @@ class MedicalFacility extends Component {
 
   async componentDidMount() {
     try {
-      // axios interceptor trả thẳng response.data
       let res = await getAllClinic();
-      if (Array.isArray(res)) {
-        this.setState({ dataClinics: res });
+      if (res.errCode === 0 && res.data) {
+        this.setState({ dataClinics: res.data });
       }
     } catch (error) {
       console.error('Error fetching clinics:', error);

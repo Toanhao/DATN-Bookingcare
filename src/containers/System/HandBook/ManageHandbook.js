@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import './HandBook.scss';
+import './ManageHandbook.scss';
 import MarkDownIt from 'markdown-it';
 import MdEditor from 'react-markdown-editor-lite';
 import { CommonUtils } from '../../../utils';
@@ -9,14 +9,14 @@ import { toast } from 'react-toastify';
 
 const mdParser = new MarkDownIt(/* Markdown-it options */);
 
-class HandBook extends Component {
+class ManageHandbook extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      name: '',
+      title: '',
       imageBase64: '',
-      descriptionHTML: '',
-      descriptionMarkdown: '',
+      contentHTML: '',
+      contentMarkdown: '',
     };
   }
 
@@ -37,36 +37,57 @@ class HandBook extends Component {
 
   handleEditorChange = ({ html, text }) => {
     this.setState({
-      descriptionHTML: html,
-      descriptionMarkdown: text,
+      contentHTML: html,
+      contentMarkdown: text,
     });
   };
 
   handleOnChangeImage = async (event) => {
-    let data = event.target.files;
-    let file = data[0];
+    const data = event.target.files;
+    const file = data?.[0];
     if (file) {
-      let base64 = await CommonUtils.getBase64(file);
-
-      this.setState({
-        imageBase64: base64,
-      });
+      const base64 = await CommonUtils.getBase64(file);
+      this.setState({ imageBase64: base64 });
     }
   };
 
   handleSaveNewHandbook = async () => {
-    let res = await createNewHandbook(this.state);
-    if (res && res.errCode === 0) {
-      toast.success('Thêm bài viết mới thành công');
-      this.setState({
-        name: '',
-        imageBase64: '',
-        descriptionHTML: '',
-        descriptionMarkdown: '',
+    const { userInfo } = this.props;
+    const doctorId = userInfo?.id;
+
+    if (!doctorId || userInfo?.role !== 'DOCTOR') {
+      toast.error('Vui lòng đăng nhập bằng tài khoản bác sĩ để tạo bài viết');
+      return;
+    }
+
+    if (!this.state.title || !this.state.contentHTML || !this.state.imageBase64) {
+      toast.error('Vui lòng nhập đầy đủ tiêu đề, ảnh và nội dung');
+      return;
+    }
+
+    try {
+      const res = await createNewHandbook({
+        title: this.state.title,
+        content: this.state.contentHTML,
+        image: this.state.imageBase64,
+        doctorId,
       });
-    } else {
+
+      if (res && res.id) {
+        toast.success('Thêm bài viết mới thành công');
+        this.setState({
+          title: '',
+          imageBase64: '',
+          contentHTML: '',
+          contentMarkdown: '',
+        });
+        return;
+      }
+
       toast.error('Thêm bài viết mới thất bại!');
-      console.log('check res', res);
+    } catch (error) {
+      const message = error?.message || 'Thêm bài viết mới thất bại!';
+      toast.error(message);
     }
   };
 
@@ -80,8 +101,8 @@ class HandBook extends Component {
             <input
               className="form-control"
               type="text"
-              value={this.state.name}
-              onChange={(event) => this.handleOnChangeInput(event, 'name')}
+              value={this.state.title}
+              onChange={(event) => this.handleOnChangeInput(event, 'title')}
             />
           </div>
           <div className="col-6 form-group">
@@ -97,7 +118,7 @@ class HandBook extends Component {
               style={{ height: '300px' }}
               renderHTML={(text) => mdParser.render(text)}
               onChange={this.handleEditorChange}
-              value={this.state.descriptionMarkdown}
+              value={this.state.contentMarkdown}
             />
           </div>
           <div className="col-12">
@@ -117,6 +138,7 @@ class HandBook extends Component {
 const mapStateToProps = (state) => {
   return {
     language: state.app.language,
+    userInfo: state.user.userInfo,
   };
 };
 
@@ -124,4 +146,4 @@ const mapDispatchToProps = (dispatch) => {
   return {};
 };
 
-export default connect(mapStateToProps, mapDispatchToProps)(HandBook);
+export default connect(mapStateToProps, mapDispatchToProps)(ManageHandbook);

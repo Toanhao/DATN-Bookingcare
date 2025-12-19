@@ -16,6 +16,7 @@ class ManageClinic extends Component {
       name: '',
       address: '',
       imageBase64: '',
+      descriptionMarkdown: '',
       descriptionHTML: '',
     };
   }
@@ -35,8 +36,9 @@ class ManageClinic extends Component {
     });
   };
 
-  handleEditorChange = ({ html }) => {
+  handleEditorChange = ({ html, text }) => {
     this.setState({
+      descriptionMarkdown: text,
       descriptionHTML: html,
     });
   };
@@ -87,8 +89,8 @@ class ManageClinic extends Component {
           name: '',
           imageBase64: '',
           address: '',
-          descriptionHTML: '',
           descriptionMarkdown: '',
+          descriptionHTML: '',
         });
       } else {
         toast.error('Thêm một cơ sở y tế mới thất bại!');

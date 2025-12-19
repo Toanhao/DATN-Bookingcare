@@ -38,6 +38,13 @@ export const createScheduleBulkNew = (data) => {
   return axios.post('/api/schedules/bulk', data);
 };
 
+// New schedules fetcher for a doctor by date (YYYY-MM-DD)
+export const getSchedules = (doctorId, workDate) => {
+  return axios.get('/api/schedules', {
+    params: { doctorId, workDate },
+  });
+};
+
 const getTopDoctorHomeService = (limit) => {
   return axios.get(`/api/top-doctor-home?limit=${limit}`);
 };
@@ -98,9 +105,7 @@ const getAllSpecialty = () => {
 };
 
 const getAllDetailSpecialtyById = (data) => {
-  return axios.get(
-    `api/get-detail-specialty-by-id?id=${data.id}&location=${data.location}`
-  );
+  return axios.get(`/api/specialties/${data.id}`);
 };
 
 const createNewClinic = (data) => {
@@ -116,15 +121,15 @@ const getAllDetailClinicById = (id) => {
 };
 
 const createNewHandbook = (data) => {
-  return axios.post('/api/create-new-handbook', data);
+  return axios.post('/api/handbooks', data);
 };
 
 const getAllHandbook = () => {
-  return axios.get('api/get-all-handbook');
+  return axios.get('/api/handbooks');
 };
 
 const getDetailHandbookById = (id) => {
-  return axios.get(`api/get-detail-handbook-by-id?id=${id}`);
+  return axios.get(`/api/handbooks/${id}`);
 };
 
 const getAllPatientForDoctor = (data) => {

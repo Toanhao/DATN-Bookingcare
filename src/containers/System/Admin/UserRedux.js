@@ -151,7 +151,11 @@ class UserRedux extends Component {
   handleEditUserFromParent = (user) => {
     let imageBase64 = '';
     if (user.image) {
-      imageBase64 = new Buffer(user.image, 'base64').toString('binary');
+      if (user.image.startsWith('data:')) {
+        imageBase64 = user.image;
+      } else {
+        imageBase64 = `data:image/jpeg;base64,${user.image}`;
+      }
     }
     
     // Convert birthday to YYYY-MM-DD format for input type="date"

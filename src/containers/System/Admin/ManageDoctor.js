@@ -12,6 +12,7 @@ import { FormattedMessage } from 'react-intl';
 import Select from 'react-select';
 import { getDetailInforDoctor } from '../../../services/userService';
 import { CRUD_ACTIONS, LANGUAGES } from '../../../utils';
+import { toast } from 'react-toastify';
 
 const mdParser = new MarkDownIt(/* Markdown-it options */);
 
@@ -19,6 +20,7 @@ class ManageDoctor extends Component {
   constructor(props) {
     super(props);
     this.state = {
+      contentMarkdown: '',
       contentHTML: '',
       selectedDoctor: '',
       description: '',
@@ -96,8 +98,9 @@ class ManageDoctor extends Component {
     }
   }
 
-  handleEditorChange = ({ html }) => {
+  handleEditorChange = ({ html, text }) => {
     this.setState({
+      contentMarkdown: text,
       contentHTML: html,
     });
   };
@@ -107,26 +110,30 @@ class ManageDoctor extends Component {
 
     // Validate
     if (!selectedDoctor || !selectedDoctor.value) {
-      alert('Vui lòng chọn bác sĩ!');
+      toast.error('Vui lòng chọn bác sĩ!');
       return;
     }
     if (!selectedClinic || !selectedClinic.value) {
-      alert('Vui lòng chọn phòng khám!');
+      toast.error('Vui lòng chọn phòng khám!');
       return;
     }
     if (!selectedSpecialty || !selectedSpecialty.value) {
-      alert('Vui lòng chọn chuyên khoa!');
+      toast.error('Vui lòng chọn chuyên khoa!');
       return;
     }
     if (!fee || parseFloat(fee) <= 0) {
-      alert('Vui lòng nhập giá khám hợp lệ!');
+      toast.error('Vui lòng nhập giá khám hợp lệ!');
+      return;
+    }
+    if (!this.state.contentHTML || !this.state.contentHTML.trim()) {
+      toast.error('Vui lòng nhập tiểu sử bác sĩ!');
       return;
     }
 
     const dataToSend = {
       id: selectedDoctor.value, // userId - FK trong bảng Doctor
       title: description || 'Bác sĩ',
-      bio: contentMarkdown || '',
+      bio: this.state.contentHTML || '',
       fee: parseFloat(fee),
       clinicId: selectedClinic.value,
       specialtyId: selectedSpecialty.value,
@@ -143,6 +150,7 @@ class ManageDoctor extends Component {
     // Reset all fields first
     this.setState({
       contentHTML: '',
+      contentMarkdown: '',
       description: '',
       hasOldData: false,
       fee: '',

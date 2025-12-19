@@ -15,7 +15,8 @@ class ManageSpecialty extends Component {
     this.state = {
       name: '',
       imageBase64: '',
-      description: '',
+      descriptionMarkdown: '',
+      descriptionHTML: '',
     };
   }
 
@@ -36,8 +37,8 @@ class ManageSpecialty extends Component {
 
   handleEditorChange = ({ html, text }) => {
     this.setState({
-      // Lưu markdown text để editor controlled đúng, backend vẫn nhận string description
-      description: text,
+      descriptionMarkdown: text,
+      descriptionHTML: html,
     });
   };
 
@@ -63,7 +64,7 @@ class ManageSpecialty extends Component {
       toast.error('Vui lòng chọn ảnh chuyên khoa');
       return;
     }
-    if (!this.state.description || !this.state.description.trim()) {
+    if (!this.state.descriptionHTML || !this.state.descriptionHTML.trim()) {
       toast.error('Vui lòng nhập mô tả');
       return;
     }
@@ -71,7 +72,7 @@ class ManageSpecialty extends Component {
     const payload = {
       name: this.state.name,
       image: this.state.imageBase64,
-      description: this.state.description,
+      description: this.state.descriptionHTML,
     };
 
     let res = await createNewSpecialty(payload);
@@ -80,7 +81,8 @@ class ManageSpecialty extends Component {
       this.setState({
         name: '',
         imageBase64: '',
-        description: '',
+        descriptionMarkdown: '',
+        descriptionHTML: '',
       });
     } else {
       toast.error('Thêm chuyên khoa mới thất bại!');
@@ -115,7 +117,7 @@ class ManageSpecialty extends Component {
               style={{ height: '300px' }}
               renderHTML={(text) => mdParser.render(text)}
               onChange={this.handleEditorChange}
-              value={this.state.description}
+              value={this.state.descriptionMarkdown}
             />
           </div>
           <div className="col-12">

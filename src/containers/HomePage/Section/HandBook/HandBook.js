@@ -15,12 +15,11 @@ class HandBook extends Component {
   }
 
   async componentDidMount() {
-    let res = await getAllHandbook();
-    if (res && res.errCode === 0) {
-      this.setState({
-        dataHandbook: res.data ? res.data : [],
-      });
-    }
+    const res = await getAllHandbook();
+    const data = Array.isArray(res) ? res : res?.data;
+    this.setState({
+      dataHandbook: data || [],
+    });
   }
 
   handleViewDetailHandbook = (item) => {
@@ -49,6 +48,7 @@ class HandBook extends Component {
               {dataHandbook &&
                 dataHandbook.length > 0 &&
                 dataHandbook.map((item, index) => {
+                  const cover = item.image ? `url(${item.image})` : undefined;
                   return (
                     <div
                       className="section-customize"
@@ -59,11 +59,11 @@ class HandBook extends Component {
                         <div className="outer-bg">
                           <div
                             className="bg-image section-handbook"
-                            style={{ backgroundImage: `url(${item.image})` }}
+                            style={cover ? { backgroundImage: cover } : {}}
                           />
                         </div>
                         <div className="position text-center">
-                          <div className="specialty-name">{item.name}</div>
+                          <div className="specialty-name">{item.title}</div>
                         </div>
                       </div>
                     </div>
