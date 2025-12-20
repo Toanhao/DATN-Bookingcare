@@ -28,24 +28,7 @@ class DetailDoctor extends Component {
       });
       let res = await getDetailInforDoctor(id);
       if (res && res.errCode === 0 && res.data) {
-        // Map dữ liệu từ backend mới sang format cũ
-        const doctor = res.data;
-        const mappedDoctor = {
-          ...doctor.user,
-          image: doctor.user?.image || '',
-          Doctor_Info: {
-            description: doctor.title || '',
-            descriptionHTML: doctor.bio || '',
-            descriptionMarkdown: doctor.bio || '',
-            clinicId: doctor.clinicId,
-            specialtyId: doctor.specialtyId,
-          },
-          positionData: {
-            valueVi: 'Bác sĩ',
-            valueEn: 'Doctor',
-          },
-        };
-        this.setState({ detailDoctor: mappedDoctor });
+        this.setState({ detailDoctor: res.data });
       }
     }
   }
@@ -55,13 +38,16 @@ class DetailDoctor extends Component {
   render() {
     let { detailDoctor } = this.state;
     let { language } = this.props;
-    let name = `${detailDoctor.lastName} ${detailDoctor.firstName}`;
-    let nameVi = '';
-    let nameEn = '';
-    if (detailDoctor && detailDoctor.positionData) {
-      nameVi = `${detailDoctor.positionData.valueVi}, ${name}`;
-      nameEn = `${detailDoctor.positionData.valueEn}, ${name}`;
-    }
+    
+    // Extract data from new API structure
+    const user = detailDoctor?.user || {};
+    const clinic = detailDoctor?.clinic || {};
+    const specialty = detailDoctor?.specialty || {};
+    
+    let name = user.fullName || '';
+    let nameVi = `Bác sĩ ${name}`;
+    let nameEn = `Doctor ${name}`;
+    
     return (
       <>
         <HomeHeader isShowBanner={false} />
@@ -70,9 +56,7 @@ class DetailDoctor extends Component {
             <div
               className="content-left"
               style={{
-                backgroundImage: `url(${
-                  detailDoctor && detailDoctor.image ? detailDoctor.image : ''
-                })`,
+                backgroundImage: `url(${user.image || ''})`,
               }}
             ></div>
             <div className="content-right">
@@ -80,12 +64,22 @@ class DetailDoctor extends Component {
                 {language === LANGUAGES.VI ? nameVi : nameEn}
               </div>
               <div className="down">
-                {detailDoctor &&
-                  detailDoctor.Doctor_Info &&
-                  detailDoctor.Doctor_Info.description && (
-                    <span>{detailDoctor.Doctor_Info.description}</span>
-                  )}
+                {detailDoctor.title && (
+                  <span>{detailDoctor.title}</span>
+                )}
               </div>
+              {specialty.name && (
+                <div className="specialty-info">
+                  <i className="fas fa-stethoscope"></i>
+                  <span> Chuyên khoa: {specialty.name}</span>
+                </div>
+              )}
+              {clinic.name && (
+                <div className="clinic-info">
+                  <i className="fas fa-hospital"></i>
+                  <span> Phòng khám: {clinic.name}</span>
+                </div>
+              )}
             </div>
           </div>
           <div className="schedule-doctor">
@@ -95,20 +89,22 @@ class DetailDoctor extends Component {
             <div className="content-right">
               <DoctorExtraInfor
                 doctorIdFromParent={this.state.currentDoctorId}
+                detailDoctorFromParent={detailDoctor}
               />
             </div>
           </div>
 
           <div className="detail-Infor-doctor">
-            {detailDoctor &&
-              detailDoctor.Doctor_Info &&
-              detailDoctor.Doctor_Info.descriptionHTML && (
+            {detailDoctor.bio && (
+              <div>
+                <h3>Thông tin chi tiết</h3>
                 <div
                   dangerouslySetInnerHTML={{
-                    __html: detailDoctor.Doctor_Info.descriptionHTML,
+                    __html: detailDoctor.bio,
                   }}
                 ></div>
-              )}
+              </div>
+            )}
           </div>
 
           

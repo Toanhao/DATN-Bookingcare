@@ -31,23 +31,7 @@ class ProfileDoctor extends Component {
     if (id) {
       let res = await getProfileDoctorById(id);
       if (res && res.errCode === 0) {
-        // Map dữ liệu từ backend mới sang format cũ
-        const doctor = res.data;
-        result = {
-          ...doctor.user,
-          image: doctor.user?.image || '',
-          Doctor_Info: {
-            description: doctor.title || '',
-            priceTypeData: {
-              valueVi: doctor.fee ? `${doctor.fee.toLocaleString('vi-VN')}` : '0',
-              valueEn: doctor.fee ? `${doctor.fee}` : '0',
-            },
-          },
-          positionData: {
-            valueVi: 'Bác sĩ',
-            valueEn: 'Doctor',
-          },
-        };
+        result = res.data;
       }
     }
     return result;
@@ -64,18 +48,14 @@ class ProfileDoctor extends Component {
   renderTimeBooking = (dataTime) => {
     let { language } = this.props;
     if (dataTime && !_.isEmpty(dataTime)) {
-      let time =
-        language === LANGUAGES.VI
-          ? dataTime.timeTypeData.valueVi
-          : dataTime.timeTypeData.valueEn;
+      // Prefer label from API for nicer display
+      const timeSlot = dataTime.timeSlot || {};
+      const time = timeSlot.label;
 
-      let date =
+      const date =
         language === LANGUAGES.VI
-          ? moment.unix(+dataTime.date / 1000).format('dddd - DD/MM/YYYY')
-          : moment
-              .unix(+dataTime.date / 1000)
-              .locale('en')
-              .format('ddd - MM/DD/YYYY');
+          ? moment(dataTime.workDate).format('dddd - DD/MM/YYYY')
+          : moment(dataTime.workDate).locale('en').format('ddd - MM/DD/YYYY');
       return (
         <>
           <div>
@@ -100,13 +80,13 @@ class ProfileDoctor extends Component {
       isShowLinkDetail,
       doctorId,
     } = this.props;
-    let name = `${dataProfile.lastName} ${dataProfile.firstName}`;
-    let nameVi = '';
-    let nameEn = '';
-    if (dataProfile && dataProfile.positionData) {
-      nameVi = `${dataProfile.positionData.valueVi}, ${name}`;
-      nameEn = `${dataProfile.positionData.valueEn}, ${name}`;
-    }
+    
+    // Extract data from new API structure
+    const user = dataProfile?.user || dataProfile || {};
+    const name = user.fullName || '';
+    const nameVi = `Bác sĩ ${name}`;
+    const nameEn = `Doctor ${name}`;
+    const fee = dataProfile?.fee || 0;
 
     return (
       <div className="profile-doctor-container">
@@ -114,9 +94,7 @@ class ProfileDoctor extends Component {
           <div
             className="content-left"
             style={{
-              backgroundImage: `url(${
-                dataProfile && dataProfile.image ? dataProfile.image : ''
-              })`,
+              backgroundImage: `url(${user.image || ''})`,
             }}
           ></div>
           <div className="content-right">
@@ -127,11 +105,9 @@ class ProfileDoctor extends Component {
             <div className="down">
               {isShowDescriptionDoctor === true ? (
                 <>
-                  {dataProfile &&
-                    dataProfile.Doctor_Info &&
-                    dataProfile.Doctor_Info.description && (
-                      <span>{dataProfile.Doctor_Info.description}</span>
-                    )}
+                  {dataProfile?.title && (
+                    <span>{dataProfile.title}</span>
+                  )}
                 </>
               ) : (
                 <>{this.renderTimeBooking(dataTime)}</>
@@ -148,29 +124,25 @@ class ProfileDoctor extends Component {
         {isShowPrice === true && (
           <div className="price">
             <FormattedMessage id="patient.booking-modal.price" />
-            {dataProfile &&
-              dataProfile.Doctor_Info &&
-              language === LANGUAGES.VI && (
-                <NumberFormat
-                  className="currency"
-                  value={dataProfile.Doctor_Info.priceTypeData.valueVi}
-                  displayType="text"
-                  thousandSeparator={true}
-                  suffix={'VND'}
-                />
-              )}
+            {language === LANGUAGES.VI && (
+              <NumberFormat
+                className="currency"
+                value={fee}
+                displayType="text"
+                thousandSeparator={true}
+                suffix={' VND'}
+              />
+            )}
 
-            {dataProfile &&
-              dataProfile.Doctor_Info &&
-              language === LANGUAGES.EN && (
-                <NumberFormat
-                  className="currency"
-                  value={dataProfile.Doctor_Info.priceTypeData.valueEn}
-                  displayType="text"
-                  thousandSeparator={true}
-                  suffix={'$'}
-                />
-              )}
+            {language === LANGUAGES.EN && (
+              <NumberFormat
+                className="currency"
+                value={fee}
+                displayType="text"
+                thousandSeparator={true}
+                suffix={'$'}
+              />
+            )}
           </div>
         )}
       </div>

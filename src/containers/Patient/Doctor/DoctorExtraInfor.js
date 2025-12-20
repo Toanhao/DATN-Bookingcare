@@ -4,40 +4,29 @@ import React, { Component } from 'react';
 import './DoctorExtraInfor.scss';
 import { connect } from 'react-redux';
 import { LANGUAGES } from '../../../utils';
-import { getExtraInforDoctorById } from '../../../services/userService';
 import { FormattedMessage } from 'react-intl';
 import NumberFormat from 'react-number-format';
 import { Link } from 'react-router-dom';
+import { getDetailInforDoctor } from '../../../services/userService';
 
 class DoctorExtraInfor extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      isShowDetailInfor: false,
       extraInfor: {},
     };
   }
 
   async componentDidMount() {
-    if (this.props.doctorIdFromParent) {
-      let res = await getExtraInforDoctorById(this.props.doctorIdFromParent);
-      if (res && res.errCode === 0) {
-        // Map dữ liệu từ backend mới sang format cũ
-        const doctor = res.data;
-        const mappedData = {
-          clinicId: doctor.clinicId,
-          clinicData: doctor.clinic || {},
-          priceTypeData: {
-            valueVi: doctor.fee ? `${doctor.fee.toLocaleString('vi-VN')}` : '0',
-            valueEn: doctor.fee ? `${doctor.fee}` : '0',
-          },
-          paymentTypeData: {
-            valueVi: 'Thanh toán sau khám',
-            valueEn: 'Payment after examination',
-          },
-          note: doctor.title || '',
-        };
-        this.setState({ extraInfor: mappedData });
+    // Nếu có data từ parent, dùng luôn (tránh duplicate API call)
+    if (this.props.detailDoctorFromParent) {
+      this.updateExtraInfor(this.props.detailDoctorFromParent);
+    } 
+    // Nếu không có data nhưng có doctorId, tự gọi API
+    else if (this.props.doctorIdFromParent) {
+      let res = await getDetailInforDoctor(this.props.doctorIdFromParent);
+      if (res && res.errCode === 0 && res.data) {
+        this.updateExtraInfor(res.data);
       }
     }
   }
@@ -46,30 +35,36 @@ class DoctorExtraInfor extends Component {
     if (this.props.language !== prevProps.language) {
     }
 
-    if (this.props.doctorIdFromParent !== prevProps.doctorIdFromParent) {
-      let res = await getExtraInforDoctorById(this.props.doctorIdFromParent);
-      if (res && res.errCode === 0) {
-        // Map dữ liệu từ backend mới sang format cũ
-        const doctor = res.data;
-        const mappedData = {
-          clinicId: doctor.clinicId,
-          clinicData: doctor.clinic || {},
-          priceTypeData: {
-            valueVi: doctor.fee ? `${doctor.fee.toLocaleString('vi-VN')}` : '0',
-            valueEn: doctor.fee ? `${doctor.fee}` : '0',
-          },
-          paymentTypeData: {
-            valueVi: 'Thanh toán sau khám',
-            valueEn: 'Payment after examination',
-          },
-          note: doctor.title || '',
-        };
-        this.setState({
-          extraInfor: mappedData,
-        });
+    if (this.props.detailDoctorFromParent !== prevProps.detailDoctorFromParent) {
+      this.updateExtraInfor(this.props.detailDoctorFromParent);
+    }
+
+    // Nếu doctorId thay đổi và không có detailDoctorFromParent, tự gọi API
+    if (
+      this.props.doctorIdFromParent !== prevProps.doctorIdFromParent &&
+      !this.props.detailDoctorFromParent &&
+      this.props.doctorIdFromParent
+    ) {
+      let res = await getDetailInforDoctor(this.props.doctorIdFromParent);
+      if (res && res.errCode === 0 && res.data) {
+        this.updateExtraInfor(res.data);
       }
     }
   }
+
+  updateExtraInfor = (doctor) => {
+    if (doctor && doctor.clinicId) {
+      const mappedData = {
+        clinicId: doctor.clinicId,
+        clinicData: doctor.clinic || {},
+        priceTypeData: {
+          valueVi: doctor.fee ? `${doctor.fee.toLocaleString('vi-VN')}` : '0',
+          valueEn: doctor.fee ? `${doctor.fee}` : '0',
+        },
+      };
+      this.setState({ extraInfor: mappedData });
+    }
+  };
 
   showHideDetailInfor = (status) => {
     this.setState({
@@ -78,7 +73,7 @@ class DoctorExtraInfor extends Component {
   };
 
   render() {
-    let { isShowDetailInfor, extraInfor } = this.state;
+    let { extraInfor } = this.state;
     let { language } = this.props;
 
     return (
@@ -110,103 +105,32 @@ class DoctorExtraInfor extends Component {
         </div>
 
         <div className="content-down">
-          {isShowDetailInfor === false && (
-            <div className="short-Infor">
-              <FormattedMessage id="patient.extra-Infor-doctor.price" />
-              {extraInfor &&
-                extraInfor.priceTypeData &&
-                language === LANGUAGES.VI && (
-                  <NumberFormat
-                    className="currency"
-                    value={extraInfor.priceTypeData.valueVi}
-                    displayType="text"
-                    thousandSeparator={true}
-                    suffix={'VND'}
-                  />
-                )}
+          <div className="short-Infor">
+            <FormattedMessage id="patient.extra-Infor-doctor.price" />
+            {extraInfor &&
+              extraInfor.priceTypeData &&
+              language === LANGUAGES.VI && (
+                <NumberFormat
+                  className="currency"
+                  value={extraInfor.priceTypeData.valueVi}
+                  displayType="text"
+                  thousandSeparator={true}
+                  suffix={'VND'}
+                />
+              )}
 
-              {extraInfor &&
-                extraInfor.priceTypeData &&
-                language === LANGUAGES.EN && (
-                  <NumberFormat
-                    className="currency"
-                    value={extraInfor.priceTypeData.valueEn}
-                    displayType="text"
-                    thousandSeparator={true}
-                    suffix={'$'}
-                  />
-                )}
-
-              <span
-                className="detail"
-                onClick={() => this.showHideDetailInfor(true)}
-              >
-                <FormattedMessage id="patient.extra-Infor-doctor.detail" />
-              </span>
-            </div>
-          )}
-          {isShowDetailInfor === true && (
-            <>
-              <div className="title-price">
-                <FormattedMessage id="patient.extra-Infor-doctor.price" />
-              </div>
-              <div className="detail-Infor">
-                <div className="price">
-                  <span className="left">
-                    <FormattedMessage id="patient.extra-Infor-doctor.price" />
-                  </span>
-                  <span className="right">
-                    {extraInfor &&
-                      extraInfor.priceTypeData &&
-                      language === LANGUAGES.VI && (
-                        <NumberFormat
-                          className="currency"
-                          value={extraInfor.priceTypeData.valueVi}
-                          displayType="text"
-                          thousandSeparator={true}
-                          suffix={'VND'}
-                        />
-                      )}
-
-                    {extraInfor &&
-                      extraInfor.priceTypeData &&
-                      language === LANGUAGES.EN && (
-                        <NumberFormat
-                          className="currency"
-                          value={extraInfor.priceTypeData.valueEn}
-                          displayType="text"
-                          thousandSeparator={true}
-                          suffix={'$'}
-                        />
-                      )}
-                  </span>
-                </div>
-                <div className="note">
-                  {extraInfor && extraInfor.note ? extraInfor.note : ''}
-                </div>
-              </div>
-              <div className="payment">
-                <FormattedMessage id="patient.extra-Infor-doctor.payment" />
-
-                {extraInfor &&
-                extraInfor.paymentTypeData &&
-                language === LANGUAGES.VI
-                  ? extraInfor.paymentTypeData.valueVi
-                  : ''}
-
-                {extraInfor &&
-                extraInfor.paymentTypeData &&
-                language === LANGUAGES.EN
-                  ? extraInfor.paymentTypeData.valueEn
-                  : ''}
-              </div>
-              <div className="hide-price">
-                <span onClick={() => this.showHideDetailInfor(false)}>
-                  <FormattedMessage id="patient.extra-Infor-doctor.hide-price" />
-                </span>
-              </div>
-            </>
-          )}
+            {extraInfor &&
+              extraInfor.priceTypeData &&
+              language === LANGUAGES.EN && (
+                <NumberFormat
+                  className="currency"
+                  value={extraInfor.priceTypeData.valueEn}
+                  displayType="text"
+                  thousandSeparator={true}
+                  suffix={'$'}
+                />
+              )}
+          </div>
         </div>
       </div>
     );
