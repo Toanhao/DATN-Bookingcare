@@ -5,7 +5,6 @@ import { connect } from 'react-redux';
 import './BookingHistoryModal.scss';
 import { Modal } from 'reactstrap';
 import { getPatientBookingHistory, cancelPatientBooking } from '../../../services/userService';
-import { LANGUAGES } from '../../../utils';
 import moment from 'moment';
 import { toast } from 'react-toastify';
 
@@ -42,8 +41,8 @@ class BookingHistoryModal extends Component {
     this.setState({ isLoading: true });
     try {
       let res = await getPatientBookingHistory(userInfo.id);
-      if (res && res.errCode === 0) {
-        this.setState({ bookingHistory: res.data }, () => {
+      if (res) {
+        this.setState({ bookingHistory: res }, () => {
           this.filterBookings(this.state.activeTab);
         });
       } else {
@@ -61,21 +60,15 @@ class BookingHistoryModal extends Component {
     const { bookingHistory } = this.state;
     let filtered = [];
 
-    const today = moment().startOf('day');
-
     if (tab === 'upcoming') {
-      // Chưa khám: chỉ S2 (đã xác nhận email, chờ khám)
-      filtered = bookingHistory.filter((booking) => {
-        return booking.statusId === 'S2';
-      });
+      // Chờ khám: CONFIRMED
+      filtered = bookingHistory.filter((booking) => booking.status === 'CONFIRMED');
     } else if (tab === 'completed') {
-      // Đã khám: chỉ S3 (đã khám xong)
-      filtered = bookingHistory.filter((booking) => {
-        return booking.statusId === 'S3';
-      });
+      // Đã khám: DONE
+      filtered = bookingHistory.filter((booking) => booking.status === 'DONE');
     } else if (tab === 'cancelled') {
-      // Đã hủy: S4
-      filtered = bookingHistory.filter((booking) => booking.statusId === 'S4');
+      // Đã hủy: CANCELLED
+      filtered = bookingHistory.filter((booking) => booking.status === 'CANCELLED');
     }
 
     // Sort by date descending
@@ -107,7 +100,7 @@ class BookingHistoryModal extends Component {
         patientId: userInfo.id,
       });
 
-      if (res && res.errCode === 0) {
+      if (res && res.errorCode === 0) {
         toast.success('Hủy lịch khám thành công!');
         this.setState({ showConfirmCancel: false, selectedBooking: null });
         await this.fetchBookingHistory();
@@ -124,15 +117,15 @@ class BookingHistoryModal extends Component {
     this.setState({ showConfirmCancel: false, selectedBooking: null });
   };
 
-  getStatusText = (statusId) => {
-    switch (statusId) {
-      case 'S1':
+  getStatusText = (status) => {
+    switch (status) {
+      case 'PENDING':
         return { text: 'Chờ xác nhận email', className: 'status-pending' };
-      case 'S2':
+      case 'CONFIRMED':
         return { text: 'Chờ khám', className: 'status-confirmed' };
-      case 'S3':
+      case 'DONE':
         return { text: 'Đã khám xong', className: 'status-completed' };
-      case 'S4':
+      case 'CANCELLED':
         return { text: 'Đã hủy', className: 'status-cancelled' };
       default:
         return { text: 'Không xác định', className: '' };
@@ -140,7 +133,7 @@ class BookingHistoryModal extends Component {
   };
 
   render() {
-    const { isOpen, closeModal, language } = this.props;
+    const { isOpen, closeModal } = this.props;
     const { filteredBookings, activeTab, isLoading, showConfirmCancel } = this.state;
 
     return (
@@ -184,10 +177,10 @@ class BookingHistoryModal extends Component {
             ) : filteredBookings && filteredBookings.length > 0 ? (
               <div className="booking-list">
                 {filteredBookings.map((booking, index) => {
-                  const status = this.getStatusText(booking.statusId);
+                  const status = this.getStatusText(booking.status);
                   const canCancel =
                     activeTab === 'upcoming' &&
-                    booking.statusId === 'S2';
+                    booking.status === 'CONFIRMED';
 
                   return (
                     <div key={index} className="booking-item">
@@ -195,8 +188,8 @@ class BookingHistoryModal extends Component {
                         <div className="booking-date">
                           <i className="fas fa-calendar"></i>
                           <strong>
-                            {booking.date 
-                              ? moment(+booking.date).format('DD/MM/YYYY')
+                            {booking.schedule && booking.schedule.workDate
+                              ? moment(booking.schedule.workDate).format('DD/MM/YYYY')
                               : 'Chưa xác định'}
                           </strong>
                         </div>
@@ -210,44 +203,63 @@ class BookingHistoryModal extends Component {
                           <i className="fas fa-user-md"></i>
                           <span>
                             <strong>Bác sĩ:</strong>{' '}
-                            {booking.doctorData
-                              ? `${booking.doctorData.lastName} ${booking.doctorData.firstName}`
+                            {booking.schedule && booking.schedule.doctor && booking.schedule.doctor.user
+                              ? booking.schedule.doctor.user.fullName
                               : 'N/A'}
                           </span>
                         </div>
 
-                        {booking.timeTypeDataPatient && (
+                        {booking.schedule && booking.schedule.timeSlot && (
                           <div className="detail-row">
                             <i className="fas fa-clock"></i>
                             <span>
                               <strong>Thời gian:</strong>{' '}
-                              {language === LANGUAGES.VI
-                                ? booking.timeTypeDataPatient.valueVi
-                                : booking.timeTypeDataPatient.valueEn}
+                              {booking.schedule.timeSlot.label}
                             </span>
                           </div>
                         )}
 
-                        {booking.doctorData &&
-                          booking.doctorData.Doctor_Info &&
-                          booking.doctorData.Doctor_Info.specialtyData && (
+                        {booking.queueNumber && booking.schedule && booking.schedule.maxPatient && (
+                          <div className="detail-row">
+                            <i className="fas fa-sort-numeric-up"></i>
+                            <span>
+                              <strong>Số thứ tự:</strong>{' '}
+                              {booking.queueNumber}/{booking.schedule.maxPatient}
+                            </span>
+                          </div>
+                        )}
+
+                        {activeTab === 'completed' &&
+                          booking.schedule &&
+                          booking.schedule.doctor &&
+                          booking.schedule.doctor.fee !== undefined && (
                             <div className="detail-row">
-                              <i className="fas fa-stethoscope"></i>
+                              <i className="fas fa-money-bill"></i>
                               <span>
-                                <strong>Chuyên khoa:</strong>{' '}
-                                {booking.doctorData.Doctor_Info.specialtyData.name}
+                                <strong>Giá khám:</strong>{' '}
+                                {new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(
+                                  Number(booking.schedule.doctor.fee) || 0
+                                )}
                               </span>
                             </div>
                           )}
 
-                        {booking.doctorData &&
-                          booking.doctorData.Doctor_Info &&
-                          booking.doctorData.Doctor_Info.clinicData && (
+                        {booking.schedule && booking.schedule.doctor && booking.schedule.doctor.specialty && (
+                            <div className="detail-row">
+                              <i className="fas fa-stethoscope"></i>
+                              <span>
+                                <strong>Chuyên khoa:</strong>{' '}
+                              {booking.schedule.doctor.specialty.name}
+                              </span>
+                            </div>
+                          )}
+
+                        {booking.schedule && booking.schedule.doctor && booking.schedule.doctor.clinic && (
                             <div className="detail-row">
                               <i className="fas fa-hospital"></i>
                               <span>
                                 <strong>Phòng khám:</strong>{' '}
-                                {booking.doctorData.Doctor_Info.clinicData.name}
+                              {booking.schedule.doctor.clinic.name}
                               </span>
                             </div>
                           )}

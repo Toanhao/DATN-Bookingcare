@@ -62,7 +62,7 @@ export const doctorMenu = [
     ],
   },
   {
-    //quản lý cẩm nang
+    //quản lý bệnh nhân
     name: 'menu.doctor.manage-patient',
     menus: [
       {

@@ -157,20 +157,18 @@ class UserRedux extends Component {
         imageBase64 = `data:image/jpeg;base64,${user.image}`;
       }
     }
-    
+
     // Convert birthday to YYYY-MM-DD format for input type="date"
     let birthdayFormatted = '';
     if (user.birthday) {
       const date = new Date(user.birthday);
       birthdayFormatted = date.toISOString().split('T')[0];
     }
-    
+
     this.setState({
       email: user.email,
       password: 'HARDCODE',
-      fullName:
-        user.fullName ||
-        [user.firstName, user.lastName].filter(Boolean).join(' '),
+      fullName: user.fullName,
       phoneNumber: user.phoneNumber,
       address: user.address,
       birthday: birthdayFormatted,

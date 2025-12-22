@@ -71,7 +71,7 @@ class ManagePatient extends Component {
       patientId: item.patientId,
       email: item.patientData.email,
       timeType: item.timeType,
-      patientName: item.patientData.firstName,
+      patientName: item.patientData.fullName,
     };
     this.setState({
       isOpenRemedyModal: true,

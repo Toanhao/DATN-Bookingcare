@@ -306,11 +306,8 @@ Trực thuộc: Công ty CP Công nghệ BookingCare
                       );
                     })()}
                     <span className="user-name">
-                      {this.props.userInfo &&
-                      this.props.userInfo.firstName &&
-                      this.props.userInfo.lastName
-                        ? `${this.props.userInfo.lastName} ${this.props.userInfo.firstName} `
-                        : ''}
+                      {this.props.userInfo?.fullName
+                        }
                     </span>
                   </div>
 

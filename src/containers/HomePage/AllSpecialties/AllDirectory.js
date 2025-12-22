@@ -61,41 +61,29 @@ const AllDirectory = (props) => {
         setClinics(data2 || []);
         setHandbooks(data4 || []);
 
-        // Enrich doctors with specialtyName (lấy từ Doctor_Info đã có sẵn)
-        const enrichDoctorsWithSpecialty = (doctorsList, specialtiesList) => {
+        // Chuẩn hóa dữ liệu bác sĩ theo BE hiện tại: Doctor kèm user, specialty, clinic
+        const normalizeDoctors = (doctorsList) => {
           if (!doctorsList || doctorsList.length === 0) return [];
 
           return doctorsList.map((doc) => {
-            let specialtyName = '';
-
-            // Lấy specialtyId trực tiếp từ Doctor_Info (đã có sẵn từ getAllDoctors)
-            const doctorInfo = doc.Doctor_Info || doc.Doctor_Infor;
-            const specialtyId = doctorInfo && doctorInfo.specialtyId;
-
-            if (specialtyId) {
-              const found = (specialtiesList || []).find(
-                (s) =>
-                  s.id === specialtyId ||
-                  s.id === +specialtyId ||
-                  String(s.id) === String(specialtyId)
-              );
-              if (found)
-                specialtyName =
-                  found.name || found.nameVi || found.nameEn || '';
-            }
+            const user = doc.user || {};
+            const specialty = doc.specialty || {};
+            const clinic = doc.clinic || {};
 
             return {
-              ...doc,
-              specialtyName,
+              id: doc.id,
+              title: doc.title,
+              specialtyId: doc.specialtyId,
+              specialtyName: specialty.name || doc.specialtyName || '',
+              clinicName: clinic.name || doc.clinicName || '',
+              fullName: user.fullName || doc.fullName || '',
+              image: user.image || doc.image || '',
             };
           });
         };
 
-        const enrichedDoctors = enrichDoctorsWithSpecialty(
-          data3 || [],
-          data1 || []
-        );
-        setDoctors(enrichedDoctors || []);
+        const normalizedDoctors = normalizeDoctors(data3 || []);
+        setDoctors(normalizedDoctors || []);
       } catch (e) {
         // ignore errors for now
       }
@@ -264,20 +252,8 @@ const AllDirectory = (props) => {
                   </h3>
                   {renderDoctorGrid(
                     doctors.filter((d) => {
-                      const pos = d.positionData || d.position || {};
-                      const name =
-                        props.language === 'vi'
-                          ? pos.valueVi
-                            ? `${pos.valueVi}, ${d.lastName || ''} ${
-                                d.firstName || ''
-                              }`
-                            : `${d.lastName || ''} ${d.firstName || ''}`
-                          : pos.valueEn
-                          ? `${pos.valueEn}, ${d.firstName || ''} ${
-                              d.lastName || ''
-                            }`
-                          : `${d.firstName || ''} ${d.lastName || ''}`;
-                      const check = (name || '').toLowerCase();
+                      const name = d.fullName || '';
+                      const check = name.toLowerCase();
                       return (
                         check.includes(searchText.toLowerCase()) ||
                         (d.specialtyName || '')

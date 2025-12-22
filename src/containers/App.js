@@ -10,7 +10,6 @@ import Doctor from "../routes/Doctor";
 import DetailSpecialty from "./Patient/Specialty/DetailSpecialty";
 import DetailClinic from "./Patient/Clinic/DetailClinic";
 import AllDirectory from "./HomePage/AllSpecialties/AllDirectory";
-import VerifyEmail from "./Patient/VerifyEmail.js";
 import {
     userIsNotAuthenticated,
     userIsAdminOrDoctor,
@@ -23,9 +22,11 @@ import Register from "../containers/Auth/Register";
 import System from "../routes/System";
 import ConfirmModal from "../components/ConfirmModal";
 import ChatWidget from "../components/ChatWidget/ChatWidget";
-import DiagnosisWidget from "../components/DiagnosisWidget/DiagnosisWidget.js";
 import BookingChat from "../components/BookingChat/BookingChat.js";
 import DetailHandbook from "./Patient/Handbook/DetailHandbook.js";
+import ConfirmBooking from "./Patient/ConfirmBooking.js";
+import CancelBooking from "./Patient/CancelBooking.js";
+
 class App extends Component {
     handlePersistorState = () => {
         const { persistor } = this.props;
@@ -93,8 +94,12 @@ class App extends Component {
                         component={DetailClinic}
                       />
                       <Route
-                        path={path.VERIFY_EMAIL_BOOKING}
-                        component={VerifyEmail}
+                        path={path.CONFIRM_BOOKING}
+                        component={ConfirmBooking}
+                      />
+                      <Route
+                        path={path.CANCEL_BOOKING}
+                        component={CancelBooking}
                       />
                     </Switch>
                   </CustomScrollbars>

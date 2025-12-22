@@ -1,0 +1,36 @@
+.confirm-booking-container,
+.cancel-booking-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 500px;
+  padding: 20px;
+}
+
+.loading-message {
+  font-size: 18px;
+  color: #666;
+  font-weight: 500;
+}
+
+.success-message {
+  font-size: 20px;
+  color: #27ae60;
+  font-weight: bold;
+  text-align: center;
+  padding: 20px;
+  border-radius: 8px;
+  background-color: #d5f4e6;
+  border-left: 4px solid #27ae60;
+}
+
+.error-message {
+  font-size: 20px;
+  color: #e74c3c;
+  font-weight: bold;
+  text-align: center;
+  padding: 20px;
+  border-radius: 8px;
+  background-color: #fadbd8;
+  border-left: 4px solid #e74c3c;
+}

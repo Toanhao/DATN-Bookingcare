@@ -49,7 +49,7 @@ class ManageSchedule extends Component {
     // Auto-select doctor for DOCTOR role
     const { userInfo, language } = this.props;
     if (userInfo?.role === 'DOCTOR') {
-      const name = userInfo.fullName || `${userInfo.firstName || ''} ${userInfo.lastName || ''}`.trim();
+      const name = userInfo.fullName ;
       this.setState({
         selectedDoctor: {
           label: name,
@@ -76,7 +76,6 @@ class ManageSchedule extends Component {
   }
 
   buildDataInputSelect = (inputData) => {
-    let { language } = this.props;
     if (!inputData || inputData.length === 0) return [];
     
     return inputData.reduce((result, item) => {
@@ -84,13 +83,6 @@ class ManageSchedule extends Component {
       if (item.user?.fullName) {
         object = {
           label: item.user.fullName,
-          value: item.id,
-        };
-      } else if (item.firstName && item.lastName) {
-        const labelVi = `${item.lastName} ${item.firstName}`;
-        const labelEn = `${item.firstName} ${item.lastName}`;
-        object = {
-          label: language === LANGUAGES.VI ? labelVi : labelEn,
           value: item.id,
         };
       }

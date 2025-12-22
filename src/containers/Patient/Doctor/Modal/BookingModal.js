@@ -90,10 +90,11 @@ class BookingModal extends Component {
     });
   };
 
-  handelOnDatePicker = (date) => {
-    this.setState({
-      birthday: date[0],
-    });
+  getActiveBookingCount = (schedule) => {
+    if (!schedule || !Array.isArray(schedule.bookings)) return 0;
+    return schedule.bookings.filter((b) =>
+      ['PENDING', 'CONFIRMED'].includes(b.status)
+    ).length;
   };
 
   handleConfirmBooking = async () => {
@@ -127,7 +128,8 @@ class BookingModal extends Component {
 
       this.setState({ isShowLoading: false });
 
-      if (res && res.data) {
+      // res sẽ là booking object do axios interceptor return response.data
+      if (res && res.id) {
         toast.success('Đặt lịch hẹn thành công! Vui lòng kiểm tra email để xác nhận.');
         this.setState({ reason: '' }); // Reset form
         this.props.closeBookingClose();
@@ -136,7 +138,7 @@ class BookingModal extends Component {
       }
     } catch (error) {
       this.setState({ isShowLoading: false });
-      const message = error.response?.data?.message || 'Đặt lịch hẹn thất bại!';
+      const message = error.message || 'Đặt lịch hẹn thất bại!';
       toast.error(message);
     }
   };
@@ -180,6 +182,38 @@ class BookingModal extends Component {
                 />
               </div>
 
+              {dataTime && !_.isEmpty(dataTime) && (
+                <div className="queue-info">
+                  {(() => {
+                    const maxPatient = dataTime.maxPatient;
+                    const activeBookings = this.getActiveBookingCount(dataTime);
+                    const yourNumber = maxPatient
+                      ? Math.min(activeBookings + 1, maxPatient)
+                      : activeBookings + 1;
+                    if (!maxPatient) {
+                      return (
+                        <div className="queue-hint">
+                          <i className="fas fa-info-circle"></i>
+                          <span>
+                            Số thứ tự dự kiến của bạn: <strong>{yourNumber}</strong>
+                          </span>
+                        </div>
+                      );
+                    }
+
+                    return (
+                      <div className="queue-hint">
+                        <i className="fas fa-info-circle"></i>
+                        <span>
+                          Hiện có <strong>{activeBookings}/{maxPatient}</strong> người đã đăng ký. 
+                          Số thứ tự dự kiến của bạn: <strong>{yourNumber}/{maxPatient}</strong>.
+                        </span>
+                      </div>
+                    );
+                  })()}
+                </div>
+              )}
+
               <div className="row">
                 <div className="col-6 form-group">
                   <label>
@@ -188,9 +222,6 @@ class BookingModal extends Component {
                   <input
                     className="form-control"
                     value={this.state.fullName}
-                    onChange={(event) =>
-                      this.handelOnChangeInput(event, 'fullName')
-                    }
                     readOnly
                   />
                 </div>
@@ -202,9 +233,6 @@ class BookingModal extends Component {
                   <input
                     className="form-control"
                     value={this.state.phoneNumber}
-                    onChange={(event) =>
-                      this.handelOnChangeInput(event, 'phoneNumber')
-                    }
                     readOnly
                   />
                 </div>
@@ -216,9 +244,6 @@ class BookingModal extends Component {
                   <input
                     className="form-control"
                     value={this.state.email}
-                    onChange={(event) =>
-                      this.handelOnChangeInput(event, 'email')
-                    }
                     readOnly
                   />
                 </div>
@@ -230,9 +255,6 @@ class BookingModal extends Component {
                   <input
                     className="form-control"
                     value={this.state.address}
-                    onChange={(event) =>
-                      this.handelOnChangeInput(event, 'address')
-                    }
                     readOnly
                   />
                 </div>
@@ -242,7 +264,6 @@ class BookingModal extends Component {
                     <FormattedMessage id="patient.booking-modal.birthday" />
                   </label>
                   <DatePicker
-                    onChange={this.handelOnDatePicker}
                     className="form-control"
                     value={this.state.birthday ? new Date(this.state.birthday) : null}
                     disabled={true}
@@ -256,9 +277,6 @@ class BookingModal extends Component {
                   <input
                     className="form-control"
                     value={this.state.gender}
-                    onChange={(event) =>
-                      this.handelOnChangeInput(event, 'gender')
-                    }
                     readOnly
                   />
                 </div>

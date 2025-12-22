@@ -2,21 +2,17 @@
 
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import { FormattedMessage } from 'react-intl';
 import './QuickBookingModal.scss';
 import { Modal } from 'reactstrap';
-import _ from 'lodash';
 import DatePicker from '../../../../components/Input/DatePicker';
-import * as actions from '../../../../store/actions';
 import { LANGUAGES } from '../../../../utils';
 import Select from 'react-select';
 import {
   getAllSpecialty,
   getAllClinic,
-  getAllDoctors,
+  getDoctorsFiltered,
   getScheduleDoctorByDate,
-  postPatientBookAppointment,
-  getExtraInforDoctorById,
+  createBooking,
 } from '../../../../services/userService';
 import { toast } from 'react-toastify';
 import moment from 'moment';
@@ -28,8 +24,6 @@ class QuickBookingModal extends Component {
     super(props);
     this.state = {
       currentStep: 1,
-      totalSteps: 5,
-
       // Step 1: Chọn chuyên khoa
       specialties: [],
       selectedSpecialty: null,
@@ -38,14 +32,10 @@ class QuickBookingModal extends Component {
       clinics: [],
       selectedClinic: null,
 
-      // Step 3: Chọn ngày khám
-      selectedDate: '',
-
-      // Step 4: Chọn bác sĩ
+      // Step 3: Chọn ngày khám, bác sĩ
+      selectedDate: null,
       doctors: [],
       selectedDoctor: null,
-
-      // Step 5: Chọn giờ khám
       timeSlots: [],
       selectedTime: null,
 
@@ -56,40 +46,25 @@ class QuickBookingModal extends Component {
       address: '',
       reason: '',
       birthday: '',
-      selectedGender: '',
-      genders: [],
 
       isShowLoading: false,
     };
   }
 
   async componentDidMount() {
+    const today = this.getToday();
+    this.setState({ selectedDate: today });
     await this.loadSpecialties();
     await this.loadClinics();
-    // Use static gender list instead of Redux allcode
-    const genders = [
-      { keyMap: 'Nam', valueVi: 'Nam', valueEn: 'Male' },
-      { keyMap: 'Nữ', valueVi: 'Nữ', valueEn: 'Female' },
-      { keyMap: 'Khác', valueVi: 'Khác', valueEn: 'Other' },
-    ];
-    this.setState({ genders: this.buildDataGender(genders) });
   }
 
-  componentDidUpdate(prevProps, prevState) {
-    if (this.props.language !== prevProps.language) {
-      const genders = [
-        { keyMap: 'Nam', valueVi: 'Nam', valueEn: 'Male' },
-        { keyMap: 'Nữ', valueVi: 'Nữ', valueEn: 'Female' },
-        { keyMap: 'Khác', valueVi: 'Khác', valueEn: 'Other' },
-      ];
-      this.setState({ genders: this.buildDataGender(genders) });
-    }
-    // No longer need to react to props.genders
-
+  componentDidUpdate(prevProps) {
     // Auto-fill user info when modal opens
     if (this.props.isOpenModal && !prevProps.isOpenModal) {
+      // Reset date to today on open
+      const today = this.getToday();
+      this.setState({ selectedDate: today });
       if (this.props.isLoggedIn) {
-        // Genders already built; just fill user info
         this.fillUserFromProps();
       } else {
         if (this.props.closeModal) this.props.closeModal();
@@ -100,56 +75,31 @@ class QuickBookingModal extends Component {
     }
   }
 
-  buildDataGender = (data) => {
-    let result = [];
-    let language = this.props.language;
-    if (data && data.length > 0) {
-      data.map((item) => {
-        let object = {};
-        object.label = language === LANGUAGES.VI ? item.valueVi : item.valueEn;
-        object.value = item.keyMap;
-        return result.push(object);
-      });
-    }
-    return result;
-  };
-
   fillUserFromProps = () => {
     const { isLoggedIn, userInfo } = this.props;
     if (isLoggedIn && userInfo) {
       const fullName =
-        userInfo.fullName ||
-        `${userInfo.firstName || ''} ${userInfo.lastName || ''}`.trim();
+        userInfo.fullName;
       const phoneNumber =
         userInfo.phoneNumber || userInfo.phonenumber || userInfo.phone || '';
       const email = userInfo.email || '';
       const address = userInfo.address || '';
-
-      let selectedGender = this.state.selectedGender;
-      const genderKey =
-        userInfo.gender ||
-        userInfo.genderId ||
-        userInfo.sex ||
-        userInfo.gender_key;
-      if (
-        genderKey &&
-        this.state.genders &&
-        Array.isArray(this.state.genders)
-      ) {
-        const match = this.state.genders.find(
-          (g) => String(g.value) === String(genderKey)
-        );
-        if (match) selectedGender = match;
-      }
+      const birthday = userInfo.birthday ? new Date(userInfo.birthday) : '';
 
       this.setState({
         fullName: fullName || this.state.fullName,
         phoneNumber: phoneNumber || this.state.phoneNumber,
         email: email || this.state.email,
         address: address || this.state.address,
-        selectedGender: selectedGender,
+        birthday: birthday || this.state.birthday,
       });
     }
+  };
+
+  getToday = () => {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    return today;
   };
 
   loadSpecialties = async () => {
@@ -186,47 +136,24 @@ class QuickBookingModal extends Component {
 
   loadDoctors = async () => {
     try {
-      let res = await getAllDoctors();
-      if (res && res.errCode === 0) {
-        let { language } = this.props;
-        let { selectedSpecialty, selectedClinic } = this.state;
+      const { selectedSpecialty, selectedClinic } = this.state;
+      if (!selectedSpecialty || !selectedClinic) return;
 
-        // Filter doctors based on specialty and clinic
-        let filteredDoctors = res.data;
+      const res = await getDoctorsFiltered(
+        selectedClinic.value,
+        selectedSpecialty.value,
+        true
+      );
 
-        // Filter by specialty
-        if (selectedSpecialty && selectedSpecialty.value) {
-          filteredDoctors = filteredDoctors.filter((doctor) => {
-            // Check if doctor has Doctor_Info with specialtyId matching selectedSpecialty
-            return (
-              doctor.Doctor_Info &&
-              doctor.Doctor_Info.specialtyId === selectedSpecialty.value
-            );
-          });
-        }
+      const doctors = Array.isArray(res) ? res : res?.data;
+      const doctorOptions = (doctors || []).map((item) => ({
+        value: item.id,
+        label:
+          item.user?.fullName,
+        data: item,
+      }));
 
-        // Filter by clinic
-        if (selectedClinic && selectedClinic.value) {
-          filteredDoctors = filteredDoctors.filter((doctor) => {
-            // Check if doctor has Doctor_Info with clinicId matching selectedClinic
-            return (
-              doctor.Doctor_Info &&
-              doctor.Doctor_Info.clinicId === selectedClinic.value
-            );
-          });
-        }
-
-        let doctorOptions = filteredDoctors.map((item) => ({
-          value: item.id,
-          label:
-            language === LANGUAGES.VI
-              ? `${item.lastName} ${item.firstName}`
-              : `${item.firstName} ${item.lastName}`,
-          data: item,
-        }));
-
-        this.setState({ doctors: doctorOptions });
-      }
+      this.setState({ doctors: doctorOptions });
     } catch (e) {
       console.log('Error loading doctors:', e);
     }
@@ -237,22 +164,25 @@ class QuickBookingModal extends Component {
       let { selectedDoctor, selectedDate } = this.state;
       if (!selectedDoctor || !selectedDate) return;
 
-      let dateTimestamp = new Date(selectedDate).getTime();
+      // Use YYYY-MM-DD to match backend DATE comparison
+      const dateStr = moment(selectedDate).format('YYYY-MM-DD');
       let res = await getScheduleDoctorByDate(
         selectedDoctor.value,
-        dateTimestamp
+        dateStr
       );
 
-      if (res && res.errCode === 0 && res.data) {
-        let { language } = this.props;
-        let timeOptions = res.data.map((item) => ({
-          value: item.timeType,
-          label:
-            language === LANGUAGES.VI
-              ? item.timeTypeData.valueVi
-              : item.timeTypeData.valueEn,
-          data: item,
-        }));
+      const schedules = Array.isArray(res) ? res : res?.data;
+      if (Array.isArray(schedules) && schedules.length > 0) {
+        const timeOptions = schedules.map((item) => {
+          const label =
+            item.timeSlot?.label ||
+            item.timeSlot?.valueVi ||
+            item.timeSlot?.valueEn ||
+            (item.timeSlot?.startTime && item.timeSlot?.endTime
+              ? `${item.timeSlot.startTime} - ${item.timeSlot.endTime}`
+              : 'Giờ không xác định');
+          return { value: item.id, label, data: item };
+        });
         this.setState({ timeSlots: timeOptions });
       } else {
         this.setState({ timeSlots: [] });
@@ -262,6 +192,13 @@ class QuickBookingModal extends Component {
       console.log('Error loading time slots:', e);
       this.setState({ timeSlots: [] });
     }
+  };
+
+  getActiveBookingCount = (schedule) => {
+    if (!schedule || !Array.isArray(schedule.bookings)) return 0;
+    return schedule.bookings.filter((b) =>
+      ['PENDING', 'CONFIRMED'].includes(b.status)
+    ).length;
   };
 
   handleSelectSpecialty = (selectedOption) => {
@@ -275,8 +212,8 @@ class QuickBookingModal extends Component {
         doctors: [],
       },
       () => {
-        // If date is chosen, reload doctors for new filters
-        if (this.state.selectedDate) {
+        // Reload doctors only when both specialty & clinic selected
+        if (this.state.selectedClinic && this.state.selectedSpecialty) {
           this.loadDoctors();
         }
       }
@@ -294,8 +231,8 @@ class QuickBookingModal extends Component {
         doctors: [],
       },
       () => {
-        // If date is chosen, reload doctors for new filters
-        if (this.state.selectedDate) {
+        // Reload doctors only when both specialty & clinic selected
+        if (this.state.selectedClinic && this.state.selectedSpecialty) {
           this.loadDoctors();
         }
       }
@@ -303,16 +240,17 @@ class QuickBookingModal extends Component {
   };
 
   handleSelectDate = (date) => {
-    // Reset doctor and times on date change, then reload doctors
+    // Update date, reset times, and reload schedules for selected doctor
     this.setState(
       {
         selectedDate: date[0],
-        selectedDoctor: null,
         timeSlots: [],
         selectedTime: null,
       },
       () => {
-        this.loadDoctors();
+        if (this.state.selectedDoctor) {
+          this.loadTimeSlots();
+        }
       }
     );
   };
@@ -328,50 +266,54 @@ class QuickBookingModal extends Component {
   };
 
   handleOnChangeInput = (event, id) => {
-    let valueInput = event.target.value;
-    let stateCopy = { ...this.state };
-    stateCopy[id] = valueInput;
-    this.setState({ ...stateCopy });
+    this.setState({ [id]: event.target.value });
   };
 
-  handleOnDatePicker = (date) => {
-    this.setState({ birthday: date[0] });
-  };
+  validateStep = (step) => {
+    const {
+      selectedSpecialty,
+      selectedClinic,
+      selectedDoctor,
+      selectedDate,
+      timeSlots,
+      selectedTime,
+    } = this.state;
 
-  handleChangeGender = (selectedOption) => {
-    this.setState({ selectedGender: selectedOption });
+    if (step === 1 && !selectedSpecialty) {
+      toast.error('Vui lòng chọn chuyên khoa!');
+      return false;
+    }
+    if (step === 2 && !selectedClinic) {
+      toast.error('Vui lòng chọn cơ sở y tế!');
+      return false;
+    }
+    if (step === 3) {
+      if (!selectedDoctor) {
+        toast.error('Vui lòng chọn bác sĩ!');
+        return false;
+      }
+      if (!selectedDate) {
+        toast.error('Vui lòng chọn ngày khám!');
+        return false;
+      }
+      if (timeSlots.length === 0) {
+        toast.error('Hôm nay bác sĩ không có lịch khám!');
+        return false;
+      }
+      if (!selectedTime) {
+        toast.error('Vui lòng chọn giờ khám!');
+        return false;
+      }
+    }
+
+    return true;
   };
 
   nextStep = () => {
-    let { currentStep, totalSteps } = this.state;
+    let { currentStep } = this.state;
+    const totalSteps = 4;
 
-    // Validate dữ liệu trước khi nhảy bước
-    if (currentStep === 1 && !this.state.selectedSpecialty) {
-      toast.error('Vui lòng chọn chuyên khoa!');
-      return;
-    }
-    if (currentStep === 2 && !this.state.selectedClinic) {
-      toast.error('Vui lòng chọn cơ sở y tế!');
-      return;
-    }
-    if (currentStep === 3 && !this.state.selectedDate) {
-      toast.error('Vui lòng chọn ngày khám!');
-      return;
-    }
-    if (currentStep === 4) {
-      if (!this.state.selectedDoctor) {
-        toast.error('Vui lòng chọn bác sĩ!');
-        return;
-      }
-      if (this.state.timeSlots.length === 0) {
-        toast.error('Hôm nay bác sĩ không có lịch khám!');
-        return;
-      }
-      if (!this.state.selectedTime) {
-        toast.error('Vui lòng chọn giờ khám!');
-        return;
-      }
-    }
+    if (!this.validateStep(currentStep)) return;
 
     if (currentStep < totalSteps) {
       this.setState({ currentStep: currentStep + 1 });
@@ -397,96 +339,64 @@ class QuickBookingModal extends Component {
   };
 
   handleConfirmBooking = async () => {
-    // Validate
-    if (!this.state.selectedSpecialty) {
-      toast.error('Vui lòng chọn chuyên khoa!');
+    const stepsToValidate = [1, 2, 3];
+    for (const step of stepsToValidate) {
+      if (!this.validateStep(step)) return;
+    }
+
+    // Require reason like BookingModal
+    if (!this.state.reason || !this.state.reason.trim()) {
+      toast.error('Vui lòng nhập lý do khám!');
       return;
     }
-    if (!this.state.selectedClinic) {
-      toast.error('Vui lòng chọn cơ sở y tế!');
+
+    const { userInfo } = this.props;
+    if (!userInfo || !userInfo.id) {
+      toast.error('Vui lòng đăng nhập!');
       return;
     }
-    if (!this.state.selectedDate) {
-      toast.error('Vui lòng chọn ngày khám!');
-      return;
-    }
-    if (!this.state.selectedDoctor) {
-      toast.error('Vui lòng chọn bác sĩ!');
-      return;
-    }
-    if (!this.state.selectedTime) {
-      toast.error('Vui lòng chọn giờ khám!');
-      return;
-    }
-    if (!this.state.fullName || !this.state.phoneNumber || !this.state.email) {
-      toast.error('Vui lòng điền đầy đủ thông tin!');
+
+    // Use scheduleId from selected time slot
+    const scheduleId = this.state.selectedTime?.value || this.state.selectedTime?.data?.id;
+    if (!scheduleId) {
+      toast.error('Không tìm thấy lịch khám!');
       return;
     }
 
     this.setState({ isShowLoading: true });
 
     try {
-      let birthday = new Date(this.state.birthday).getTime();
-      let date = new Date(this.state.selectedDate).getTime();
-      let { language } = this.props;
-
-      let timeString =
-        language === LANGUAGES.VI
-          ? this.state.selectedTime.data.timeTypeData.valueVi
-          : this.state.selectedTime.data.timeTypeData.valueEn;
-
-      timeString += ' - ';
-      timeString +=
-        language === LANGUAGES.VI
-          ? moment.unix(date / 1000).format('dddd - DD/MM/YYYY')
-          : moment
-              .unix(date / 1000)
-              .locale('en')
-              .format('dddd - DD/MM/YYYY');
-
-      let doctorName =
-        language === LANGUAGES.VI
-          ? `${this.state.selectedDoctor.data.lastName} ${this.state.selectedDoctor.data.firstName}`
-          : `${this.state.selectedDoctor.data.firstName} ${this.state.selectedDoctor.data.lastName}`;
-
-      let res = await postPatientBookAppointment({
-        fullName: this.state.fullName,
-        phoneNumber: this.state.phoneNumber,
-        email: this.state.email,
-        address: this.state.address,
-        reason: this.state.reason,
-        date: date,
-        birthday: birthday,
-        selectedGender: this.state.selectedGender.value,
-        doctorId: this.state.selectedDoctor.value,
-        timeType: this.state.selectedTime.value,
-        language: language,
-        timeString: timeString,
-        doctorName: doctorName,
+      const res = await createBooking({
+        patientId: userInfo.id,
+        scheduleId: scheduleId,
+        reason: this.state.reason.trim(),
       });
 
       this.setState({ isShowLoading: false });
 
-      if (res && res.errCode === 0) {
+      // axios interceptor may return booking object directly
+      if (res && res.id) {
         toast.success('Đặt lịch khám nhanh thành công!');
         this.props.closeModal();
         this.resetForm();
       } else {
-        toast.error('Đặt lịch khám thất bại! ' + res.errMessage);
+        toast.error('Đặt lịch khám thất bại!');
       }
     } catch (e) {
       this.setState({ isShowLoading: false });
-      toast.error('Có lỗi xảy ra!');
+      const message = e.message || 'Có lỗi xảy ra khi đặt lịch!';
+      toast.error(message);
       console.log('Error booking:', e);
     }
   };
 
   resetForm = () => {
+    const today = this.getToday();
     this.setState({
       currentStep: 1,
       selectedSpecialty: null,
       selectedClinic: null,
-      selectedDate: '',
+      selectedDate: today,
       selectedDoctor: null,
       selectedTime: null,
       doctors: [],
@@ -497,18 +407,16 @@ class QuickBookingModal extends Component {
       address: '',
       reason: '',
       birthday: '',
-      selectedGender: '',
     });
   };
 
   renderStepIndicator = () => {
-    let { currentStep, totalSteps } = this.state;
+    let { currentStep } = this.state;
     let steps = [
       { number: 1, label: 'Chuyên khoa' },
       { number: 2, label: 'Cơ sở' },
-      { number: 3, label: 'Ngày' },
-      { number: 4, label: 'Bác sĩ & Giờ' },
-      { number: 5, label: 'Thông tin' },
+      { number: 3, label: 'Bác sĩ & Giờ' },
+      { number: 4, label: 'Thông tin' },
     ];
 
     return (
@@ -539,10 +447,8 @@ class QuickBookingModal extends Component {
       case 2:
         return this.renderClinicStep();
       case 3:
-        return this.renderDateStep();
-      case 4:
         return this.renderDoctorStep();
-      case 5:
+      case 4:
         return this.renderPatientInfoStep();
       default:
         return null;
@@ -585,15 +491,7 @@ class QuickBookingModal extends Component {
         />
 
         {this.state.selectedClinic && (
-          <div
-            className="clinic-info"
-            style={{
-              marginTop: '15px',
-              padding: '10px',
-              backgroundColor: '#f5f5f5',
-              borderRadius: '4px',
-            }}
-          >
+          <div className="clinic-info">
             <p>
               <strong>Thông tin cơ sở:</strong>
             </p>
@@ -610,29 +508,8 @@ class QuickBookingModal extends Component {
     );
   };
 
-  renderDateStep = () => {
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-
-    return (
-      <div className="step-content">
-        <h4 className="step-title">
-          <i className="fas fa-calendar-alt"></i> Chọn ngày khám
-        </h4>
-        <p className="step-description">Bạn muốn đặt lịch vào ngày nào?</p>
-        <DatePicker
-          onChange={this.handleSelectDate}
-          className="form-control date-picker-quick"
-          value={this.state.selectedDate}
-          placeholder="Chọn ngày khám..."
-          minDate={today}
-        />
-      </div>
-    );
-  };
-
   renderDoctorStep = () => {
-    const { selectedDoctor, doctors, timeSlots, selectedTime } = this.state;
+    const { selectedDoctor, doctors, timeSlots, selectedTime, selectedDate } = this.state;
     const { language } = this.props;
 
     return (
@@ -640,78 +517,56 @@ class QuickBookingModal extends Component {
         <h4 className="step-title">
           <i className="fas fa-user-md"></i> Chọn bác sĩ
         </h4>
-        <p className="step-description">Chọn bác sĩ bạn muốn khám</p>
+        <p className="step-description">Chọn bác sĩ bạn muốn khám và ngày khám</p>
         <Select
           value={selectedDoctor}
           onChange={this.handleSelectDoctor}
           options={doctors}
           placeholder="Chọn bác sĩ..."
           className="select-doctor"
-          isLoading={doctors.length === 0}
         />
 
-        {/* Hiển thị thông báo khi không có bác sĩ nào thoả mãn */}
+        {/* Chọn ngày trong cùng bước bác sĩ */}
+        <div className="doctor-date-wrapper">
+          <DatePicker
+            onChange={this.handleSelectDate}
+            className="form-control date-picker-quick"
+            value={selectedDate}
+            placeholder="Chọn ngày khám..."
+            minDate={this.getToday()}
+          />
+        </div>
+
         {!selectedDoctor && doctors.length === 0 && (
-          <div
-            style={{
-              marginTop: '15px',
-              padding: '10px',
-              backgroundColor: '#fff3cd',
-              border: '1px solid #ffc107',
-              borderRadius: '4px',
-              color: '#856404',
-            }}
-          >
+          <div className="no-doctor-alert">
             <p>
               <i className="fas fa-info-circle"></i> Không có bác sĩ nào thoả
-              mãn điều kiện
+              mãn điều kiện, hãy chọn chuyên khoa và cơ sở khác
             </p>
           </div>
         )}
 
         {/* Hiển thị giá khám khi đã chọn bác sĩ */}
-        {selectedDoctor &&
-          selectedDoctor.data &&
-          selectedDoctor.data.Doctor_Info && (
-            <div
-              style={{
-                marginTop: '15px',
-                padding: '10px',
-                backgroundColor: '#e8f4f8',
-                border: '1px solid #b3e5fc',
-                borderRadius: '4px',
-              }}
-            >
-              <p>
-                <strong>
-                  {language === LANGUAGES.VI
-                    ? 'Giá khám: '
-                    : 'Examination Fee: '}
-                </strong>
-                <span
-                  style={{
-                    color: '#d32f2f',
-                    fontSize: '16px',
-                    fontWeight: 'bold',
-                  }}
-                >
-                  {selectedDoctor.data.Doctor_Info.priceTypeData &&
-                  language === LANGUAGES.VI
-                    ? selectedDoctor.data.Doctor_Info.priceTypeData.valueVi +
-                      ' VND'
-                    : selectedDoctor.data.Doctor_Info.priceTypeData &&
-                      language === LANGUAGES.EN
-                    ? selectedDoctor.data.Doctor_Info.priceTypeData.valueEn +
-                      ' $'
-                    : 'N/A'}
-                </span>
-              </p>
-            </div>
-          )}
+        {selectedDoctor && selectedDoctor.data && (
+          <div className="doctor-fee-box">
+            <p>
+              <strong>
+                {language === LANGUAGES.VI
+                  ? 'Giá khám: '
+                  : 'Examination Fee: '}
+              </strong>
+              <span className="fee-value">
+                {selectedDoctor.data.fee != null
+                  ? `${selectedDoctor.data.fee} VND`
+                  : 'N/A'}
+              </span>
+            </p>
+          </div>
+        )}
 
-        {/* Khi chọn bác sĩ nhưng có timeSlots */}
-        {selectedDoctor && timeSlots.length > 0 && (
-          <div className="time-slots-section" style={{ marginTop: '15px' }}>
+        {/* Khi chọn bác sĩ và ngày, có timeSlots */}
+        {selectedDoctor && selectedDate && timeSlots.length > 0 && (
+          <div className="time-slots-section">
             <h5 className="time-title">
               <i className="fas fa-clock"></i> Chọn giờ khám
             </h5>
@@ -725,34 +580,41 @@ class QuickBookingModal extends Component {
                       : ''
                   }`}
                   onClick={() => this.handleSelectTime(time)}
-                  style={{
-                    cursor: 'pointer',
-                    padding: '10px',
-                    margin: '5px',
-                    border: '1px solid #ddd',
-                    borderRadius: '4px',
-                    textAlign: 'center',
-                  }}
                 >
                   <i className="far fa-clock"></i> {time.label}
                 </div>
               ))}
             </div>
+            {selectedTime && (
+              <div className="time-queue-hint">
+                {(() => {
+                  const maxPatient = selectedTime.data?.maxPatient;
+                  const activeBookings = this.getActiveBookingCount(selectedTime.data);
+                  const yourNumber = maxPatient
+                    ? Math.min(activeBookings + 1, maxPatient)
+                    : activeBookings + 1;
+                  if (!maxPatient) {
+                    return (
+                      <span>
+                        Số thứ tự dự kiến của bạn: {yourNumber}
+                      </span>
+                    );
+                  }
+
+                  return (
+                    <span>
+                      Hiện có {activeBookings}/{maxPatient} người đã đăng ký. Số thứ tự dự kiến của bạn: {yourNumber}/{maxPatient}.
+                    </span>
+                  );
+                })()}
+              </div>
+            )}
           </div>
         )}
 
-        {/* Khi chọn bác sĩ nhưng không có timeSlots */}
-        {selectedDoctor && timeSlots.length === 0 && (
-          <div
-            style={{
-              marginTop: '15px',
-              padding: '10px',
-              backgroundColor: '#f8d7da',
-              border: '1px solid #f5c6cb',
-              borderRadius: '4px',
-              color: '#721c24',
-            }}
-          >
+        {/* Khi chọn bác sĩ và ngày, nhưng không có timeSlots */}
+        {selectedDoctor && selectedDate && timeSlots.length === 0 && (
+          <div className="no-time-slot-alert">
             <p>
               <i className="fas fa-calendar-times"></i> Hôm nay bác sĩ không có
               lịch khám
@@ -781,12 +643,10 @@ class QuickBookingModal extends Component {
           <div className="summary-item">
             <strong>Bác sĩ:</strong> {this.state.selectedDoctor?.label}
           </div>
-          {this.state.selectedDoctor?.data?.Doctor_Info?.priceTypeData && (
+          {this.state.selectedDoctor?.data?.fee != null && (
             <div className="summary-item">
               <strong>Giá khám:</strong>{' '}
-              {this.props.language === LANGUAGES.VI
-                ? `${this.state.selectedDoctor.data.Doctor_Info.priceTypeData.valueVi} VND`
-                : `${this.state.selectedDoctor.data.Doctor_Info.priceTypeData.valueEn} $`}
+              {`${this.state.selectedDoctor.data.fee} VND`}
             </div>
           )}
           <div className="summary-item">
@@ -807,8 +667,8 @@ class QuickBookingModal extends Component {
             <input
               className="form-control"
               value={this.state.fullName}
-              onChange={(event) => this.handleOnChangeInput(event, 'fullName')}
-              placeholder="Nhập họ và tên"
+              readOnly
+              placeholder="Họ và tên"
             />
           </div>
 
@@ -819,10 +679,8 @@ class QuickBookingModal extends Component {
             <input
               className="form-control"
               value={this.state.phoneNumber}
-              onChange={(event) =>
-                this.handleOnChangeInput(event, 'phoneNumber')
-              }
-              placeholder="Nhập số điện thoại"
+              readOnly
+              placeholder="Số điện thoại"
             />
           </div>
 
@@ -833,8 +691,8 @@ class QuickBookingModal extends Component {
             <input
               className="form-control"
               value={this.state.email}
-              onChange={(event) => this.handleOnChangeInput(event, 'email')}
-              placeholder="Nhập email"
+              readOnly
+              placeholder="Email"
             />
           </div>
 
@@ -843,28 +701,18 @@ class QuickBookingModal extends Component {
             <input
               className="form-control"
               value={this.state.address}
-              onChange={(event) => this.handleOnChangeInput(event, 'address')}
-              placeholder="Nhập địa chỉ"
+              readOnly
+              placeholder="Địa chỉ"
             />
           </div>
 
           <div className="col-6 form-group">
             <label>Ngày sinh</label>
             <DatePicker
-              onChange={this.handleOnDatePicker}
               className="form-control"
               value={this.state.birthday}
-              placeholder="Chọn ngày sinh"
-            />
-          </div>
-
-          <div className="col-6 form-group">
-            <label>Giới tính</label>
-            <Select
-              value={this.state.selectedGender}
-              onChange={this.handleChangeGender}
-              options={this.state.genders}
-              placeholder="Chọn giới tính"
+              disabled={true}
+              placeholder="Ngày sinh"
             />
           </div>
 
@@ -904,7 +752,7 @@ class QuickBookingModal extends Component {
                 <h3>
                   <i className="fas fa-calendar-alt"></i> Đặt lịch khám nhanh
                 </h3>
-                <p>Chỉ 5 bước đơn giản để đặt lịch khám bệnh</p>
+                <p>Chỉ 4 bước đơn giản để đặt lịch khám bệnh</p>
               </div>
               <span className="close-btn" onClick={closeModal}>
                 <i className="fas fa-times"></i>
@@ -923,13 +771,13 @@ class QuickBookingModal extends Component {
                 </button>
               )}
 
-              {this.state.currentStep < 5 && (
+              {this.state.currentStep < 4 && (
                 <button className="btn-next" onClick={this.nextStep}>
                   Tiếp tục <i className="fas fa-arrow-right"></i>
                 </button>
               )}
 
-              {this.state.currentStep === 5 && (
+              {this.state.currentStep === 4 && (
                 <button
                   className="btn-confirm"
                   onClick={this.handleConfirmBooking}

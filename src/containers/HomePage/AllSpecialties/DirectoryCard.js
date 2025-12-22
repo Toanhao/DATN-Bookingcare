@@ -10,14 +10,7 @@ const DirectoryCard = ({ type = 'specialty', item = {}, onClick = () => {}, lang
   // compute display name (handle doctor positions)
   const getDisplayName = () => {
     if (type === 'doctor') {
-      const pos = item.positionData || item.position || {};
-      const nameVi = pos.valueVi
-        ? `${pos.valueVi}, ${item.lastName || ''} ${item.firstName || ''}`.trim()
-        : `${item.lastName || ''} ${item.firstName || ''}`.trim();
-      const nameEn = pos.valueEn
-        ? `${pos.valueEn}, ${item.firstName || ''} ${item.lastName || ''}`.trim()
-        : `${item.firstName || ''} ${item.lastName || ''}`.trim();
-      return language === 'vi' ? nameVi : nameEn;
+      return item.fullName || 'Bác sĩ';
     }
     return item.name || item.title || '';
   };

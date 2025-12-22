@@ -15,8 +15,7 @@ const getAllUsers = (inputId) => {
 };
 
 const createNewUserService = (data) => {
-  console.log('check data from service: ', data);
-  return axios.post(`/api/users/create`, data); // Admin tạo user với role tùy chỉnh
+  return axios.post(`/api/users/register`, data); // Admin tạo user với role tùy chỉnh
 };
 
 const deleteUserService = (userId) => {
@@ -51,6 +50,12 @@ const getTopDoctorHomeService = (limit) => {
 
 const getAllDoctors = () => {
   return axios.get(`/api/doctors`);
+};
+
+// Filtered doctors by clinicId and specialtyId; lean reduces payload
+const getDoctorsFiltered = (clinicId, specialtyId, lean = true) => {
+  const params = { clinicId, specialtyId, lean };
+  return axios.get('/api/doctors', { params });
 };
 
 const getAllDoctorsUser = () => {
@@ -99,6 +104,18 @@ const createBooking = (data) => {
 
 const postVerifyBookAppointment = (data) => {
   return axios.post('/api/verify-book-appointment', data);
+};
+
+const postConfirmBooking = (token) => {
+  return axios.get('/api/bookings/confirm', {
+    params: { token },
+  });
+};
+
+const postCancelBooking = (token) => {
+  return axios.get('/api/bookings/cancel', {
+    params: { token },
+  });
 };
 
 const createNewSpecialty = (data) => {
@@ -163,6 +180,7 @@ export {
   editUserService,
   getTopDoctorHomeService,
   getAllDoctors,
+  getDoctorsFiltered,
   getAllDoctorsUser,
   saveDetailDoctorService,
   getDetailInforDoctor,
@@ -173,6 +191,8 @@ export {
   postPatientBookAppointment,
   createBooking,
   postVerifyBookAppointment,
+  postConfirmBooking,
+  postCancelBooking,
   createNewSpecialty,
   getAllSpecialty,
   createNewHandbook,
