@@ -4,7 +4,8 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import './BookingHistoryModal.scss';
 import { Modal } from 'reactstrap';
-import { getPatientBookingHistory, cancelPatientBooking } from '../../../services/userService';
+import { getPatientBookingHistory, cancelPatientBooking, getBookingDetails } from '../../../services/userService';
+import ExaminationDetailModal from '../../System/Doctor/ExaminationDetailModal';
 import moment from 'moment';
 import { toast } from 'react-toastify';
 
@@ -18,6 +19,8 @@ class BookingHistoryModal extends Component {
       isLoading: false,
       showConfirmCancel: false,
       selectedBooking: null,
+      showDetailModal: false,
+      selectedBookingDetail: null,
     };
   }
 
@@ -117,6 +120,31 @@ class BookingHistoryModal extends Component {
     this.setState({ showConfirmCancel: false, selectedBooking: null });
   };
 
+  handleViewDetails = async (booking) => {
+    try {
+      // Lấy chi tiết đầy đủ của booking từ API
+      let res = await getBookingDetails(booking.id);
+      if (res && res.id) {
+        this.setState({
+          showDetailModal: true,
+          selectedBookingDetail: res,
+        });
+      } else {
+        toast.error('Lỗi khi tải chi tiết khám!');
+      }
+    } catch (error) {
+      console.error('Error fetching booking details:', error);
+      toast.error('Lỗi khi tải chi tiết khám!');
+    }
+  };
+
+  closeDetailModal = () => {
+    this.setState({
+      showDetailModal: false,
+      selectedBookingDetail: null,
+    });
+  };
+
   getStatusText = (status) => {
     switch (status) {
       case 'PENDING':
@@ -134,7 +162,7 @@ class BookingHistoryModal extends Component {
 
   render() {
     const { isOpen, closeModal } = this.props;
-    const { filteredBookings, activeTab, isLoading, showConfirmCancel } = this.state;
+    const { filteredBookings, activeTab, isLoading, showConfirmCancel, showDetailModal, selectedBookingDetail } = this.state;
 
     return (
       <>
@@ -275,6 +303,17 @@ class BookingHistoryModal extends Component {
                           </button>
                         </div>
                       )}
+
+                      {activeTab === 'completed' && (
+                        <div className="booking-actions">
+                          <button
+                            className="detail-btn"
+                            onClick={() => this.handleViewDetails(booking)}
+                          >
+                            <i className="fas fa-eye"></i> Xem chi tiết
+                          </button>
+                        </div>
+                      )}
                     </div>
                   );
                 })}
@@ -311,6 +350,12 @@ class BookingHistoryModal extends Component {
             </button>
           </div>
         </Modal>
+
+        <ExaminationDetailModal
+          isOpen={showDetailModal}
+          onClose={this.closeDetailModal}
+          bookingDetail={selectedBookingDetail}
+        />
       </>
     );
   }

@@ -229,6 +229,7 @@
         .booking-actions {
           display: flex;
           justify-content: flex-end;
+          gap: 10px;
           padding-top: 15px;
           border-top: 1px solid #e9ecef;
 
@@ -244,6 +245,29 @@
 
             i {
               margin-right: 8px;
+            }
+
+            &:active {
+              transform: translateY(0);
+            }
+          }
+
+          .detail-btn {
+            padding: 10px 20px;
+            background: #007bff;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s ease;
+
+            i {
+              margin-right: 8px;
+            }
+
+            &:hover {
+              background: #0056b3;
             }
 
             &:active {

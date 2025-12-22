@@ -172,6 +172,36 @@ const cancelPatientBooking = (data) => {
   return axios.post('/api/cancel-patient-booking', data);
 };
 
+// Doctor booking management
+const getDoctorBookings = ({ doctorId, workDate, status }) => {
+  return axios.get('/api/doctor/bookings', { params: { doctorId, workDate, status } });
+};
+
+const getBookingDetails = (bookingId) => {
+  return axios.get(`/api/doctor/bookings/${bookingId}`);
+};
+
+// Examination flow
+const createMedicalRecord = (data) => {
+  return axios.post('/api/medical-records', data);
+};
+
+const createPrescription = (data) => {
+  return axios.post('/api/prescriptions', data);
+};
+
+const createBill = (data) => {
+  return axios.post('/api/bills', data);
+};
+
+const payBill = (data) => {
+  return axios.patch('/api/bills/pay', data);
+};
+
+const getMedicines = () => {
+  return axios.get('/api/medicines');
+};
+
 export {
   handleLoginApi,
   getAllUsers,
@@ -206,4 +236,11 @@ export {
   postSendRemedy,
   getPatientBookingHistory,
   cancelPatientBooking,
+  getDoctorBookings,
+  getBookingDetails,
+  createMedicalRecord,
+  createPrescription,
+  createBill,
+  payBill,
+  getMedicines,
 };
