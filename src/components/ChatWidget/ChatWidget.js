@@ -390,9 +390,14 @@ const ChatWidget = () => {
   };
 
   useEffect(() => {
-    if (reduxLang && reduxLang !== language) {
-      setLanguage(reduxLang);
-    }
+    if (!reduxLang) return;
+
+    setLanguage((prev) => {
+      if (prev !== reduxLang) {
+        return reduxLang;
+      }
+      return prev;
+    });
   }, [reduxLang]);
 
   return (

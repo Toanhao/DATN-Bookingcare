@@ -4,7 +4,7 @@ import { Route, Switch } from 'react-router-dom';
 import ManageSchedule from '../containers/System/Doctor/ManageSchedule';
 import Header from '../containers/Header/Header';
 import ManagePatient from '../containers/System/Doctor/ManagePatient';
-import ManageHandbook from '../containers/System/HandBook/ManageHandbook';
+import ManageHandbook from '../containers/System//Doctor/HandBook/ManageHandbook';
 class Doctor extends Component {
   render() {
     const { isLoggedIn } = this.props;

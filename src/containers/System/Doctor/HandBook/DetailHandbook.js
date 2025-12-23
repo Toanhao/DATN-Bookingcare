@@ -3,10 +3,13 @@
 import { Component } from 'react';
 import { connect } from 'react-redux';
 import './DetailHandbook.scss';
-import HomeHeader from '../../HomePage/HomeHeader/HomeHeader';
-import { getDetailHandbookById, getAllHandbook } from '../../../services/userService';
+import HomeHeader from '../../../HomePage/HomeHeader/HomeHeader';
+import {
+  getDetailHandbookById,
+  getAllHandbook,
+} from '../../../../services/userService';
 import _ from 'lodash';
-import HomeFooter from '../../HomePage/HomeFooter/HomeFooter';
+import HomeFooter from '../../../HomePage/HomeFooter/HomeFooter';
 
 class DetailHandbook extends Component {
   constructor(props) {
@@ -39,7 +42,9 @@ class DetailHandbook extends Component {
         // Fetch detail handbook
         const detailRes = await getDetailHandbookById(id);
         this.setState({
-          dataDetailHandbook: detailRes?.data ? detailRes.data : detailRes || {},
+          dataDetailHandbook: detailRes?.data
+            ? detailRes.data
+            : detailRes || {},
         });
 
         // Fetch all handbooks for sidebar
@@ -51,7 +56,7 @@ class DetailHandbook extends Component {
         console.log('Error fetching handbooks:', error);
       }
     }
-  }
+  };
 
   handleSelectHandbook = (handbookId) => {
     if (this.props.history) {
@@ -62,7 +67,7 @@ class DetailHandbook extends Component {
   render() {
     let { dataDetailHandbook, allHandbooks } = this.state;
     let currentId = this.props.match?.params?.id;
-    
+
     // Filter out current handbook from the list
     let otherHandbooks = allHandbooks.filter(
       (handbook) => handbook.id !== parseInt(currentId)
@@ -80,10 +85,14 @@ class DetailHandbook extends Component {
                     {dataDetailHandbook.image && (
                       <div
                         className="handbook-image"
-                        style={{ backgroundImage: `url(${dataDetailHandbook.image})` }}
+                        style={{
+                          backgroundImage: `url(${dataDetailHandbook.image})`,
+                        }}
                       ></div>
                     )}
-                    <h1 className="handbook-title">{dataDetailHandbook.title}</h1>
+                    <h1 className="handbook-title">
+                      {dataDetailHandbook.title}
+                    </h1>
                   </div>
                   <div
                     className="handbook-html"
@@ -97,9 +106,7 @@ class DetailHandbook extends Component {
 
             <div className="handbook-sidebar">
               <div className="sidebar-card">
-                <h3 className="sidebar-title">
-                  Bài viết khác
-                </h3>
+                <h3 className="sidebar-title">Bài viết khác</h3>
                 <div className="sidebar-list">
                   {otherHandbooks && otherHandbooks.length > 0 ? (
                     otherHandbooks.map((handbook, index) => (
@@ -116,7 +123,9 @@ class DetailHandbook extends Component {
                           )}
                         </div>
                         <div className="sidebar-item-info">
-                          <h4 className="sidebar-item-title">{handbook.title}</h4>
+                          <h4 className="sidebar-item-title">
+                            {handbook.title}
+                          </h4>
                         </div>
                       </div>
                     ))

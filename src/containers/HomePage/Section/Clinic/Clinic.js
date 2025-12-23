@@ -8,7 +8,7 @@ import { getAllClinic } from '../../../../services/userService';
 import { withRouter } from 'react-router';
 import { Link } from 'react-router-dom';
 
-class MedicalFacility extends Component {
+class Clinic extends Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -88,6 +88,4 @@ const mapDispatchToProps = (dispatch) => {
   return {};
 };
 
-export default withRouter(
-  connect(mapStateToProps, mapDispatchToProps)(MedicalFacility)
-);
+export default withRouter(connect(mapStateToProps, mapDispatchToProps)(Clinic));

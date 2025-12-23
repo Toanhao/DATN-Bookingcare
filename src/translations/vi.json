@@ -33,7 +33,9 @@
       "specialty": "Chuyên khoa",
       "manage-specialty": "Quản lý chuyên khoa",
       "handbook": "Cẩm nang sức khoẻ",
-      "manage-handbook": "Quản lý bài viết"
+      "manage-handbook": "Quản lý bài viết",
+      "Statistical": "Thống Kê",
+      "ViewStatistics": "Xem Thống Kê"
     },
     "doctor": {
       "manage-schedule": "Quản lý kế hoạch khám bệnh",

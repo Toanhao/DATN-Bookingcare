@@ -409,7 +409,6 @@ class ManagePatient extends Component {
               <th>Bệnh nhân</th>
               <th>Ngày giờ khám</th>
               <th>Lý do khám</th>
-              <th>Trạng thái</th>
               <th>Thao tác</th>
             </tr>
           </thead>
@@ -438,7 +437,6 @@ class ManagePatient extends Component {
             <th>Bệnh nhân</th>
             <th>Ngày giờ khám</th>
             <th>Lý do khám</th>
-            <th>Trạng thái</th>
             <th>Thao tác</th>
           </tr>
         </thead>
@@ -449,14 +447,13 @@ class ManagePatient extends Component {
               <td>{b.patient?.user?.fullName}</td>
               <td>{this.formatDateTime(b)}</td>
               <td>{b.reason}</td>
-              <td>{b.status}</td>
                 <td>
                   {isPending ? (
                     <button
                       className="btn-primary"
                       onClick={() => this.openExamination(b)}
                     >
-                      Khám
+                      Khám xong
                     </button>
                   ) : (
                     <button
@@ -588,11 +585,10 @@ class ManagePatient extends Component {
                     <tr>
                       <td className="label">Địa chỉ</td>
                       <td className="value">{patientUser?.address || '---'}</td>
-                      <td className="label">Trạng thái</td>
+                      <td className="label">Bác sĩ</td>
                       <td className="value">
-                        <span className="status-badge">
-                          {bookingDetail?.status || '---'}
-                        </span>
+                        {bookingDetail?.schedule?.doctor?.user?.fullName ||
+                          '---'}
                       </td>
                     </tr>
                   </tbody>

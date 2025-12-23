@@ -33,17 +33,17 @@ const BookingChat = () => {
   const chatContainerRef = useRef(null);
 
   useEffect(() => {
+    const recognition = recognitionRef.current;
+
     return () => {
-      if (recognitionRef.current) {
+      if (recognition) {
         try {
-          recognitionRef.current.onresult = null;
-          recognitionRef.current.onend = null;
-          recognitionRef.current.onerror = null;
+          recognition.onresult = null;
+          recognition.onend = null;
+          recognition.onerror = null;
         } catch (e) {}
       }
     };
-    // run once
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // Handle click outside to close chat
@@ -195,9 +195,14 @@ const BookingChat = () => {
   };
 
   useEffect(() => {
-    if (reduxLang && reduxLang !== language) {
-      setLanguage(reduxLang);
-    }
+    if (!reduxLang) return;
+
+    setLanguage((prev) => {
+      if (prev !== reduxLang) {
+        return reduxLang;
+      }
+      return prev;
+    });
   }, [reduxLang]);
 
   return (
@@ -250,7 +255,8 @@ const BookingChat = () => {
           {messages.length === 0 && (
             <div className="empty">
               <div>
-                Chào bạn! Bạn có thể hỏi thông tin về đặt lịch khám, bác sĩ, và các thông tin liên quan.
+                Chào bạn! Bạn có thể hỏi thông tin về đặt lịch khám, bác sĩ, và
+                các thông tin liên quan.
               </div>
             </div>
           )}

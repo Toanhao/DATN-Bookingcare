@@ -3,8 +3,8 @@ import { connect } from 'react-redux';
 import './ManageSpecialty.scss';
 import MarkDownIt from 'markdown-it';
 import MdEditor from 'react-markdown-editor-lite';
-import { CommonUtils } from '../../../utils';
-import { createNewSpecialty } from '../../../services/userService';
+import { CommonUtils } from '../../../../utils';
+import { createNewSpecialty } from '../../../../services/userService';
 import { toast } from 'react-toastify';
 
 const mdParser = new MarkDownIt(/* Markdown-it options */);

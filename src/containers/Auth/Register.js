@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { push } from 'connected-react-router';
-import * as actions from '../../store/actions';
 import { createNewUserService } from '../../services/userService';
 import { CommonUtils } from '../../utils';
 import { toast } from 'react-toastify';

@@ -7,7 +7,6 @@ import './UserRedux.scss';
 import Lightbox from 'react-image-lightbox';
 import 'react-image-lightbox/style.css'; // This only needs to be imported once in your app
 import TableManageUser from './TableManageUser';
-import { Buffer } from 'buffer';
 
 class UserRedux extends Component {
   constructor(props) {
@@ -195,7 +194,6 @@ class UserRedux extends Component {
       address,
       birthday,
       gender,
-      position,
       role,
     } = this.state;
 

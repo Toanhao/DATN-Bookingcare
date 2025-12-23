@@ -4,8 +4,9 @@ import { Redirect, Route, Switch } from "react-router-dom";
 import Header from "../containers/Header/Header";
 import UserRedux from "../containers/System/Admin/UserRedux";
 import ManageDoctor from "../containers/System/Admin/ManageDoctor";
-import ManageSpecialty from "../containers/System/Specialty/ManageSpecialty";
-import ManageClinic from "../containers/System/Clinic/ManageClinic";
+import ManageSpecialty from "../containers/System/Admin/Specialty/ManageSpecialty";
+import ManageClinic from "../containers/System/Admin/Clinic/ManageClinic";
+import Statistics from "../containers/System/Admin/Statistics/Statistics";
 class System extends Component {
     render() {
         const { systemMenuPath, isLoggedIn } = this.props;
@@ -25,8 +26,8 @@ class System extends Component {
                     component={ManageSpecialty}
                   />
                   <Route
-                    path="/system/manage-specialty"
-                    component={ManageSpecialty}
+                    path="/system/view-statistics"
+                    component={Statistics}
                   />
 
                   <Route

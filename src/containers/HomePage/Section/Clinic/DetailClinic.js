@@ -3,13 +3,13 @@
 import { Component } from 'react';
 import { connect } from 'react-redux';
 import './DetailClinic.scss';
-import HomeHeader from '../../HomePage/HomeHeader/HomeHeader';
-import ProfileDoctor from '../Doctor/ProfileDoctor';
-import DoctorSchedule from '../Doctor/DoctorSchedule';
-import DoctorExtraInfor from '../Doctor/DoctorExtraInfor';
-import { getAllDetailClinicById } from '../../../services/userService';
+import HomeHeader from '../../HomeHeader/HomeHeader';
+import ProfileDoctor from '../../../Patient/Doctor/ProfileDoctor';
+import DoctorSchedule from '../../../Patient/Doctor/DoctorSchedule';
+import DoctorExtraInfor from '../../../Patient/Doctor/DoctorExtraInfor';
+import { getAllDetailClinicById } from '../../../../services/userService';
 import _ from 'lodash';
-import HomeFooter from '../../HomePage/HomeFooter/HomeFooter';
+import HomeFooter from '../../HomeFooter/HomeFooter';
 
 class DetailClinic extends Component {
   constructor(props) {

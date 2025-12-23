@@ -3,14 +3,13 @@
 import { Component } from 'react';
 import { connect } from 'react-redux';
 import './DetailSpecialty.scss';
-import HomeHeader from '../../HomePage/HomeHeader/HomeHeader';
-import ProfileDoctor from '../Doctor/ProfileDoctor';
-import DoctorSchedule from '../Doctor/DoctorSchedule';
-import DoctorExtraInfor from '../Doctor/DoctorExtraInfor';
-import { getAllDetailSpecialtyById } from '../../../services/userService';
+import HomeHeader from '../../../HomePage/HomeHeader/HomeHeader';
+import ProfileDoctor from '../../../Patient/Doctor/ProfileDoctor';
+import DoctorSchedule from '../../../Patient/Doctor/DoctorSchedule';
+import DoctorExtraInfor from '../../../Patient/Doctor/DoctorExtraInfor';
+import { getAllDetailSpecialtyById } from '../../../../services/userService';
 import _ from 'lodash';
-import { LANGUAGES } from '../../../utils';
-import HomeFooter from '../../HomePage/HomeFooter/HomeFooter';
+import HomeFooter from '../../../HomePage/HomeFooter/HomeFooter';
 
 class DetailSpecialty extends Component {
   constructor(props) {
@@ -52,15 +51,10 @@ class DetailSpecialty extends Component {
     }
   }
 
-  async componentDidUpdate(prevProps, prevState, snapshot) {
-    if (this.props.language !== prevProps.language) {
-    }
-  }
 
   render() {
     let { arrDoctorId, dataDetailSpecialty } = this.state;
     // console.log('check state: ', this.state )
-    let { language } = this.props;
     return (
       <div className="detail-specialty-container">
         <HomeHeader />
@@ -111,7 +105,6 @@ class DetailSpecialty extends Component {
 
 const mapStateToProps = (state) => {
   return {
-    language: state.app.language,
   };
 };
 

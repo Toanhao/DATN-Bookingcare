@@ -6,11 +6,10 @@ import './ManageSchedule.scss';
 import { FormattedMessage } from 'react-intl';
 import * as actions from '../../../store/actions';
 import Select from 'react-select';
-import { LANGUAGES, USER_ROLE } from '../../../utils';
+import { USER_ROLE } from '../../../utils';
 import DatePicker from '../../../components/Input/DatePicker';
 import moment from 'moment';
 import { toast } from 'react-toastify';
-import _ from 'lodash';
 import { createScheduleBulkNew, getTimeSlots, getSchedules } from '../../../services/userService';
 
 // import Header from "../containers/Header/Header";
@@ -25,7 +24,7 @@ class ManageSchedule extends Component {
       rangeTime: [],
       maxPatient: 2,
       loadingSlots: false,
-      minDate: moment().subtract(1, 'days'),
+      minDate: "today",
     };
   }
 
@@ -47,7 +46,7 @@ class ManageSchedule extends Component {
     }
     
     // Auto-select doctor for DOCTOR role
-    const { userInfo, language } = this.props;
+    const { userInfo } = this.props;
     if (userInfo?.role === 'DOCTOR') {
       const name = userInfo.fullName ;
       this.setState({
@@ -198,8 +197,6 @@ class ManageSchedule extends Component {
   };
   render() {
     let { rangeTime, maxPatient, loadingSlots } = this.state;
-    let { language } = this.props;
-    let yesterday = new Date(new Date().setDate(new Date().getDate() - 1));
     return (
       <div className="manage-schedule-container">
         <div className="m-s-title">
@@ -229,7 +226,7 @@ class ManageSchedule extends Component {
                 onChange={this.handleOnChangeDatePicker}
                 className="form-control"
                 value={this.state.currentDate}
-                minDate={yesterday}
+                minDate='today'
               />
             </div>
             <div className="col-6 form-group">
@@ -291,7 +288,6 @@ const mapStateToProps = (state) => {
     isLoggedIn: state.user.isLoggedIn,
     userInfo: state.user.userInfo,
     allDoctors: state.admin.allDoctors,
-    language: state.app.language,
   };
 };
 

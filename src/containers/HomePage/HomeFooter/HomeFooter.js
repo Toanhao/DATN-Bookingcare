@@ -50,17 +50,6 @@ class HomeFooter extends Component {
               <li>
                 <Link to="/history">Lịch sử khám</Link>
               </li>
-              <li>
-                <a
-                  role="button"
-                  onClick={(e) => {
-                    e.preventDefault();
-                    this.handleSupportClick();
-                  }}
-                >
-                  Hỗ trợ
-                </a>
-              </li>
             </ul>
           </div>
 

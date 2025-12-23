@@ -38,6 +38,17 @@ export const adminMenu = [
       },
     ],
   },
+
+  {
+    //Xem Thống Kê
+    name: 'menu.admin.Statistical',
+    menus: [
+      {
+        name: 'menu.admin.ViewStatistics',
+        link: '/system/view-statistics',
+      },
+    ],
+  },
 ];
 
 export const doctorMenu = [

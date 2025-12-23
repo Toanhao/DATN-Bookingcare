@@ -3,8 +3,8 @@ import { connect } from 'react-redux';
 import './ManageClinic.scss';
 import MarkDownIt from 'markdown-it';
 import MdEditor from 'react-markdown-editor-lite';
-import { CommonUtils } from '../../../utils';
-import { createNewClinic } from '../../../services/userService';
+import { CommonUtils } from '../../../../utils';
+import { createNewClinic } from '../../../../services/userService';
 import { toast } from 'react-toastify';
 
 const mdParser = new MarkDownIt(/* Markdown-it options */);

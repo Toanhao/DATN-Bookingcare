@@ -1,0 +1,59 @@
+import axios from '../axios';
+
+const statisticService = {
+  /**
+   * Lấy danh sách cơ sở y tế
+   */
+  getClinics() {
+    return axios.get('/api/clinics');
+  },
+
+  /**
+   * Lấy danh sách chuyên khoa
+   */
+  getSpecialties() {
+    return axios.get('/api/specialties');
+  },
+
+  /**
+   * Lấy dữ liệu dashboard (KPI)
+   */
+  getDashboardKPI(params) {
+    return axios.get('/api/statistics/dashboard', { params });
+  },
+
+  /**
+   * Lấy dữ liệu time series (bookings & revenue)
+   */
+  getTimeSeries(params, metric) {
+    return axios.get('/api/statistics/time-series', { 
+      params: {
+        ...params,
+        metric
+      }
+    });
+  },
+
+  /**
+   * Lấy thống kê bác sĩ
+   */
+  getTopDoctors(params) {
+    return axios.get('/api/statistics/doctors', { params });
+  },
+
+  /**
+   * Lấy thống kê cơ sở y tế
+   */
+  getClinicStats(params) {
+    return axios.get('/api/statistics/clinics', { params });
+  },
+
+  /**
+   * Lấy thống kê chuyên khoa
+   */
+  getSpecialtyStats(params) {
+    return axios.get('/api/statistics/specialties', { params });
+  },
+};
+
+export default statisticService;

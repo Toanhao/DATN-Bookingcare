@@ -11,7 +11,7 @@ import 'react-markdown-editor-lite/lib/index.css';
 import { FormattedMessage } from 'react-intl';
 import Select from 'react-select';
 import { getDetailInforDoctor } from '../../../services/userService';
-import { CRUD_ACTIONS, LANGUAGES } from '../../../utils';
+import { CRUD_ACTIONS } from '../../../utils';
 import { toast } from 'react-toastify';
 
 const mdParser = new MarkDownIt(/* Markdown-it options */);
@@ -106,7 +106,14 @@ class ManageDoctor extends Component {
   };
 
   handleSaveContentMarkdown = () => {
-    let { hasOldData, selectedDoctor, description, contentMarkdown, fee, selectedClinic, selectedSpecialty } = this.state;
+    let {
+      hasOldData,
+      selectedDoctor,
+      description,
+      fee,
+      selectedClinic,
+      selectedSpecialty,
+    } = this.state;
 
     // Validate
     if (!selectedDoctor || !selectedDoctor.value) {
@@ -163,9 +170,13 @@ class ManageDoctor extends Component {
       let res = await getDetailInforDoctor(selectedDoctor.value);
       if (res && res.errCode === 0 && res.data) {
         const doctor = res.data;
-        
-        let selectedSpecialty = listSpecialty.find((item) => item && item.value === doctor.specialtyId);
-        let selectedClinic = listClinic.find((item) => item && item.value === doctor.clinicId);
+
+        let selectedSpecialty = listSpecialty.find(
+          (item) => item && item.value === doctor.specialtyId
+        );
+        let selectedClinic = listClinic.find(
+          (item) => item && item.value === doctor.clinicId
+        );
 
         this.setState({
           contentMarkdown: doctor.bio || '',
@@ -274,9 +285,7 @@ class ManageDoctor extends Component {
             />
           </div>
           <div className="col-4 form-group">
-            <label>
-              Giá khám (VNĐ)
-            </label>
+            <label>Giá khám (VNĐ)</label>
             <input
               className="form-control"
               type="text"
@@ -322,7 +331,6 @@ class ManageDoctor extends Component {
 const mapStateToProps = (state) => {
   return {
     allDoctors: state.admin.allDoctors,
-    language: state.app.language,
     allRequiredDoctorInfor: state.admin.allRequiredDoctorInfor,
   };
 };

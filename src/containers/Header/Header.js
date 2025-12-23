@@ -7,7 +7,7 @@ import * as actions from '../../store/actions';
 import Navigator from '../../components/Navigator';
 import { adminMenu, doctorMenu } from './menuApp';
 import './Header.scss';
-import { LANGUAGES, USER_ROLE } from '../../utils';
+import { LANGUAGES } from '../../utils';
 import { FormattedMessage } from 'react-intl';
 import _ from 'lodash';
 
