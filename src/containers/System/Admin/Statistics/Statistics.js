@@ -2,9 +2,7 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import {
   Line,
-  Bar,
   Area,
-  BarChart,
   ComposedChart,
   XAxis,
   YAxis,
@@ -31,19 +29,17 @@ class Statistics extends Component {
       kpi: {
         totalBookings: 0,
         totalRevenue: 0,
-        todayBookings: 0,
-        todayRevenue: 0,
       },
       timeSeries: [],
-      topDoctors: [],
-      clinicsStats: [],
-      specialtiesStats: [],
+      bookingDetails: [],
 
       // UI State
       loading: false,
-      activeTab: 'clinics', // 'clinics' or 'specialties'
       clinics: [],
       specialties: [],
+      // Pagination
+      currentPage: 1,
+      pageSize: 10,
     };
   }
 
@@ -121,23 +117,56 @@ class Statistics extends Component {
         revenueData
       );
 
-      // Lấy thống kê
-      const doctorsRes = await statisticService.getTopDoctors(params);
-      const clinicsRes = await statisticService.getClinicStats(params);
-      const specialtiesRes = await statisticService.getSpecialtyStats(params);
+      let bookingDetailsList = [];
+      try {
+        const bookingDetailsRes = await statisticService.getBookingDetails({
+          ...params,
+          limit: 50,
+          offset: 0,
+        });
+        bookingDetailsList = bookingDetailsRes.data?.bookings || [];
+      } catch (err) {
+        console.error('Error fetching booking details:', err);
+      }
 
       this.setState({
         kpi: kpiData,
         timeSeries: mergedTimeSeries,
-        topDoctors: doctorsRes.data || [],
-        clinicsStats: clinicsRes.data || [],
-        specialtiesStats: specialtiesRes.data || [],
+        bookingDetails: bookingDetailsList,
         loading: false,
+        currentPage: 1,
       });
     } catch (error) {
       console.error('Error fetching statistics:', error);
       this.setState({ loading: false });
     }
+  };
+
+  // Pagination helpers
+  getPaginatedData = () => {
+    const { bookingDetails, currentPage, pageSize } = this.state;
+    const start = (currentPage - 1) * pageSize;
+    return bookingDetails.slice(start, start + pageSize);
+  };
+
+  getTotalPages = () => {
+    const { bookingDetails, pageSize } = this.state;
+    const total = Math.ceil((bookingDetails?.length || 0) / pageSize);
+    return Math.max(total, 1);
+  };
+
+  changePage = (newPage) => {
+    const total = this.getTotalPages();
+    if (newPage < 1 || newPage > total) return;
+    this.setState({ currentPage: newPage });
+  };
+
+  nextPage = () => {
+    this.changePage(this.state.currentPage + 1);
+  };
+
+  prevPage = () => {
+    this.changePage(this.state.currentPage - 1);
   };
 
   mergeTimeSeriesData = (bookings, revenue) => {
@@ -185,49 +214,41 @@ class Statistics extends Component {
     return new Intl.NumberFormat('vi-VN').format(value);
   };
 
+  formatDateTime = (dateString) => {
+    if (!dateString) return '';
+    const date = new Date(dateString);
+    const day = String(date.getDate()).padStart(2, '0');
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const year = date.getFullYear();
+    return `${day}/${month}/${year}`;
+  };
+
   render() {
     const {
       clinicId,
       specialtyId,
       kpi,
       timeSeries,
-      topDoctors,
-      clinicsStats,
-      specialtiesStats,
+      bookingDetails,
       loading,
-      activeTab,
       clinics,
       specialties,
       startDate,
       endDate,
+      currentPage,
+      pageSize,
     } = this.state;
+
+    const paginatedBookingDetails = this.getPaginatedData();
+    const totalPages = this.getTotalPages();
+    const baseIndex = (currentPage - 1) * pageSize;
 
     return (
       <div className="statistics-container">
         <div className="statistics-header">
-          <h1><i className="fas fa-chart-bar"></i> Dashboard Thống Kê Khám Bệnh</h1>
-        </div>
-
-        {/* TODAY SUMMARY */}
-        <div className="today-summary">
-          <div className="summary-card">
-            <div className="summary-icon"><i className="fas fa-calendar-check"></i></div>
-            <div>
-              <div className="summary-label">Lượt khám hôm nay</div>
-              <div className="summary-value">
-                {this.formatNumber(kpi.todayBookings)}
-              </div>
-            </div>
-          </div>
-          <div className="summary-card">
-            <div className="summary-icon"><i className="fas fa-dollar-sign"></i></div>
-            <div>
-              <div className="summary-label">Doanh thu hôm nay</div>
-              <div className="summary-value">
-                {this.formatCurrency(kpi.todayRevenue)}
-              </div>
-            </div>
-          </div>
+          <h1>
+            <i className="fas fa-chart-bar"></i> Dashboard Thống Kê Khám Bệnh
+          </h1>
         </div>
 
         {/* FILTER BAR */}
@@ -305,7 +326,9 @@ class Statistics extends Component {
             {/* KPI CARDS (theo khoảng thời gian lọc) */}
             <div className="kpi-section">
               <div className="kpi-card">
-                <div className="kpi-icon"><i className="fas fa-clipboard-list"></i></div>
+                <div className="kpi-icon">
+                  <i className="fas fa-clipboard-list"></i>
+                </div>
                 <div className="kpi-content">
                   <div className="kpi-label">Tổng Lượt Khám</div>
                   <div className="kpi-value">
@@ -315,7 +338,9 @@ class Statistics extends Component {
               </div>
 
               <div className="kpi-card">
-                <div className="kpi-icon"><i className="fas fa-money-bill-wave"></i></div>
+                <div className="kpi-icon">
+                  <i className="fas fa-money-bill-wave"></i>
+                </div>
                 <div className="kpi-content">
                   <div className="kpi-label">Tổng Doanh Thu</div>
                   <div className="kpi-value">
@@ -328,7 +353,10 @@ class Statistics extends Component {
             {/* CHARTS */}
             <div className="charts-section">
               <div className="chart-card">
-                <h3><i className="fas fa-chart-line"></i> Lượt Khám & Doanh Thu Theo Ngày</h3>
+                <h3>
+                  <i className="fas fa-chart-line"></i> Lượt Khám & Doanh Thu
+                  Theo Ngày
+                </h3>
                 <ResponsiveContainer width="100%" height={300}>
                   <ComposedChart data={timeSeries}>
                     <CartesianGrid strokeDasharray="3 3" />
@@ -372,124 +400,67 @@ class Statistics extends Component {
               </div>
             </div>
 
-            {/* TOP DOCTORS */}
+            {/* BOOKING DETAILS TABLE */}
             <div className="table-section">
-              <h3><i className="fas fa-user-md"></i> Top 10 Bác Sĩ</h3>
+              <h3>
+                <i className="fas fa-list"></i> Chi Tiết Các Lượt Khám (
+                {this.formatNumber(bookingDetails.length)} lượt)
+              </h3>
               <table className="stats-table">
                 <thead>
                   <tr>
                     <th>STT</th>
-                    <th>Tên Bác Sĩ</th>
+                    <th>Bệnh Nhân</th>
+                    <th>SĐT</th>
+                    <th>Bác Sĩ</th>
                     <th>Chuyên Khoa</th>
                     <th>Cơ Sở</th>
-                    <th>Lượt Khám</th>
+                    <th>Ngày Khám</th>
+                    <th>Giờ Khám</th>
                     <th>Doanh Thu</th>
-                    <th>% Tổng</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {topDoctors.map((doctor, index) => (
-                    <tr key={doctor.doctorId}>
-                      <td>{index + 1}</td>
-                      <td>{doctor.doctorName}</td>
-                      <td>{doctor.specialty}</td>
-                      <td>{doctor.clinic}</td>
-                      <td>{this.formatNumber(doctor.bookingCount)}</td>
-                      <td>{this.formatCurrency(doctor.revenue)}</td>
-                      <td>
-                        {(
-                          (kpi.totalRevenue > 0
-                            ? (doctor.revenue / kpi.totalRevenue) * 100
-                            : 0) || 0
-                        ).toFixed(1)}
-                        %
+                  {bookingDetails.length > 0 ? (
+                    paginatedBookingDetails.map((booking, index) => (
+                      <tr key={booking.id}>
+                        <td>{baseIndex + index + 1}</td>
+                        <td>{booking.patientName}</td>
+                        <td>{booking.patientPhone}</td>
+                        <td>{booking.doctorName}</td>
+                        <td>{booking.specialty}</td>
+                        <td>{booking.clinic}</td>
+                        <td>{this.formatDateTime(booking.workDate)}</td>
+                        <td>{booking.timeSlot}</td>
+                        <td>{this.formatCurrency(booking.revenue)}</td>
+                      </tr>
+                    ))
+                  ) : (
+                    <tr>
+                      <td colSpan="9" style={{ textAlign: 'center' }}>
+                        Không có dữ liệu
                       </td>
                     </tr>
-                  ))}
+                  )}
                 </tbody>
               </table>
-            </div>
-
-            {/* CLINIC & SPECIALTY COMPARISON */}
-            <div className="comparison-section">
-              <div className="tabs">
-                <button
-                  className={`tab-btn ${
-                    activeTab === 'clinics' ? 'active' : ''
-                  }`}
-                  onClick={() => this.setState({ activeTab: 'clinics' })}
-                >
-                  <i className="fas fa-hospital"></i> So Sánh Cơ Sở
-                </button>
-                <button
-                  className={`tab-btn ${
-                    activeTab === 'specialties' ? 'active' : ''
-                  }`}
-                  onClick={() => this.setState({ activeTab: 'specialties' })}
-                >
-                  <i className="fas fa-stethoscope"></i> So Sánh Chuyên Khoa
-                </button>
+              {/* Pagination Controls */}
+              <div className="pagination-controls">
+                <div className="pager">
+                  <button className="pagination-btn" onClick={this.prevPage} disabled={currentPage <= 1}>
+                    <i className="fas fa-chevron-left"></i>
+                    <span className="btn-text">Trước</span>
+                  </button>
+                  <span className="page-info">
+                    Trang {this.formatNumber(currentPage)} / {this.formatNumber(totalPages)}
+                  </span>
+                  <button className="pagination-btn" onClick={this.nextPage} disabled={currentPage >= totalPages}>
+                    <span className="btn-text">Sau</span>
+                    <i className="fas fa-chevron-right"></i>
+                  </button>
+                </div>
               </div>
-
-              {activeTab === 'clinics' && (
-                <div className="chart-card">
-                  <h3>So Sánh Doanh Thu Theo Cơ Sở</h3>
-                  <ResponsiveContainer width="100%" height={300}>
-                    <BarChart data={clinicsStats} layout="vertical">
-                      <CartesianGrid strokeDasharray="3 3" />
-                      <XAxis xAxisId="revenue" type="number" orientation="top" />
-                      <XAxis xAxisId="bookings" type="number" orientation="bottom" />
-                      <YAxis dataKey="clinicName" type="category" width={250} />
-                      <Tooltip />
-                      <Legend />
-                      <Bar
-                        xAxisId="revenue"
-                        dataKey="revenue"
-                        fill="#8884d8"
-                        name="Doanh Thu (VNĐ)"
-                      />
-                      <Bar
-                        xAxisId="bookings"
-                        dataKey="bookingCount"
-                        fill="#82ca9d"
-                        name="Lượt Khám"
-                      />
-                    </BarChart>
-                  </ResponsiveContainer>
-                </div>
-              )}
-
-              {activeTab === 'specialties' && (
-                <div className="chart-card">
-                  <h3>So Sánh Doanh Thu Theo Chuyên Khoa</h3>
-                  <ResponsiveContainer width="100%" height={300}>
-                    <BarChart data={specialtiesStats} layout="vertical">
-                      <CartesianGrid strokeDasharray="3 3" />
-                      <XAxis xAxisId="revenue" type="number" orientation="top" />
-                      <XAxis xAxisId="bookings" type="number" orientation="bottom" />
-                      <YAxis
-                        dataKey="specialtyName"
-                        type="category"
-                        width={150}
-                      />
-                      <Tooltip />
-                      <Legend />
-                      <Bar
-                        xAxisId="revenue"
-                        dataKey="revenue"
-                        fill="#8884d8"
-                        name="Doanh Thu (VNĐ)"
-                      />
-                      <Bar
-                        xAxisId="bookings"
-                        dataKey="bookingCount"
-                        fill="#82ca9d"
-                        name="Lượt Khám"
-                      />
-                    </BarChart>
-                  </ResponsiveContainer>
-                </div>
-              )}
+             
             </div>
           </>
         )}

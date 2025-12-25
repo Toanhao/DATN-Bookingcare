@@ -164,7 +164,9 @@
     padding: 20px;
     background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
     border-radius: 15px;
-    min-height: 400px;
+    height: 400px;
+    overflow-y: auto;
+    overflow-x: hidden;
 
     .step-title {
       font-size: 22px;
@@ -181,16 +183,38 @@
       }
     }
 
+    .clinic-info {
+      margin-top: 15px;
+      padding: 10px;
+      background-color: #f5f5f5;
+      border-radius: 10px;
+    }
+
     .step-description {
       color: #666;
       margin-bottom: 25px;
       font-size: 15px;
     }
 
+    .doctor-date-wrapper {
+      margin-top: 10px;
+    }
+
+    .doctor-fee-box {
+      margin-top: 10px;
+    }
+
+    .no-doctor-alert {
+      margin-top: 20px;
+      background-color: #fff3cd;
+      border-color: #ffc107;
+      color: #856404;
+    }
+
     .select-specialty,
     .select-clinic,
     .select-doctor {
-      margin-top: 10px;
+      margin-top: 2%;
     }
 
     .date-picker-quick {
@@ -511,6 +535,12 @@
         }
       }
     }
+    .clinic-info {
+      margin-top: 15px;
+      padding: 10px;
+      background-color: #f5f5f5;
+      border-radius: 10px;
+    }
 
     .doctor-fee-box {
       margin-top: 15px;
@@ -527,13 +557,6 @@
       }
     }
 
-    .clinic-info {
-      margin-top: 15px;
-      padding: 10px;
-      background-color: #f5f5f5;
-      border-radius: 10px;
-    }
-
     .doctor-date-wrapper {
       margin-top: 15px;
     }
@@ -548,6 +571,7 @@
     }
 
     .no-doctor-alert {
+      margin-top: 20px;
       background-color: #fff3cd;
       border-color: #ffc107;
       color: #856404;

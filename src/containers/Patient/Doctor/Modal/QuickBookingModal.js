@@ -601,6 +601,15 @@ class QuickBookingModal extends Component {
                     );
                   }
 
+                  // Kiểm tra nếu lịch đã đầy
+                  if (activeBookings >= maxPatient) {
+                    return (
+                      <span style={{ color: '#dc3545' }}>
+                        <i className="fas fa-exclamation-circle"></i> Lịch khám này đã đầy ({activeBookings}/{maxPatient}). Vui lòng chọn giờ khác hoặc ngày khác.
+                      </span>
+                    );
+                  }
+
                   return (
                     <span>
                       Hiện có {activeBookings}/{maxPatient} người đã đăng ký. Số thứ tự dự kiến của bạn: {yourNumber}/{maxPatient}.

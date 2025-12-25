@@ -8,10 +8,11 @@ import './Navigator.scss';
 class MenuGroup extends Component {
 
     render() {
-        const { name, children } = this.props;
+        const { name, children, icon } = this.props;
         return (
             <li className="menu-group">
                 <div className="menu-group-name">
+                    {icon && <i className={icon}></i>}
                     <FormattedMessage id={name} />
                 </div>
                 <ul className="menu-list list-unstyled">
@@ -193,7 +194,7 @@ class Navigator extends Component {
                         menus.map((group, groupIndex) => {
                             return (
                                 <Fragment key={groupIndex}>
-                                    <MenuGroupWithRouter name={group.name}>
+                                    <MenuGroupWithRouter name={group.name} icon={group.icon}>
                                         {group.menus ? (
                                             group.menus.map((menu, menuIndex) => {
                                                 const isMenuHasSubMenuActive = this.isMenuHasSubMenuActive(location, menu.subMenus, menu.link);

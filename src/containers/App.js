@@ -21,8 +21,6 @@ import Login from '../containers/Auth/Login';
 import Register from '../containers/Auth/Register';
 import System from '../routes/System';
 import ConfirmModal from '../components/ConfirmModal';
-import ChatWidget from '../components/ChatWidget/ChatWidget';
-import BookingChat from '../components/BookingChat/BookingChat.js';
 import DetailHandbook from './System/Doctor/HandBook/DetailHandbook.js';
 import ConfirmBooking from './Patient/ConfirmBooking.js';
 import CancelBooking from './Patient/CancelBooking.js';
@@ -105,9 +103,7 @@ class App extends Component {
               pauseOnHover
               theme="light"
             />
-            <BookingChat />
-            <ChatWidget />
-            {/* <DiagnosisWidget /> */}
+
           </div>
         </Router>
       </Fragment>

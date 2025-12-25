@@ -54,6 +54,13 @@ const statisticService = {
   getSpecialtyStats(params) {
     return axios.get('/api/statistics/specialties', { params });
   },
+
+  /**
+   * Lấy danh sách chi tiết các lượt khám
+   */
+  getBookingDetails(params) {
+    return axios.get('/api/statistics/bookings', { params });
+  },
 };
 
 export default statisticService;

@@ -15,7 +15,7 @@ class BookingHistoryModal extends Component {
     this.state = {
       bookingHistory: [],
       filteredBookings: [],
-      activeTab: 'upcoming', // upcoming, completed, cancelled
+      activeTab: 'upcoming',
       isLoading: false,
       showConfirmCancel: false,
       selectedBooking: null,
@@ -37,7 +37,7 @@ class BookingHistoryModal extends Component {
   fetchBookingHistory = async () => {
     const { userInfo } = this.props;
     if (!userInfo || !userInfo.id) {
-      // toast.error('Vui lòng đăng nhập để xem lịch sử khám!');
+      toast.error('Vui lòng đăng nhập để xem lịch sử khám!');
       return;
     }
 

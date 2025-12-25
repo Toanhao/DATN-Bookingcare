@@ -453,7 +453,7 @@ class ManagePatient extends Component {
                       className="btn-primary"
                       onClick={() => this.openExamination(b)}
                     >
-                      Khám xong
+                      Kết quả
                     </button>
                   ) : (
                     <button

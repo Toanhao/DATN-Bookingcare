@@ -58,10 +58,7 @@ class Header extends Component {
         <div className="languages">
           <span className="welcome">
             <FormattedMessage id="home-header.welcome" />
-            {userInfo
-              ? (userInfo.fullName)
-              : ''}
-            !
+            {userInfo ? userInfo.fullName : ''}!
           </span>
           <span
             className={
@@ -71,7 +68,7 @@ class Header extends Component {
               this.handleChangeLanguage(LANGUAGES.VI);
             }}
           >
-            VN
+            <i className="fas fa-globe"></i> VN
           </span>
           <span
             className={
@@ -81,7 +78,7 @@ class Header extends Component {
               this.handleChangeLanguage(LANGUAGES.EN);
             }}
           >
-            EN
+            <i className="fas fa-globe"></i> EN
           </span>
           {/* nút logout */}
           <div
@@ -89,7 +86,7 @@ class Header extends Component {
             onClick={processLogout}
             title="Log out"
           >
-            <i className="fas fa-sign-out-alt"></i>
+            <i className="fas fa-power-off"></i>
           </div>
         </div>
       </div>

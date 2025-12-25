@@ -201,6 +201,18 @@ class BookingModal extends Component {
                       );
                     }
 
+                    // Kiểm tra nếu lịch đã đầy
+                    if (activeBookings >= maxPatient) {
+                      return (
+                        <div className="queue-hint" style={{ color: '#dc3545' }}>
+                          <i className="fas fa-exclamation-circle"></i>
+                          <span>
+                            <strong>Lịch khám này đã đầy ({activeBookings}/{maxPatient}).</strong> Vui lòng chọn giờ hoặc ngày khác.
+                          </span>
+                        </div>
+                      );
+                    }
+
                     return (
                       <div className="queue-hint">
                         <i className="fas fa-info-circle"></i>

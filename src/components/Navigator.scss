@@ -24,15 +24,20 @@
     }
 
     .menu-group-name {
-      line-height: 40px;
+      line-height: 70px;
       font-size: 16px;
       font-weight: 500;
       padding: 0 15px;
       border-right: 1px solid #e0e0e0;
       transition: background-color 0.2s ease;
+      display: flex;
+      align-items: center;
+      gap: 8px;
 
-      &:first-child {
-        border-left: 1px solid #e0e0e0;
+      i {
+        font-size: 16px;
+        color: rgba(255, 255, 255, 0.8);
+        transition: all 0.3s ease;
       }
     }
 
@@ -44,11 +49,10 @@
       position: absolute;
       top: calc(100% - 2px);
       left: 0;
-      // padding: 8px 0;
       min-width: 240px;
       border: 1px solid rgba(0, 0, 0, 0.08);
       animation: slideDown 0.2s ease-out;
-      z-index: 1000;
+      z-index: 100000;
       pointer-events: none;
 
       @keyframes slideDown {
@@ -113,7 +117,7 @@
           padding: 8px 0;
           min-width: 240px;
           animation: slideRight 0.2s ease-out;
-          z-index: 1001;
+          z-index: 10001;
 
           @keyframes slideRight {
             from {

@@ -213,23 +213,22 @@ const BookingChat = () => {
       <div
         className="chat-toggle"
         onClick={() => setOpen((s) => !s)}
-        title="Hỗ trợ đặt lịch khám"
+        title="Tra cứu"
       >
         <div className="chat-toggle-content">
           <div className="chat-icon">
             {' '}
             <i className="fas fa-calendar-alt"></i>
           </div>
-          <div className="chat-toggle-text">Đặt lịch</div>
+          <div className="chat-toggle-text">Tra cứu</div>
         </div>
         {unread > 0 && <div className="unread">{unread}</div>}
       </div>
 
       <div className="chat-panel" role="dialog" aria-hidden={!open}>
         <div className="chat-header">
-          <div className="title">Hỗ trợ đặt lịch khám</div>
+          <div className="title">Hỗ trợ tra cứu thông tin</div>
           <div className="controls">
-            {/* attachment removed from chat widget - use Diagnosis widget for analysis uploads */}
             <select
               value={language}
               onChange={(e) => setLanguage(e.target.value)}
@@ -255,8 +254,8 @@ const BookingChat = () => {
           {messages.length === 0 && (
             <div className="empty">
               <div>
-                Chào bạn! Bạn có thể hỏi thông tin về đặt lịch khám, bác sĩ, và
-                các thông tin liên quan.
+                Chào bạn! Bạn có thể hỏi thông tin về đặt lịch khám, bác sĩ,
+                chuyên khoa, cơ sở y tế....
               </div>
             </div>
           )}

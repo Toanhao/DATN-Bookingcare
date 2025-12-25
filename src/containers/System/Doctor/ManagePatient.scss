@@ -1,6 +1,7 @@
 /** @format */
 
 .manage-patient-container {
+  margin-top: 90px;
   .mp-header {
     display: flex;
     align-items: center;
@@ -90,7 +91,7 @@
     }
 
     .btn-primary {
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      background: #0d6efd;
       color: #fff;
       box-shadow: 0 3px 10px rgba(102, 126, 234, 0.25);
 
@@ -493,7 +494,7 @@
   }
 
   .btn-next {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: #0b72d8;
     color: #fff;
     box-shadow: 0 4px 15px rgba(102, 126, 234, 0.35);
   }

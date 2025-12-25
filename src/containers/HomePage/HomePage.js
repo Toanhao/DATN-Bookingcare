@@ -10,6 +10,8 @@ import OutStandingDoctor from './Section/OutStandingDoctor/OutStandingDoctor';
 import './HomePage.scss';
 import 'slick-carousel/slick/slick.css';
 import 'slick-carousel/slick/slick-theme.css';
+import BookingChat from '../../components/BookingChat/BookingChat';
+import ChatWidget from '../../components/ChatWidget/ChatWidget';
 class HomePage extends Component {
   render() {
     var settings = {
@@ -29,6 +31,8 @@ class HomePage extends Component {
         <HandBook settings={settings} />
         <About />
         <HomeFooter />
+        <BookingChat />
+        <ChatWidget />
       </div>
     );
   }

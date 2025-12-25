@@ -7,6 +7,8 @@ import ManageDoctor from "../containers/System/Admin/ManageDoctor";
 import ManageSpecialty from "../containers/System/Admin/Specialty/ManageSpecialty";
 import ManageClinic from "../containers/System/Admin/Clinic/ManageClinic";
 import Statistics from "../containers/System/Admin/Statistics/Statistics";
+import DoctorStatistic from "../containers/System/Admin/Statistics/DoctorStatistic";
+import SpecialtyClinicStatistics from "../containers/System/Admin/Statistics/SpecialtyClinicStatistics";
 class System extends Component {
     render() {
         const { systemMenuPath, isLoggedIn } = this.props;
@@ -28,6 +30,16 @@ class System extends Component {
                   <Route
                     path="/system/view-statistics"
                     component={Statistics}
+                  />
+
+                  <Route
+                    path="/system/doctor-statistic"
+                    component={DoctorStatistic}
+                  />
+
+                  <Route
+                    path="/system/speciality-clinic-statistic"
+                    component={SpecialtyClinicStatistics}
                   />
 
                   <Route

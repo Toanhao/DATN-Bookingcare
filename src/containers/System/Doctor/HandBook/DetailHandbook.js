@@ -10,6 +10,7 @@ import {
 } from '../../../../services/userService';
 import _ from 'lodash';
 import HomeFooter from '../../../HomePage/HomeFooter/HomeFooter';
+import { Link } from 'react-router-dom/cjs/react-router-dom.min';
 
 class DetailHandbook extends Component {
   constructor(props) {
@@ -64,6 +65,12 @@ class DetailHandbook extends Component {
     }
   };
 
+  handleSelectDoctor = (doctorId) => {
+    if (this.props.history) {
+      this.props.history.push(`/detail-doctor/${doctorId}`);
+    }
+  };
+
   render() {
     let { dataDetailHandbook, allHandbooks } = this.state;
     let currentId = this.props.match?.params?.id;
@@ -90,9 +97,38 @@ class DetailHandbook extends Component {
                         }}
                       ></div>
                     )}
-                    <h1 className="handbook-title">
-                      {dataDetailHandbook.title}
-                    </h1>
+                    <div className="handbook-header-content">
+                      <h1 className="handbook-title">
+                        {dataDetailHandbook.title}
+                      </h1>
+                      {dataDetailHandbook.doctor &&
+                        dataDetailHandbook.doctor.user && (
+                          <div
+                            className="handbook-author"
+                            onClick={() =>
+                              this.handleSelectDoctor(dataDetailHandbook.doctor.id)
+                            }
+                          >
+                            {dataDetailHandbook.doctor.user.image && (
+                              <img
+                                src={dataDetailHandbook.doctor.user.image}
+                                alt="author"
+                                className="author-avatar"
+                              />
+                            )}
+                            <div className="author-info">
+                              <p className="author-name">
+                                Tác giả bài viết : {dataDetailHandbook.doctor.user.fullName}
+                              </p>
+                              {dataDetailHandbook.doctor.title && (
+                                <p className="author-title">
+                                  {dataDetailHandbook.doctor.title}
+                                </p>
+                              )}
+                            </div>
+                          </div>
+                        )}
+                    </div>
                   </div>
                   <div
                     className="handbook-html"

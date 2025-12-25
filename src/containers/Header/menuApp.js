@@ -2,6 +2,7 @@ export const adminMenu = [
   {
     //quản lý người dùng
     name: 'menu.admin.manage-user',
+    icon: 'fas fa-users',
     menus: [
       {
         name: 'menu.admin.crud-redux',
@@ -21,6 +22,7 @@ export const adminMenu = [
   {
     //quản lý phòng khám
     name: 'menu.admin.clinic',
+    icon: 'fas fa-hospital',
     menus: [
       {
         name: 'menu.admin.manage-clinic',
@@ -31,6 +33,7 @@ export const adminMenu = [
   {
     //quản lý chuyên khoa
     name: 'menu.admin.specialty',
+    icon: 'fas fa-microscope',
     menus: [
       {
         name: 'menu.admin.manage-specialty',
@@ -42,10 +45,19 @@ export const adminMenu = [
   {
     //Xem Thống Kê
     name: 'menu.admin.Statistical',
+    icon: 'fas fa-chart-bar',
     menus: [
       {
         name: 'menu.admin.ViewStatistics',
         link: '/system/view-statistics',
+      },
+      {
+        name: 'menu.admin.DoctorStatistics',
+        link: '/system/doctor-statistic',
+      },
+      {
+        name: 'menu.admin.SpecialityClinicStatistics',
+        link: '/system/speciality-clinic-statistic',
       },
     ],
   },
@@ -53,11 +65,12 @@ export const adminMenu = [
 
 export const doctorMenu = [
   {
-    name: 'menu.admin.manage-user',
+    name: 'menu.doctor.manage-schedule',
+    icon: 'fas fa-tasks',
     menus: [
       {
         //Quản lý kế hoạch khám bệnh của bác sĩ
-        name: 'menu.doctor.manage-schedule',
+        name: 'menu.doctor.register-schedule',
         link: '/doctor/manage-schedule',
       },
     ],
@@ -65,6 +78,7 @@ export const doctorMenu = [
   {
     //quản lý cẩm nang
     name: 'menu.admin.handbook',
+    icon: 'fas fa-book',
     menus: [
       {
         name: 'menu.admin.manage-handbook',
@@ -75,9 +89,10 @@ export const doctorMenu = [
   {
     //quản lý bệnh nhân
     name: 'menu.doctor.manage-patient',
+    icon: 'fas fa-users-cog',
     menus: [
       {
-        name: 'menu.doctor.manage-patient',
+        name: 'menu.doctor.manage-examination-shift',
         link: '/doctor/manage-patient',
       },
     ],

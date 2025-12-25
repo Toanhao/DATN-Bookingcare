@@ -35,11 +35,15 @@
       "handbook": "Handbook",
       "manage-handbook": "Manage handbook",
       "Statistical": "Statistics",
-      "ViewStatistics": "View Statistics"
+      "ViewStatistics": "Revenue and Booking Statistics",
+      "DoctorStatistics": "Doctor Statistics",
+      "SpecialityClinicStatistics": "Specialty - Health Facility Statistics"
     },
     "doctor": {
       "manage-schedule": "Manage Doctor's schedule",
-      "manage-patient": "Manage Doctor's patient"
+      "register-schedule": "Register Work Schedule",
+      "manage-patient": "Manage Doctor's patient",
+      "manage-examination-shift": "Manage Examination Shift"
     }
   },
   "manage-user": {
