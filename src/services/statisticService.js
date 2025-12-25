@@ -25,13 +25,8 @@ const statisticService = {
   /**
    * Lấy dữ liệu time series (bookings & revenue)
    */
-  getTimeSeries(params, metric) {
-    return axios.get('/api/statistics/time-series', { 
-      params: {
-        ...params,
-        metric
-      }
-    });
+  getTimeSeries(params) {
+    return axios.get('/api/statistics/time-series', { params });
   },
 
   /**

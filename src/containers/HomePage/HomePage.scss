@@ -23,7 +23,8 @@ html {
 
 .slick-prev {
   left: -10px !important;
-  z-index: 1000 !important;
+  z-index: 10 !important;
+
   height: 48px !important;
   width: 44px !important;
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
@@ -43,7 +44,7 @@ html {
 
 .slick-next {
   right: -10px !important;
-  z-index: 1000 !important;
+  z-index: 10 !important;
   height: 48px !important;
   width: 44px !important;
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);

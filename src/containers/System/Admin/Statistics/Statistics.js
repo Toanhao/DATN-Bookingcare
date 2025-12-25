@@ -101,17 +101,10 @@ class Statistics extends Component {
       const kpiData = kpiRes.data || this.state.kpi;
 
       // Lấy Time Series
-      const bookingsRes = await statisticService.getTimeSeries(
-        params,
-        'bookings'
-      );
-      const revenueRes = await statisticService.getTimeSeries(
-        params,
-        'revenue'
-      );
+      const timeSeriesRes = await statisticService.getTimeSeries(params);
 
-      const bookingsData = bookingsRes.data || [];
-      const revenueData = revenueRes.data || [];
+      const bookingsData = timeSeriesRes.data?.bookings || [];
+      const revenueData = timeSeriesRes.data?.revenue || [];
       const mergedTimeSeries = this.mergeTimeSeriesData(
         bookingsData,
         revenueData
@@ -447,20 +440,28 @@ class Statistics extends Component {
               {/* Pagination Controls */}
               <div className="pagination-controls">
                 <div className="pager">
-                  <button className="pagination-btn" onClick={this.prevPage} disabled={currentPage <= 1}>
+                  <button
+                    className="pagination-btn"
+                    onClick={this.prevPage}
+                    disabled={currentPage <= 1}
+                  >
                     <i className="fas fa-chevron-left"></i>
                     <span className="btn-text">Trước</span>
                   </button>
                   <span className="page-info">
-                    Trang {this.formatNumber(currentPage)} / {this.formatNumber(totalPages)}
+                    Trang {this.formatNumber(currentPage)} /{' '}
+                    {this.formatNumber(totalPages)}
                   </span>
-                  <button className="pagination-btn" onClick={this.nextPage} disabled={currentPage >= totalPages}>
+                  <button
+                    className="pagination-btn"
+                    onClick={this.nextPage}
+                    disabled={currentPage >= totalPages}
+                  >
                     <span className="btn-text">Sau</span>
                     <i className="fas fa-chevron-right"></i>
                   </button>
                 </div>
               </div>
-             
             </div>
           </>
         )}
