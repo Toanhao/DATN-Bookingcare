@@ -180,6 +180,7 @@ class ManageDoctor extends Component {
 
         this.setState({
           contentMarkdown: doctor.bio || '',
+          contentHTML: doctor.bio || '',
           description: doctor.title || '',
           hasOldData: true,
           fee: doctor.fee ? doctor.fee.toString() : '',

@@ -59,7 +59,7 @@ const getDoctorsFiltered = (clinicId, specialtyId, lean = true) => {
 };
 
 const getAllDoctorsUser = () => {
-  return axios.get(`/api/users/getAllDoctors`);
+  return axios.get(`/api/users/doctors`);
 };
 
 const saveDetailDoctorService = (data) => {
@@ -165,20 +165,22 @@ const postSendRemedy = (data) => {
 };
 
 const getPatientBookingHistory = (patientId) => {
-  return axios.get(`/api/get-patient-booking-history?patientId=${patientId}`);
+  return axios.get(`/api/patient/bookings?patientId=${patientId}`);
 };
 
 const cancelPatientBooking = (data) => {
-  return axios.post('/api/cancel-patient-booking', data);
+  return axios.patch('/api/patient/bookings/cancel', data);
 };
 
 // Doctor booking management
 const getDoctorBookings = ({ doctorId, workDate, status }) => {
-  return axios.get('/api/doctor/bookings', { params: { doctorId, workDate, status } });
+  return axios.get('/api/doctor/bookings', {
+    params: { doctorId, workDate, status },
+  });
 };
 
 const getBookingDetails = (bookingId) => {
-  return axios.get(`/api/doctor/bookings/${bookingId}`);
+  return axios.get(`/api/bookings/${bookingId}`);
 };
 
 // Examination flow
