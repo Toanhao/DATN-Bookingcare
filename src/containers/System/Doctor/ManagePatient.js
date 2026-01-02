@@ -42,6 +42,8 @@ class ManagePatient extends Component {
     prescription: null,
     bill: null,
     payMethod: 'Tiền mặt',
+    showPaymentQR: false,
+    paymentConfirmed: false,
   };
 
   componentDidMount() {
@@ -99,19 +101,22 @@ class ManagePatient extends Component {
         getBookingDetails(booking.id),
         getMedicines(),
       ]);
-      
+
       const record = detail?.medicalRecord;
       const prescription = record?.prescription;
       const bill = record?.bill;
-      const isHistoryMode = booking?.status === 'DONE' || this.state.activeTab === 'history';
-      
+      const isHistoryMode =
+        booking?.status === 'DONE' || this.state.activeTab === 'history';
+
       const prefetchedItems = prescription?.items?.length
-        ? prescription.items.map(({ medicineId, quantity, usage, duration }) => ({
-            medicineId,
-            quantity,
-            usage,
-            duration,
-          }))
+        ? prescription.items.map(
+            ({ medicineId, quantity, usage, duration }) => ({
+              medicineId,
+              quantity,
+              usage,
+              duration,
+            })
+          )
         : [{ medicineId: '', quantity: 1, usage: '', duration: 1 }];
 
       this.setState({
@@ -129,7 +134,16 @@ class ManagePatient extends Component {
         prescriptionNote: prescription?.note || '',
         prescription,
         bill,
-        payMethod: bill?.method && bill.method !== 'UNDEFINED' ? bill.method : 'Tiền mặt',
+        payMethod:
+          bill?.method && bill.method !== 'UNDEFINED'
+            ? bill.method
+            : 'Tiền mặt',
+        showPaymentQR:
+          bill?.method &&
+          bill.method !== 'UNDEFINED' &&
+          bill.method !== 'Tiền mặt',
+        paymentConfirmed:
+          bill?.method === 'Tiền mặt' || bill?.status === 'PAID',
       });
     } catch (e) {
       toast.error(e?.message || 'Không mở được hồ sơ khám');
@@ -153,6 +167,8 @@ class ManagePatient extends Component {
       prescriptionNote: '',
       prescription: null,
       bill: null,
+      showPaymentQR: false,
+      paymentConfirmed: false,
     });
   };
 
@@ -245,6 +261,36 @@ class ManagePatient extends Component {
     }));
   };
 
+  renderVNPayQR = (amount, bookingDetail, bill) => {
+    const bankId = '970436';
+    const accountNumber = '9347581948';
+    const accountName = 'DINH VAN TOAN';
+
+    const description = `THANH TOAN HOA DON ID ${bookingDetail?.id} ${bookingDetail?.patient?.user?.fullName}`;
+
+    // VietQR API với accountName để hiển thị tên người nhận khi quét
+    const vietqrUrl = `https://img.vietqr.io/image/${bankId}-${accountNumber}-compact2.png?amount=${amount}&addInfo=${encodeURIComponent(
+      description
+    )}&accountName=${encodeURIComponent(accountName)}`;
+
+    return (
+      <div className="qr-code">
+        <img
+          src={vietqrUrl}
+          alt="VNPay QR Code"
+          style={{ maxWidth: '250px', height: 'auto' }}
+          onError={(e) => {
+            // Fallback nếu VietQR không hoạt động
+            console.error('VietQR failed, using fallback');
+            e.target.src = `https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=${encodeURIComponent(
+              `Bank: ${accountName}\nSTK: ${accountNumber}\nAmount: ${amount} VND\nContent: ${description}`
+            )}`;
+          }}
+        />
+      </div>
+    );
+  };
+
   validatePrescription = () => {
     const { items, prescriptionNote } = this.state;
     if (items.length === 0) {
@@ -289,9 +335,16 @@ class ManagePatient extends Component {
       bill,
       payMethod,
       isHistoryMode,
+      paymentConfirmed,
     } = this.state;
 
     if (isHistoryMode) return;
+
+    // Kiểm tra xác nhận thanh toán online
+    if (payMethod !== 'Tiền mặt' && !paymentConfirmed) {
+      toast.warn('Vui lòng xác nhận đã thanh toán');
+      return;
+    }
 
     const needsMedical = !createdMedicalRecord?.id;
     const needsPrescription = !prescription?.id;
@@ -443,29 +496,31 @@ class ManagePatient extends Component {
         <tbody>
           {sortedRows.map((b) => (
             <tr key={b.id}>
-              <td>{b.queueNumber} / {b.schedule?.maxPatient}</td>
+              <td>
+                {b.queueNumber} / {b.schedule?.maxPatient}
+              </td>
               <td>{b.patient?.user?.fullName}</td>
               <td>{this.formatDateTime(b)}</td>
               <td>{b.reason}</td>
-                <td>
-                  {isPending ? (
-                    <button
-                      className="btn-primary"
-                      onClick={() => this.openExamination(b)}
-                    >
-                      Kết quả
-                    </button>
-                  ) : (
-                    <button
-                      className="btn-secondary"
-                      onClick={() => this.openDetailModal(b)}
-                    >
-                      Chi tiết
-                    </button>
-                  )}
-                </td>
-              </tr>
-            ))}
+              <td>
+                {isPending ? (
+                  <button
+                    className="btn-primary"
+                    onClick={() => this.openExamination(b)}
+                  >
+                    Kết quả
+                  </button>
+                ) : (
+                  <button
+                    className="btn-secondary"
+                    onClick={() => this.openDetailModal(b)}
+                  >
+                    Chi tiết
+                  </button>
+                )}
+              </td>
+            </tr>
+          ))}
         </tbody>
       </table>
     );
@@ -759,16 +814,75 @@ class ManagePatient extends Component {
                   <label>Phương thức thanh toán</label>
                   <select
                     value={payMethod}
-                    onChange={(e) =>
-                      this.setState({ payMethod: e.target.value })
-                    }
+                    onChange={(e) => {
+                      const method = e.target.value;
+                      this.setState({
+                        payMethod: method,
+                        showPaymentQR: method !== 'Tiền mặt',
+                        paymentConfirmed: method === 'Tiền mặt',
+                      });
+                    }}
                     disabled={bill?.status === 'PAID' || isHistoryMode}
                   >
                     <option value="Tiền mặt">Tiền mặt</option>
-                    <option value="MOMO">Momo</option>
-                    <option value="Chuyển khoản">Chuyển khoản</option>
+                    <option value="Thanh toán online">
+                      Thanh toán online (VNPay)
+                    </option>
                   </select>
                 </div>
+
+                {this.state.showPaymentQR && (
+                  <div className="payment-qr-section">
+                    <div className="qr-container">
+                      <h4>
+                        <i className="fas fa-qrcode"></i> Quét mã QR để thanh
+                        toán
+                      </h4>
+                      {this.renderVNPayQR(totalFee, bookingDetail, bill)}
+                      <div className="payment-info">
+                        <div className="info-row">
+                          <span>Ngân hàng:</span>
+                          <strong>Vietcombank</strong>
+                        </div>
+                        <div className="info-row">
+                          <span>Số tài khoản:</span>
+                          <strong>9347581948</strong>
+                        </div>
+                        <div className="info-row">
+                          <span>Chủ tài khoản:</span>
+                          <strong>DINH VAN TOAN</strong>
+                        </div>
+                        <div className="info-row">
+                          <span>Số tiền:</span>
+                          <strong>{totalFee?.toLocaleString('vi-VN')} đ</strong>
+                        </div>
+                        <div className="info-row">
+                          <span>Nội dung:</span>
+                          <strong>
+                            THANH TOAN HOA DON ID{bookingDetail?.id} {bookingDetail?.patient?.user?.fullName}
+                          </strong>
+                        </div>
+                      </div>
+                      {!this.state.paymentConfirmed && (
+                        <button
+                          className="btn-confirm-payment"
+                          onClick={() =>
+                            this.setState({ paymentConfirmed: true })
+                          }
+                        >
+                          <i className="fas fa-check" /> Xác nhận đã thanh toán
+                        </button>
+                      )}
+                      {this.state.paymentConfirmed && (
+                        <div className="payment-confirmed">
+                          <i className="fas fa-check-circle" /> Đã xác nhận
+                          thanh toán
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                )}
+
                 <div className="info">
                   {createdMedicalRecord && (
                     <div>
